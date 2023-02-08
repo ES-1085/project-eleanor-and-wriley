@@ -20,6 +20,8 @@ Great Duck Island is an important seabird colony in the Gulf of Maine--it is the
 
 ## 2. Data
 
+```{r echo = FALSE}
+```
 
 
 ## 3. Data analysis plan

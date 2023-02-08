@@ -63,10 +63,13 @@ collected on Great Duck. There are aspects of this data that have been
 well analyzed, and others that are relatively untouched. Our hope for
 this project is to create successful visualizations and comprehensive
 analysis from this long term data. We also hope to continue the work of
-Addison, and continue to organize data from Great Duck. We hope to add
-meta data information and create a central location from which future
-students can access this valuable data from the last 25 years.
+Addison, and continue to organize data from Great Duck. Finally, we plan
+to create additional metadata where possible, and create a central
+location from which future students can access this valuable data from
+the last 25 years.
 
 ## 2. Data
+
+`glimpse(gulls2021)`
 
 ## 3. Data analysis plan
