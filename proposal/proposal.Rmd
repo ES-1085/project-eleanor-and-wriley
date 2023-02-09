@@ -7,6 +7,7 @@ output: github_document
 ```{r load-packages, message = FALSE}
 library(tidyverse)
 library(broom)
+library(sf)
 ```
 
 ## 1. Introduction
@@ -20,11 +21,44 @@ Great Duck Island is an important seabird colony in the Gulf of Maine--it is the
 
 ## 2. Data
 
-```{r echo = FALSE}
+A bare-bones example of a shapefile of gull nests mapped on the south end:
+```{r gull shape file, echo = FALSE}
+gullshape <- read_sf("data/gulls2021")
+head(gullshape)
+plot(gullshape)
+```
+
+An example of raw data from the 2022 petrel survey:
+
+```{r petrel survey data, echo = FALSE}
+#NOTE: Wriley, to read in data, find the folder that this project made on your computer, go to the proposal folder within that folder, and plop your data files into the data folder within the proposal folder:
+#filepath: initialfilejunk/project-eleanor-and-wriley/proposal/data
+#then you can read in data with this syntax:
+petrelsurvey <- read_csv("data/islandestimatefinal.csv")
+head(petrelsurvey)
+```
+
+An example of some petrel band return data from 2022 (which birds were found or banded in which burrow and their morphometrics):
+```{r petrel bands, echo = FALSE}
+petrelbands <- read_csv("data/longfidelity.csv")
+head(petrelbands)
 ```
 
 
 ## 3. Data analysis plan
 
+Much of our data analysis will involve mapping spatial data, so an early part of our data analysis will include learning to work with this sort of data. NOTE: Eleanor finish this paragraph
 
+```{r petrel exploratory visualization, echo = FALSE}
+#Eleanor visualize some simple petrel data
+#will probably be burrows/subplot mapped over latitude to show their bimodal distribution
+#will also do some interesting summary statistics for the population estimate perhaps
+#what else for an initial analysis? Could do my barplot of past petrel counts or something
+#And if you plop some gull data in the data folder I can play with that too
+```
+
+```{r gull exploratory visualization, echo = FALSE}
+#Wriley visualize some simple gull data
+#Perhaps one of your by-habitat barplots from your lighting talk? 
+```
 
