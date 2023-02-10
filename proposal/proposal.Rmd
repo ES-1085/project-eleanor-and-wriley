@@ -34,6 +34,7 @@ An example of raw data from the 2022 petrel survey:
 ```{r petrel survey data, echo = FALSE}
 petrelsurvey <- read_csv("data/islandestimatefinal.csv")
 head(petrelsurvey)
+#hi wriley
 ```
 
 An example of some petrel band return data from 2022 (which birds were found or banded in which burrow and their morphometrics):
