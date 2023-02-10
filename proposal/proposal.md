@@ -168,7 +168,7 @@ survey–it creates a clear map of Great Duck.
     ## ℹ Use `spec()` to retrieve the full column specification for this data.
     ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
 
-    ## Warning: Removed 10 rows containing missing values (`geom_point()`).
+    ## Warning: Removed 10 rows containing missing values (geom_point).
 
 ![](proposal_files/figure-gfm/petrel%20exploratory%20visualization-1.png)<!-- -->![](proposal_files/figure-gfm/petrel%20exploratory%20visualization-2.png)<!-- -->
 

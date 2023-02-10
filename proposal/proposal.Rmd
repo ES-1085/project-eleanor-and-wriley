@@ -107,7 +107,7 @@ fledging2022 %>%
   scale_fill_viridis_d()+
   labs(caption = "Error Bars Denote Standard Error", title = "Median # of chicks fledged by habitat")+
   ylab("Median number of chicks fledged")
-
+#hghg
 #Let's print some summary statistics with fledging2022 also? 
 
 ```
