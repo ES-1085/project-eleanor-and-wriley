@@ -150,48 +150,64 @@ Much of our data analysis will involve mapping spatial data, so an early
 part of our data analysis will include learning to work with this sort
 of data. We hope to give ourselves a primer in using the r packages
 “leaflet” and “sf.” We have a continuous series of maps from 1999 - 2022
-that show the location of each nest. We hope to create a series of
-exploratory series of data visualizations showing the changing
-distribution of gull nests that breed on the south end of Great Duck. If
-we are able to, we would like create an animation demonstrating the
-changes in distribution. The main variables of interest here in these
-spatial visualizations are location within the south end colony and
-year. As an interesting supplement to this, we will also create a bar
-graph demonstrating island wide shifts in distribution. Gulls have
+that show the locations of nearly every gull nest on GDI each year. We
+hope to create an exploratory series of data visualizations showing the
+changing distribution of gull nests that breed on the south end of Great
+Duck. If we are able to, we would like create an animation demonstrating
+the changes in distribution. The main variables of interest here in
+these spatial visualizations are locations within the south end colony
+and year. As an interesting supplement to this, we will also create a
+bar graph demonstrating island wide shifts in distribution. Gulls have
 nested at 4 different sub colonies. While the total number of gulls has
 changed only slightly in the last 25 years, their distribution between
-these four sub colonies has changhed dramatically.
+these four sub colonies has changed dramatically.
 
 Another long term data set we have is from tower count observations.
 Each morning, the Great Duck Team stands in the lighthouse at 0700 and
 counts all birds in sight. This data set also goes back 20+ years. We
 would like to create a series of graphs demonstrating the changes in the
 abundance of birds that we have counted. The variables of interest here
-are species, count, and year.
+are species, count, and year. This data requires additional tidying
+before we can easily work with it, and getting it into a workable form
+will be one of our first tasks.
 
-We will create a series of visualizations looking at chick check data.
-Chick check is where a team of students selects a sample of nests that
-they visit each day to record weight and survival status. This allows us
-to look at growth curves and survival rates of chicks. We have a tidy
-version of this data from 2022 that we will definitely visualize. There
-are many variables of interest in this 2022 data: habitat of nest,
+We hope to create a series of visualizations looking at chick check
+data. Chick check is where a team of students selects a sample of nests
+that they visit each day to record weight and survival status. This
+allows us to look at growth curves and survival rates of chicks. We have
+a tidy version of this data from 2022 that we will definitely visualize.
+There are many variables of interest in this 2022 data: habitat of nest,
 clutch size, hatch sequence, growth rates and survival status are the
 ones we will explore for this project. We also have data ranging back 20
 or so years. These data are in disparate formats. If we have the time,
 we will begin tidying these data so that we can compare them. There is a
 lot of potential for comparing data from across the years, but there is
 also a lot of work that would need to be done to do this. If we
-succeeded, we could compare over all fledging success and average growth
+succeeded, we could compare overall fledging success and average growth
 curves across the years.
 
-An interesting visualization of 2022 petrel survey data, where the
-number of burrows per survey plot is mapped over longitude and latitude.
-The bimodal distribution of burrows across latitude is very interesting
-to us.
+If we have time, we may also look at some Leach’s Storm-Petrel data from
+the 2022 population survey. This is interesting spatial data, and we
+hope that by considering it carefully we may be able to produce some
+insights on how future counts of this type, which are extremely
+time-intensive and done infrequently, could be designed for maximum
+efficiency.
 
-Plotting the latitude and longitudes of each subplot (so that each
-subplot is a point) shows how well we covered the island with our
-survey–it creates a clear map of Great Duck.
+Here are two examples of exploratory visualizations that show some
+interesting features of the 2022 petrel survey data. In the first, the
+total number of burrows found in each survey subplot is shown mapped
+over the latitude of the survey subplot. There is a clear bimodal
+distribution–the center of the island, which is a wetland, is absent of
+petrel burrows. However, why the peaks of the distributions are where
+they are is unclear and could merit future consideration about the
+habitats of those areas.
+
+In the second, the latitude and longitude of each survey subplot are
+places on the x and y axes, and the points are colored according to the
+total number of burrows found in each subplot. The shape of GDI is
+formed, indicating that we did a pretty good job covering the whole
+island in our survey. This visualization begins to show hotspots of
+petrel activity on the island.
 
     ## Rows: 620 Columns: 12
     ## ── Column specification ────────────────────────────────────────────────────────
@@ -202,16 +218,28 @@ survey–it creates a clear map of Great Duck.
     ## ℹ Use `spec()` to retrieve the full column specification for this data.
     ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
 
-    ## Warning: Removed 10 rows containing missing values (geom_point).
+    ## Warning: Removed 10 rows containing missing values (`geom_point()`).
 
 ![](proposal_files/figure-gfm/petrel%20exploratory%20visualization-1.png)<!-- -->![](proposal_files/figure-gfm/petrel%20exploratory%20visualization-2.png)<!-- -->
 
-Sample distribution of survey plot populations from the 2022 petrel
-survey:
+Our 2022 petrel survey involved breaking the entire island into 50x50
+meter grid squares. We surveyed two 10x10m subplots in each grid square.
+The sample distribution for the observed (actually counted) number of
+burrows per 50 meter grid square looks like this:
 ![](proposal_files/figure-gfm/petrel%20summary%20statistics-1.png)<!-- -->
+Finally, here are some summary statistics for the number of burrows per
+survey plot:
 
-An example of a visualization from 2022 gull data, looking at fledging
-success by habitat:
+    ##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+    ##   0.000   0.000   0.000   2.516   2.000 145.000
+
+On average, our subplots contained 2.54 petrel burrows. The median is
+zero. This is clearly very strongly skewed data, which is one reason why
+we chose to go with a bootstrapping approach when turning the survey
+data into a population estimate.
+
+Here’s an example of a visualization from 2022 gull data, looking at
+fledging success by habitat:
 
     ## New names:
     ## Rows: 1087 Columns: 10
@@ -233,4 +261,23 @@ success by habitat:
 
 ![](proposal_files/figure-gfm/fledging%20success%20barplot%20in%20ggplot-1.png)<!-- -->![](proposal_files/figure-gfm/fledging%20success%20barplot%20in%20ggplot-2.png)<!-- -->
 
+It is very interesting to see the difference between mean and median
+fledging success, and that’s something we would like to explore further.
+This next visualization sheds some light on it:
+
 ![](proposal_files/figure-gfm/gull%20exploratory%20visualization-1.png)<!-- -->
+
+And here are some summary stats that get at the same thing:
+
+    ## # A tibble: 3 × 5
+    ##   habitat          medfledge meanfledge medclutch meanclutch
+    ##   <chr>                <dbl>      <dbl>     <dbl>      <dbl>
+    ## 1 Berm                     1       1.44         3       2.89
+    ## 2 Dense Vegetation         2       1.8          3       3   
+    ## 3 Meadow                   2       1.8          3       2.85
+
+It’s interesting to us that the berm has such a difference between its
+median and mean fledging success, as well as the lowest overall fledging
+success of the habitats. At a glance, clutch size doesn’t appear
+different enough to help explain this difference. It merits further
+investigation.
