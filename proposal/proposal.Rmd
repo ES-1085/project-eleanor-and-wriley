@@ -46,11 +46,17 @@ head(petrelbands)
 
 ## 3. Data analysis plan
 
-Much of our data analysis will involve mapping spatial data, so an early part of our data analysis will include learning to work with this sort of data. NOTE: Eleanor finish this paragraph
+Much of our data analysis will involve mapping spatial data, so an early part of our data analysis will include learning to work with this sort of data. We hope to give ourselves a primer in using the r packages "leaflet" and "sf." We have a continuous series of maps from 1999 - 2022 that show the location of each nest. We hope to create a series of exploratory series of data visualizations showing the changing distribution of gull nests that breed on the south end of Great Duck. If we are able to, we would like create an animation demonstrating the changes in distribution. The main variables of interest here in these spatial visualizations are location within the south end colony and year. As an interesting supplement to this, we will also create a bar graph demonstrating island wide shifts in distribution. Gulls have nested at 4 different sub colonies. While the total number of gulls has changed only slightly in the last 25 years, their distribution between these four sub colonies has changhed dramatically.
+
+Another long term data set we have is from tower count observations. Each morning, the Great Duck Team stands in the lighthouse at 0700 and counts all birds in sight. This data set also goes back 20+ years. We would like to create a series of graphs demonstrating the changes in the abundance of birds that we have counted. The variables of interest here are species, count, and year. 
+
+We will create a series of visualizations looking at chick check data. Chick check is where a team of students selects a sample of nests that they visit each day to record weight and survival status. This allows us to look at growth curves and survival rates of chicks. We have a tidy version of this data from 2022 that we will definitely visualize. There are many variables of interest in this 2022 data: habitat of nest, clutch size, hatch sequence, growth rates and survival status are the ones we will explore for this project. We also have data ranging back 20 or so years. These data are in disparate formats. If we have the time, we will begin tidying these data so that we can compare them. There is a lot of potential for comparing data from across the years, but there is also a lot of work that would need to be done to do this. If we succeeded, we could compare over all fledging success and average growth curves across the years.
 
 An interesting visualization of 2022 petrel survey data, where the number of burrows per survey plot is mapped over longitude and latitude. The bimodal distribution of burrows across latitude is very interesting to us. 
 
 Plotting the latitude and longitudes of each subplot (so that each subplot is a point) shows how well we covered the island with our survey--it creates a clear map of Great Duck. 
+
+
 ```{r petrel exploratory visualization, echo = FALSE}
 petrelcoords <- read_csv("data/subplotscoords.csv")
 ggplot(petrelcoords, aes(x = latitude, y = Total))+
