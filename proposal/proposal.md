@@ -175,6 +175,6 @@ success by habitat:
     ## • `nest...4` -> `nest...6`
     ## • `nest...5` -> `nest...7`
 
-![](proposal_files/figure-gfm/gull%20exploratory%20visualization-1.png)<!-- -->![](proposal_files/figure-gfm/gull%20exploratory%20visualization-2.png)<!-- -->
+![](proposal_files/figure-gfm/fledging%20success%20barplot%20in%20ggplot-1.png)<!-- -->![](proposal_files/figure-gfm/fledging%20success%20barplot%20in%20ggplot-2.png)<!-- -->
 
-![](proposal_files/figure-gfm/fledging%20success%20barplot%20in%20ggplot-1.png)<!-- -->
+![](proposal_files/figure-gfm/gull%20exploratory%20visualization-1.png)<!-- -->

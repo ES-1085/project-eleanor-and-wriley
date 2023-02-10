@@ -32,9 +32,6 @@ plot(gullshape)
 An example of raw data from the 2022 petrel survey:
 
 ```{r petrel survey data, echo = FALSE}
-#NOTE: Wriley, to read in data, find the folder that this project made on your computer, go to the proposal folder within that folder, and plop your data files into the data folder within the proposal folder:
-#filepath: initialfilejunk/project-eleanor-and-wriley/proposal/data
-#then you can read in data with this syntax:
 petrelsurvey <- read_csv("data/islandestimatefinal.csv")
 head(petrelsurvey)
 ```
@@ -70,6 +67,11 @@ fledging2022 <- read_csv("data/fledging_final2022.csv")
 ```
 
 ```{r fledging success barplot in ggplot, echo = FALSE}
+
+#create standard error function
+se <- function(x) sd(x)/sqrt(length(x))
+#Eleanor check that this is doing what it's supposed to
+
 fledging2022 %>% 
   group_by(habitat) %>% 
   summarise(mean = mean(fledging_success), se = se(fledging_success)) %>%
@@ -78,7 +80,8 @@ fledging2022 %>%
   geom_errorbar(aes(ymin=mean-se, ymax=mean+se), width=.2,
                  position=position_dodge(.9))+
   scale_fill_viridis_d()+
-  labs(caption = "Error Bars Denote Standard Error")
+  labs(caption = "Error Bars Denote Standard Error", title = " Mean # of Chicks Fledged by Habitat")+
+  ylab("Mean number of chicks fledged")
 
 fledging2022 %>% 
   group_by(habitat) %>% 
@@ -88,14 +91,19 @@ fledging2022 %>%
   geom_errorbar(aes(ymin=median-se, ymax=median+se), width=.2,
                  position=position_dodge(.9))+
   scale_fill_viridis_d()+
-  labs(caption = "Error Bars Denote Standard Error")
+  labs(caption = "Error Bars Denote Standard Error", title = "Median # of chicks fledged by habitat")+
+  ylab("Median number of chicks fledged")
+
+#Let's print some summary statistics with fledging2022 also? 
 
 ```
+
 ```{r gull exploratory visualization, echo = FALSE}
 ggplot(fledging2022, aes(x = fledging_success))+
   geom_bar(fill = "gray" , color = "black")+
   facet_wrap(~habitat) +
-  theme_bw()
+  theme_bw()+
+  labs(title = "Count of nests that fledged 0 - 3 chicks by habitat")
 ```
 
 
