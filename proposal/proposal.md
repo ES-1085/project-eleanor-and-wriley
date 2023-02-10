@@ -152,7 +152,29 @@ of data. NOTE: Eleanor finish this paragraph
 
 An interesting visualization of 2022 petrel survey data, where the
 number of burrows per survey plot is mapped over longitude and latitude.
-The bimodal distribution in longitude is very interesting to us.
+The bimodal distribution of burrows across latitude is very interesting
+to us.
+
+Plotting the latitude and longitudes of each subplot (so that each
+subplot is a point) shows how well we covered the island with our
+survey–it creates a clear map of Great Duck.
+
+    ## Rows: 620 Columns: 12
+    ## ── Column specification ────────────────────────────────────────────────────────
+    ## Delimiter: ","
+    ## chr (5): Plot, Date, Surveyors, Notes, GISID
+    ## dbl (7): Subplot, Active, Inactive, Maybe, Total, longitude, latitude
+    ## 
+    ## ℹ Use `spec()` to retrieve the full column specification for this data.
+    ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+
+    ## Warning: Removed 10 rows containing missing values (`geom_point()`).
+
+![](proposal_files/figure-gfm/petrel%20exploratory%20visualization-1.png)<!-- -->![](proposal_files/figure-gfm/petrel%20exploratory%20visualization-2.png)<!-- -->
+
+Sample distribution of survey plot populations from the 2022 petrel
+survey:
+![](proposal_files/figure-gfm/petrel%20summary%20statistics-1.png)<!-- -->
 
 An example of a visualization from 2022 gull data, looking at fledging
 success by habitat:

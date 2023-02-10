@@ -47,22 +47,35 @@ head(petrelbands)
 
 Much of our data analysis will involve mapping spatial data, so an early part of our data analysis will include learning to work with this sort of data. NOTE: Eleanor finish this paragraph
 
-An interesting visualization of 2022 petrel survey data, where the number of burrows per survey plot is mapped over longitude and latitude. The bimodal distribution in longitude is very interesting to us. 
+An interesting visualization of 2022 petrel survey data, where the number of burrows per survey plot is mapped over longitude and latitude. The bimodal distribution of burrows across latitude is very interesting to us. 
+
+Plotting the latitude and longitudes of each subplot (so that each subplot is a point) shows how well we covered the island with our survey--it creates a clear map of Great Duck. 
 ```{r petrel exploratory visualization, echo = FALSE}
-#Eleanor visualize some simple petrel data
-#will probably be burrows/subplot mapped over latitude to show their bimodal distribution
-#will also do some interesting summary statistics for the population estimate perhaps
-#what else for an initial analysis? Could do my barplot of past petrel counts or something
-#And if you plop some gull data in the data folder I can play with that too
+petrelcoords <- read_csv("data/subplotscoords.csv")
+ggplot(petrelcoords, aes(x = latitude, y = Total))+
+  geom_point()
+ggplot(petrelcoords, aes(x = longitude, y = latitude))+
+  geom_point()
+  
+```
+
+Sample distribution of survey plot populations from the 2022 petrel survey:
+```{r petrel summary statistics, echo = FALSE}
+
+petrelsurvey %>% 
+  filter(!is.na(Subplot)) %>%
+  group_by(Plot) %>%
+  summarize(burrows_obs = sum(Total),n_subplots=n()) %>% 
+  ggplot(aes(x = (burrows_obs*0.46)))+
+  geom_histogram(binwidth = 1)+
+  xlab("Observed number of active burrows per 50x50 meter plot")
+
 ```
 
 An example of a visualization from 2022 gull data, looking at fledging success by habitat:
 
 ```{r reading gull data, echo = FALSE}
-#Wriley visualize some simple gull data
-#chickcheck2022 <- read_csv("/Users/wrileyhodge/Wriley and Eleanor Final Project/data/chickchecktidy2022.csv") #the only way I can get this to read in is by typing out my whole path....
 chickcheck2022 <- read_csv("data/chickchecktidy2022.csv")
-#fledging2022 <- read_csv("/Users/wrileyhodge/Wriley and Eleanor Final Project/data/fledging_final2022.csv")
 fledging2022 <- read_csv("data/fledging_final2022.csv")
 ```
 
