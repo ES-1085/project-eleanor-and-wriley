@@ -63,40 +63,22 @@ An example of a visualization from 2022 gull data, looking at fledging success b
 
 ```{r reading gull data, echo = FALSE}
 #Wriley visualize some simple gull data
-library(readr)
 #chickcheck2022 <- read_csv("/Users/wrileyhodge/Wriley and Eleanor Final Project/data/chickchecktidy2022.csv") #the only way I can get this to read in is by typing out my whole path....
 chickcheck2022 <- read_csv("data/chickchecktidy2022.csv")
 #fledging2022 <- read_csv("/Users/wrileyhodge/Wriley and Eleanor Final Project/data/fledging_final2022.csv")
 fledging2022 <- read_csv("data/fledging_final2022.csv")
 ```
 
-
-```{r gull exploratory visualization, echo = FALSE}
-#I'm so annoyed I literally can't figure out how to make this graph in ggplot and I'm sad
-barfledge=tapply(fledging2022$fledging_success,fledging2022$habitat,mean)
-bar1=barplot(barfledge,xlab="Habitat",ylab="Fledging Success",ylim=c(0,3),col="darkslategray3", main="Fledging Success in Each Habitat")
-
-se=function(x)
-{y = x[!is.na(x)] # remove the missing values
-sqrt(var(as.vector(y))/length(y))} # calculate SE
-plot.se=tapply(fledging2022$fledging_success, fledging2022$habitat, se)
-
-plot.err=tapply(fledging2022$fledging_success, fledging2022$habitat,sd)
-nlo=barfledge-plot.se; nhi=barfledge+plot.se
-segments(x0=bar1, x1=bar1, y0=nlo, y1=nhi) # bars
-segments(x0=bar1-.1, x1=bar1+0.1, y0=nhi, y1=nhi) # lower whiskers
-segments(x0=bar1-.1, x1=bar1+0.1, y0=nlo, y1=nlo) # upper whiskers
-
-ggplot(fledging2022, aes(x = fledging_success))+
-  geom_bar(fill = "gray" , color = "black")+
-  facet_wrap(~habitat) +
-  theme_bw()
-
-
-```
-
 ```{r fledging success barplot in ggplot, echo = FALSE}
-#I think you have to use geom_col()
+fledging2022 %>% 
+  group_by(habitat) %>% 
+  summarise(mean = mean(fledging_success), se = se(fledging_success)) %>%
+  ggplot(aes(x = habitat, y= mean, fill = habitat))+
+  geom_col()+
+  geom_errorbar(aes(ymin=mean-se, ymax=mean+se), width=.2,
+                 position=position_dodge(.9))+
+  scale_fill_viridis_d()+
+  labs(caption = "Error Bars Denote Standard Error")
 
 fledging2022 %>% 
   group_by(habitat) %>% 
@@ -109,6 +91,13 @@ fledging2022 %>%
   labs(caption = "Error Bars Denote Standard Error")
 
 ```
+```{r gull exploratory visualization, echo = FALSE}
+ggplot(fledging2022, aes(x = fledging_success))+
+  geom_bar(fill = "gray" , color = "black")+
+  facet_wrap(~habitat) +
+  theme_bw()
+```
+
 
 
 
