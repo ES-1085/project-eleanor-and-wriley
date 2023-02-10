@@ -50,6 +50,7 @@ head(petrelbands)
 
 Much of our data analysis will involve mapping spatial data, so an early part of our data analysis will include learning to work with this sort of data. NOTE: Eleanor finish this paragraph
 
+An interesting visualization of 2022 petrel survey data, where the number of burrows per survey plot is mapped over longitude and latitude. The bimodal distribution in longitude is very interesting to us. 
 ```{r petrel exploratory visualization, echo = FALSE}
 #Eleanor visualize some simple petrel data
 #will probably be burrows/subplot mapped over latitude to show their bimodal distribution
@@ -58,11 +59,15 @@ Much of our data analysis will involve mapping spatial data, so an early part of
 #And if you plop some gull data in the data folder I can play with that too
 ```
 
+An example of a visualization from 2022 gull data, looking at fledging success by habitat:
+
 ```{r reading gull data, echo = FALSE}
 #Wriley visualize some simple gull data
 library(readr)
-chickcheck2022 <- read_csv("/Users/wrileyhodge/Wriley and Eleanor Final Project/data/chickchecktidy2022.csv") #the only way I can get this to read in is by typing out my whole path....
-fledging2022 <- read_csv("/Users/wrileyhodge/Wriley and Eleanor Final Project/data/fledging_final2022.csv")
+#chickcheck2022 <- read_csv("/Users/wrileyhodge/Wriley and Eleanor Final Project/data/chickchecktidy2022.csv") #the only way I can get this to read in is by typing out my whole path....
+chickcheck2022 <- read_csv("data/chickchecktidy2022.csv")
+#fledging2022 <- read_csv("/Users/wrileyhodge/Wriley and Eleanor Final Project/data/fledging_final2022.csv")
+fledging2022 <- read_csv("data/fledging_final2022.csv")
 ```
 
 
@@ -86,7 +91,26 @@ ggplot(fledging2022, aes(x = fledging_success))+
   geom_bar(fill = "gray" , color = "black")+
   facet_wrap(~habitat) +
   theme_bw()
+
+
 ```
+
+```{r fledging success barplot in ggplot, echo = FALSE}
+#I think you have to use geom_col()
+
+fledging2022 %>% 
+  group_by(habitat) %>% 
+  summarise(median = median(fledging_success), se = se(fledging_success)) %>%
+  ggplot(aes(x = habitat, y= median, fill = habitat))+
+  geom_col()+
+  geom_errorbar(aes(ymin=median-se, ymax=median+se), width=.2,
+                 position=position_dodge(.9))+
+  scale_fill_viridis_d()+
+  labs(caption = "Error Bars Denote Standard Error")
+
+```
+
+
 
 
 

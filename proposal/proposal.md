@@ -150,6 +150,13 @@ Much of our data analysis will involve mapping spatial data, so an early
 part of our data analysis will include learning to work with this sort
 of data. NOTE: Eleanor finish this paragraph
 
+An interesting visualization of 2022 petrel survey data, where the
+number of burrows per survey plot is mapped over longitude and latitude.
+The bimodal distribution in longitude is very interesting to us.
+
+An example of a visualization from 2022 gull data, looking at fledging
+success by habitat:
+
     ## New names:
     ## Rows: 1087 Columns: 10
     ## ── Column specification
@@ -169,3 +176,5 @@ of data. NOTE: Eleanor finish this paragraph
     ## • `nest...5` -> `nest...7`
 
 ![](proposal_files/figure-gfm/gull%20exploratory%20visualization-1.png)<!-- -->![](proposal_files/figure-gfm/gull%20exploratory%20visualization-2.png)<!-- -->
+
+![](proposal_files/figure-gfm/fledging%20success%20barplot%20in%20ggplot-1.png)<!-- -->
