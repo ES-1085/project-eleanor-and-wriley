@@ -6,6 +6,7 @@ Eleanor and Wriley
 library(tidyverse)
 library(broom)
 library(sf)
+library(forcats)
 ```
 
 ## 1. Introduction
@@ -148,3 +149,23 @@ found or banded in which burrow and their morphometrics):
 Much of our data analysis will involve mapping spatial data, so an early
 part of our data analysis will include learning to work with this sort
 of data. NOTE: Eleanor finish this paragraph
+
+    ## New names:
+    ## Rows: 1087 Columns: 10
+    ## ── Column specification
+    ## ──────────────────────────────────────────────────────── Delimiter: "," chr
+    ## (2): habitat, nest...6 dbl (8): ...1, clutch, hatch_seq, chick, nest...7, date,
+    ## weight, chickage
+    ## ℹ Use `spec()` to retrieve the full column specification for this data. ℹ
+    ## Specify the column types or set `show_col_types = FALSE` to quiet this message.
+    ## Rows: 53 Columns: 5
+    ## ── Column specification
+    ## ──────────────────────────────────────────────────────── Delimiter: "," chr
+    ## (1): habitat dbl (4): nest_number, clutch, fledging_success, Percent Success
+    ## ℹ Use `spec()` to retrieve the full column specification for this data. ℹ
+    ## Specify the column types or set `show_col_types = FALSE` to quiet this message.
+    ## • `` -> `...1`
+    ## • `nest...4` -> `nest...6`
+    ## • `nest...5` -> `nest...7`
+
+![](proposal_files/figure-gfm/gull%20exploratory%20visualization-1.png)<!-- -->![](proposal_files/figure-gfm/gull%20exploratory%20visualization-2.png)<!-- -->

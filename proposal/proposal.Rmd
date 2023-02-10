@@ -8,6 +8,7 @@ output: github_document
 library(tidyverse)
 library(broom)
 library(sf)
+library(forcats)
 ```
 
 ## 1. Introduction
@@ -57,8 +58,35 @@ Much of our data analysis will involve mapping spatial data, so an early part of
 #And if you plop some gull data in the data folder I can play with that too
 ```
 
-```{r gull exploratory visualization, echo = FALSE}
+```{r reading gull data, echo = FALSE}
 #Wriley visualize some simple gull data
-#Perhaps one of your by-habitat barplots from your lighting talk? 
+library(readr)
+chickcheck2022 <- read_csv("/Users/wrileyhodge/Wriley and Eleanor Final Project/data/chickchecktidy2022.csv") #the only way I can get this to read in is by typing out my whole path....
+fledging2022 <- read_csv("/Users/wrileyhodge/Wriley and Eleanor Final Project/data/fledging_final2022.csv")
 ```
+
+
+```{r gull exploratory visualization, echo = FALSE}
+#I'm so annoyed I literally can't figure out how to make this graph in ggplot and I'm sad
+barfledge=tapply(fledging2022$fledging_success,fledging2022$habitat,mean)
+bar1=barplot(barfledge,xlab="Habitat",ylab="Fledging Success",ylim=c(0,3),col="darkslategray3", main="Fledging Success in Each Habitat")
+
+se=function(x)
+{y = x[!is.na(x)] # remove the missing values
+sqrt(var(as.vector(y))/length(y))} # calculate SE
+plot.se=tapply(fledging2022$fledging_success, fledging2022$habitat, se)
+
+plot.err=tapply(fledging2022$fledging_success, fledging2022$habitat,sd)
+nlo=barfledge-plot.se; nhi=barfledge+plot.se
+segments(x0=bar1, x1=bar1, y0=nlo, y1=nhi) # bars
+segments(x0=bar1-.1, x1=bar1+0.1, y0=nhi, y1=nhi) # lower whiskers
+segments(x0=bar1-.1, x1=bar1+0.1, y0=nlo, y1=nlo) # upper whiskers
+
+ggplot(fledging2022, aes(x = fledging_success))+
+  geom_bar(fill = "gray" , color = "black")+
+  facet_wrap(~habitat) +
+  theme_bw()
+```
+
+
 
