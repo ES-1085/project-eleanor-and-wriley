@@ -43,6 +43,7 @@ population_distribution_gulls %>%
                values_to = "total") %>%
   ggplot(aes(y = total, x = YEAR, fill = location)) +
   geom_col(position = "dodge", stat = "identity") +
+   scale_fill_viridis(discrete = T) +
   theme_ipsum()
 ```
 
