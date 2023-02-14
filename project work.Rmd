@@ -109,4 +109,9 @@ leaflet(data = gullshape) %>%
 
 
 
+```{r}
+ggplot(outline) +
+  geom_sf(data = outline)+
+  geom_sf(data = gullshape)
+```
 
