@@ -15,16 +15,20 @@ library(hrbrthemes)
 
 ## R Markdown
 
-```{r}
+
+##Island Counts over Time
+```{r reading in data}
 data <- read_csv("data/chickchecktidy2022.csv")
 ```
 
-```{r}
+```{r reading in data cont}
 population_distribution_gulls <- read_xlsx(str_c("data/gull_pop_distribution_2022.xlsx")) 
 population_distribution_gulls$West[3]=193 
 ```
 
-```{r}
+```{r dodged barplot}
+
+#it would be good to split this up into a data tidying section and then the visuals
 ggplot(population_distribution_gulls, aes(x = `YEAR`, y = `Total Corrected`)) +
   geom_col()
 
@@ -59,7 +63,7 @@ population_distribution_gulls %>%
   theme_ipsum()
 ```
 
-```{r}
+```{r filled barplot}
 population_distribution_gulls %>%
   rename(little_point = `Little Point (near Boathouse)`) %>%
   mutate(West = as.numeric(`West`)) %>%
@@ -74,4 +78,13 @@ population_distribution_gulls %>%
    scale_fill_viridis(discrete = T) +
   theme_ipsum()
 ```
+
+
+##Tower Count Visualization (Eleanor)
+
+
+##Colony Distribution Animation
+
+
+
 
