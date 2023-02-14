@@ -89,7 +89,7 @@ population_distribution_gulls %>%
 
 ```{r practice leaflet}
 
-gullshape <- read_sf("data/gulls2021")
+gullshape <- read_sf("data/gullshapefiles/gulls2021")
 outline <- read_sf("data/outlinecolored")
 head(gullshape)
 plot(gullshape)
