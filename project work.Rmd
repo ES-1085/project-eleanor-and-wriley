@@ -45,6 +45,18 @@ population_distribution_gulls %>%
   geom_col(position = "dodge", stat = "identity") +
    scale_fill_viridis(discrete = T) +
   theme_ipsum()
+
+population_distribution_gulls %>%
+  rename(little_point = `Little Point (near Boathouse)`) %>%
+  mutate(West = as.numeric(`West`)) %>%
+  select(YEAR, East, West, Extension) %>%
+  pivot_longer( cols = East:Extension,
+               names_to = "location",
+               values_to = "total") %>%
+  ggplot(aes(y = total, x = YEAR, fill = location)) +
+  geom_col(position = "dodge", stat = "identity") +
+   scale_fill_viridis(discrete = T) +
+  theme_ipsum()
 ```
 
 ```{r}
