@@ -90,16 +90,19 @@ population_distribution_gulls %>%
 ```{r practice leaflet}
 
 gullshape <- read_sf("data/gulls2021")
+outline <- read_sf("data/outlinecolored")
 head(gullshape)
 plot(gullshape)
 
 gullshape <- st_transform(gullshape, "+init=epsg:4326")
+outline <- st_transform(outline, "+init=epsg:4326")
 
 leaflet(data = gullshape) %>% 
   addProviderTiles(providers$Esri.WorldImagery) %>% 
     setView(lng = -68, 
           lat = 44, 
           zoom = 8) %>%
+  addPolygons(data = outline) %>% 
   addCircleMarkers()
 
 ```
