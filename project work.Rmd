@@ -47,3 +47,19 @@ population_distribution_gulls %>%
   theme_ipsum()
 ```
 
+```{r}
+population_distribution_gulls %>%
+  rename(little_point = `Little Point (near Boathouse)`) %>%
+  mutate(West = as.numeric(`West`)) %>%
+  mutate(south_end = East + West + Extension) %>%
+  mutate(north_end = Point + Cabin + Hell) %>%
+  select(YEAR, south_end, north_end, Borofsky, little_point) %>%
+  pivot_longer( cols = south_end:little_point,
+               names_to = "location",
+               values_to = "total") %>%
+  ggplot(aes(y = total, x = YEAR, fill = location)) +
+  geom_col(position = "fill", stat = "identity") +
+   scale_fill_viridis(discrete = T) +
+  theme_ipsum()
+```
+
