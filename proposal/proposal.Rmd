@@ -9,6 +9,7 @@ library(tidyverse)
 library(broom)
 library(sf)
 library(forcats)
+library(leaflet)
 ```
 
 ## 1. Introduction
@@ -27,6 +28,15 @@ A bare-bones example of a shapefile of gull nests mapped on the south end:
 gullshape <- read_sf("data/gulls2021")
 head(gullshape)
 plot(gullshape)
+
+gullshape <- st_transform(gullshape, "+init=epsg:4326")
+
+leaflet(data = gullshape) %>% 
+  addProviderTiles(providers$Esri.WorldImagery) %>% 
+    setView(lng = -80, 
+          lat = 34.5, 
+          zoom = 5) %>%
+  addCircleMarkers()
 ```
 
 An example of raw data from the 2022 petrel survey:

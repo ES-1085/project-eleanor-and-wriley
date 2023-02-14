@@ -11,6 +11,8 @@ library(tidyverse)
 library(readxl)
 library(viridis)
 library(hrbrthemes)
+library(sf)
+library(leaflet)
 ```
 
 ## R Markdown
@@ -84,6 +86,23 @@ population_distribution_gulls %>%
 
 
 ##Colony Distribution Animation
+
+```{r practice leaflet}
+
+gullshape <- read_sf("data/gulls2021")
+head(gullshape)
+plot(gullshape)
+
+gullshape <- st_transform(gullshape, "+init=epsg:4326")
+
+leaflet(data = gullshape) %>% 
+  addProviderTiles(providers$Esri.WorldImagery) %>% 
+    setView(lng = -68, 
+          lat = 44, 
+          zoom = 8) %>%
+  addCircleMarkers()
+
+```
 
 
 
