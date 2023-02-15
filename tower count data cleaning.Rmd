@@ -19,58 +19,6 @@ library(lubridate)
 
 ##FIX THE READ EXCEL IS READING EVERY YEAR IN AS 2013
 
-```{r 2009}
-
-tower_count_2009 <- read_excel("data/tower_count/tower_count_2009.xlsx", skip = 2)
-#If we're going to do this in such an inefficient way I'm going to ask Laurie how to comment/space the code so it isn't agonizing to read
-tower_count_2009 <- tower_count_2009 %>% 
-#puff
-  mutate(puffin = str_extract(other, "\\d*ATPU|\\d*.ATPU")) %>% 
-  mutate(puffin = str_extract(puffin, "\\d*")) %>% 
-  mutate(puffin = as.double(puffin)) %>% 
- #corm
-  mutate(dcco = str_extract(other, "\\d*DCCO|\\d*.DCCO")) %>% 
-  mutate(dcco = str_extract(dcco, "\\d*")) %>% 
-  mutate(dcco = as.double(dcco)) %>%
-#razo
-  mutate(razo = str_extract(other, "\\d*RAZO|\\d*.RAZO")) %>% 
-  mutate(razo = str_extract(razo, "\\d*")) %>% 
-  mutate(razo = as.double(razo)) %>%
- #baea
-  mutate(baea = str_extract(other, "\\d*BAEA|\\d*.BAEA")) %>% 
-  mutate(baea = str_extract(baea, "\\d*")) %>% 
-  mutate(baea = as.double(baea)) %>%
- #scoter
-  mutate(scoter = str_extract(other, "\\d*.scoter")) %>% 
-  mutate(scoter = str_extract(scoter, "\\d*")) %>% 
-  mutate(scoter = as.double(scoter)) %>% 
-#corvid
-  mutate(corvid = str_extract(other, "\\d*.crow")) %>% 
-  mutate(corvid = str_extract(corvid, "\\d*")) %>%
-  mutate(corvid = as.double(corvid)) %>% 
-#gannet
-  mutate(noga = str_extract(other, "\\d*.gannet")) %>% 
-  mutate(noga = str_extract(noga, "\\d*")) %>% 
-  mutate(noga = as.double(noga)) %>% 
-  mutate(HERG = as.double(HERG))
-
-tower_count_2009 <- tower_count_2009 %>% 
-  pivot_longer(cols = c(HERG, GBBG, BLGU, COEI, `COEI  chix`, puffin, dcco, razo, baea, scoter, corvid, noga ),
-               names_to = "species",
-               values_to = "count")
-
-tower_2009_clean <- tower_count_2009 %>% 
-  mutate(notes = other, date = Date) %>% 
-  select(date, species, count, notes) %>% 
-  mutate(species = case_when(species == "GBBG" ~ "gbbg",
-                            species == "HERG" ~ "herg",
-                            species == "COEI" ~ "coei_ad",
-                            species == "COEI  chix" ~ "coei_ju",
-                            species == "BLGU" ~ "blgu",
-                            species == "puffin" ~ "atpu",
-                            TRUE ~ as.character(species)))
-
-```
 
 ```{r 2000}
 tower_count_2000 <- read_excel("data/tower_count/tower_count_2000.XLS")
@@ -154,7 +102,7 @@ cleaner <- function(inputdataframe) {
   mutate(ternsp = str_extract(ternsp, "\\d*")) %>%
   mutate(ternsp = as.double(ternsp)) %>% 
     #razorbills
-  mutate(razo = str_extract(other, "\\d*razo|\\d*razor|\\d*.RAZO")) %>% 
+  mutate(razo = str_extract(other, "\\d*razo|\\d*razor|\\d*.RAZO|\\d*.razorbills")) %>% 
   mutate(razo = str_extract(razo, "\\d*")) %>% 
   mutate(razo = as.double(razo)) %>%
     #laughing gulls
@@ -182,7 +130,7 @@ cleaner <- function(inputdataframe) {
   mutate(peepsp = str_extract(peepsp, "\\d*")) %>% 
   mutate(peepsp = as.double(peepsp)) %>% 
     #seals
-  mutate(seals = str_extract(other, "\\d*.Seal|\\d*.Seals|\\d*.Harbor|\\d*.Gray")) %>% 
+  mutate(seals = str_extract(other, "\\d*.Seal|\\d*.Seals|\\d*.Harbor|\\d*.Gray|\\d*.seals|\\d*.grey")) %>% 
   mutate(seals = str_extract(seals, "\\d*")) %>% 
   mutate(seals = as.double(seals)) %>% 
     #Loons
@@ -220,6 +168,25 @@ fixcolumns <- function(inputdataframe) {
 }
 
 ```
+
+```{r 2001}
+tower_count_2001 <- read_excel("data/tower_count/tower_count_2001.xlsx", skip = 2)
+tower_count_2001 <- tower_count_2001 %>% 
+  mutate(GBBG = case_when(GBBG == "-" ~ "NA",
+         TRUE ~ as.character(GBBG))) %>% 
+  mutate(other = notes)
+
+tower_count_2001 <- cleaner(tower_count_2001)
+
+tower_count_2001 <- tower_count_2001 %>% 
+  mutate(herg = as.numeric(gulls), gbbg = as.numeric(GBBG), date = Date) %>% 
+  pivot_longer(cols = c(herg, gbbg, COEI, chix, BLGU, puffin, dcco, ternsp, razo, lagu, comu, baea, noga, corvid, peepsp, seals, colo, cago, porpoise),
+               names_to = "species",
+               values_to = "count")
+
+tower_2001_clean <- fixcolumns(tower_count_2001)
+```
+
 
 ```{r 2011}
 tower_count_2011 <- read_excel("data/tower_count/tower_count_2011.xls", skip = 2)
