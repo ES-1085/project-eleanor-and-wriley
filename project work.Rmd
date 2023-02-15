@@ -116,17 +116,42 @@ ggplot(outline) +
 ```
 
 ```{r cleaning 2006 tower}
-#for now import the spreadsheet manually
+tower_count_2006 <- read_excel("data/tower_count/tower_count_2006.xls")
 #in progress...getting there
-tower_count_2006 %>% 
+#Hallie swears to me that this can be done with a for loop that runs through the species of interest so that might be a next step. She's also a lot more allergic to copy/pasting than I am
+tower_count_2006 <- tower_count_2006 %>% 
   mutate(puffin = str_extract(other, "\\d*puff|\\d*.puff|\\d*atpu|\\d*.atpu|\\d*puffis|\\d*puffins|\\d*.puffins")) %>% 
-  mutate(puffin = str_extract(puffin, "\\d*")) %>% 
+  mutate(puffin = str_extract(puffin, "\\d*")) %>%
+  mutate(puffin = as.double(puffin)) %>% 
   mutate(dcco = str_extract(other, "\\d*corm|\\d*dcc|\\d*dcco|\\d*ddco")) %>% 
-  mutate(dcco = str_extract(dcco, "\\d*"))
+  mutate(dcco = str_extract(dcco, "\\d*")) %>% 
+  mutate(dcco = as.double(dcco)) %>% 
+  mutate(ternsp = str_extract(other, "\\d*cote|\\d*.terns")) %>% 
+  mutate(ternsp = str_extract(ternsp, "\\d*")) %>%
+  mutate(ternsp = as.double(ternsp)) %>% 
+  mutate(razo = str_extract(other, "\\d*razo|\\d*razor")) %>% 
+  mutate(razo = str_extract(razo, "\\d*")) %>% 
+  mutate(razo = as.double(razo)) %>%  #likewise there's gotta be a more efficient way to turn these all into doubles
+  mutate(lagu = str_extract(other, "\\d*lagu")) %>% 
+  mutate(lagu = str_extract(lagu, "\\d*")) %>% 
+  mutate(lagu = as.double(lagu))
+
+tower_count_2006 <- tower_count_2006 %>% 
+  pivot_longer(cols = c(hegu, bbgu, eider, squee, puffin, dcco, ternsp, razo, lagu),
+             names_to = "species",
+             values_to = "count")
+#literally so powerful
+
+ggplot(tower_count_2006, aes(x = date, y = count, color = species))+
+  geom_point()+
+  labs(title = "2006 Tower Count")
 ```
 
 Run this code chunk to understand my feelings about the stringr package:
 ```{r}
 #browseURL("https://xkcd.com/2347/")
+```
+
+```{r}
 ```
 
