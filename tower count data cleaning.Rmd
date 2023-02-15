@@ -13,6 +13,7 @@ library(viridis)
 library(hrbrthemes)
 library(sf)
 library(leaflet)
+library(lubridate)
 ```
 
 
@@ -44,7 +45,7 @@ tower_count_2006 <- tower_count_2006 %>%
   mutate(comu = as.double(comu))
 
 tower_count_2006 <- tower_count_2006 %>% 
-  pivot_longer(cols = c(hegu, bbgu, eider, squee, puffin, dcco, ternsp, razo, lagu, comu),
+  pivot_longer(cols = c(hegu, bbgu, eider, squee, puffin, dcco, ternsp, razo, lagu, comu, GBBG, HERG,),
              names_to = "species",
              values_to = "count")
 #literally so powerful
@@ -55,7 +56,7 @@ tower_2006_clean <- tower_count_2006 %>%
   select(date, species, count, notes) %>% 
   mutate(species = case_when(species == "bbgu" ~ "gbbg",
                             species == "hegu" ~ "herg",
-                            species == "eider" ~ "coei-ad",
+                            species == "eider" ~ "coei_ad",
                             species == "squee" ~ "blgu",
                             species == "puffin" ~ "atpu",
                             TRUE ~ as.character(species)))
@@ -220,20 +221,27 @@ cleaner <- function(inputdataframe) {
   mutate(corvid = str_extract(corvid, "\\d*")) %>%
   mutate(corvid = as.double(corvid)) %>% 
     #sandpipers
-  mutate(peepsp = str_extract(other, "\\d*.SPSA|"))
+  mutate(peepsp = str_extract(other, "\\d*.SPSA|\\d*.WHIM")) %>% 
+  mutate(peepsp = str_extract(peepsp, "\\d*")) %>% 
+  mutate(peepsp = as.double(peepsp))
   return(r)
 }
 
 fixcolumns <- function(inputdataframe) {
   r <- inputdataframe %>% 
-    mutate(notes = notes, date = Date) %>% 
+    mutate(notes = other) %>% 
     select(date, species, count, notes) %>% 
     mutate(species = case_when(species == "GBBG" ~ "gbbg",
                             species == "HERG" ~ "herg",
+                            species == "gulls" ~ "herg",
                             species == "COEI" ~ "coei_ad",
                             species == "chix" ~ "coei_ju",
                             species == "BLGU" ~ "blgu",
+                            species == "hegu" ~ "herg",
+                            species == "bbgu" ~ "gbbg",
                             species == "puffin" ~ "atpu",
+                            species == "eider" ~ "coei_ad",
+                            species == "squee" ~ "blgu",
                             TRUE ~ as.character(species)))
   return(r)
 }
@@ -243,11 +251,52 @@ fixcolumns <- function(inputdataframe) {
 ```{r}
 tower_count_2011 <- read_excel("data/tower_count/tower_count_2011.xls", skip = 2)
 tower_count_2011 <- tower_count_2011[1:47,]
+tower_count_2011 <- tower_count_2011 %>% 
+  mutate(year = "2011") %>% 
+  mutate(day = str_sub(Date, start = 1, end = 2)) %>% 
+  mutate(monthch = str_sub(Date, start = 3,)) %>% 
+  mutate(month = case_when(monthch %in% "June" ~ "6",
+                           monthch %in% " June" ~ "6",
+                           monthch %in% " July" ~ "7",
+                           monthch %in% " August" ~ "8",
+                           monthch %in% "July" ~ "7",
+                           monthch %in% "August" ~ "8",
+                           TRUE ~ ""
+                           )) %>% 
+  mutate(month = as.numeric(month), day = as.numeric(day), year = as.numeric(year)) %>% 
+  mutate(datereal = make_date(year, month, day)) %>% 
+  select(-year, -day, -month, -monthch, -Date) %>% 
+  mutate(date = datereal) %>% 
+  select(-datereal)
+  
 
 tower_count_2011 <- tower_count_2011 %>% 
   mutate(other = Others, date = Date)
 
 tower_count_2011 <- cleaner(tower_count_2011)
+
+tower_count_2011 <- tower_count_2011 %>% 
+  mutate(herg = as.double(HERG), gbbg = as.double(GBBG), blgu = as.double(BLGU), coei_ad = as.double(COEI), atpu = as.double(ATPU), coei_ju = as.double(`Eider Chicks`)) %>% 
+  pivot_longer(cols = c(herg, gbbg, coei_ad, coei_ju, blgu, atpu, dcco, ternsp, razo, lagu, comu, baea, noga, corvid, peepsp),
+               names_to = "species",
+               values_to = "count")
+
+
+tower_2011_clean <- fixcolumns(tower_count_2011)
+```
+
+
+```{r}
+tower_count_2006 <- read_excel("data/tower_count/tower_count_2006.xls")
+
+tower_count_2006 <- cleaner(tower_count_2006)
+
+tower_count_2006 <- tower_count_2006 %>% 
+  pivot_longer(cols = c(hegu, bbgu, eider, squee, puffin, dcco, ternsp, razo, lagu, comu, baea, noga, corvid, peepsp),
+             names_to = "species",
+             values_to = "count")
+
+tower_2006_clean <- fixcolumns(tower_count_2006)
 
 
 ```
