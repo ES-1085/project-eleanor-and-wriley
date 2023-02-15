@@ -115,3 +115,18 @@ ggplot(outline) +
   geom_sf(data = gullshape)
 ```
 
+```{r cleaning 2006 tower}
+#for now import the spreadsheet manually
+#in progress...getting there
+tower_count_2006 %>% 
+  mutate(puffin = str_extract(other, "\\d*puff|\\d*.puff|\\d*atpu|\\d*.atpu|\\d*puffis|\\d*puffins|\\d*.puffins")) %>% 
+  mutate(puffin = str_extract(puffin, "\\d*")) %>% 
+  mutate(dcco = str_extract(other, "\\d*corm|\\d*dcc|\\d*dcco|\\d*ddco")) %>% 
+  mutate(dcco = str_extract(dcco, "\\d*"))
+```
+
+Run this code chunk to understand my feelings about the stringr package:
+```{r}
+#browseURL("https://xkcd.com/2347/")
+```
+
