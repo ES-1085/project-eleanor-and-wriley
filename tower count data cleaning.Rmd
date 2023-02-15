@@ -205,7 +205,7 @@ cleaner <- function(inputdataframe) {
   mutate(lagu = str_extract(lagu, "\\d*")) %>% 
   mutate(lagu = as.double(lagu)) %>% 
     #common murre
-  mutate(comu = str_extract(other, "\\d*murre")) %>% 
+  mutate(comu = str_extract(other, "\\d*murre|\\d*.COMU")) %>% 
   mutate(comu = str_extract(comu, "\\d*")) %>% 
   mutate(comu = as.double(comu)) %>% 
     #bald eagle
@@ -230,12 +230,16 @@ cleaner <- function(inputdataframe) {
   mutate(seals = as.double(seals)) %>% 
     #Loons
   mutate(colo = str_extract(other, "\\d*.COLO|\\d*.loon")) %>% 
-  mutate(colo = str_extract(other, "\\d*")) %>% 
+  mutate(colo = str_extract(colo, "\\d*")) %>% 
   mutate(colo = as.double(colo)) %>% 
     #geese
   mutate(cago = str_extract(other, "\\d*.CAGO|\\d*.goose")) %>% 
-  mutate(cago = str_extract(other, "\\d*")) %>% 
-  mutate(cago = as.double(cago)) 
+  mutate(cago = str_extract(cago, "\\d*")) %>% 
+  mutate(cago = as.double(cago)) %>% 
+    #porpoise
+  mutate(porpoise = str_extract(other, "\\d*.Harbor|\\d*.porpoise")) %>% 
+  mutate(porpoise = str_extract(porpoise, "\\d*")) %>% 
+  mutate(porpoise = as.double(porpoise))
   return(r)
 }
 
