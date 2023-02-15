@@ -420,8 +420,11 @@ tell it to select from a list of possible columns</p>
   mutate(cago = as.double(cago)) %&gt;% 
     #porpoise
   mutate(porpoise = str_extract(other, &quot;\\d*.Harbor|\\d*.porpoise&quot;)) %&gt;% 
-  mutate(porpoise = str_extract(porpoise, &quot;\\d*&quot;)) %&gt;% 
-  mutate(porpoise = as.double(porpoise))
+  mutate(porpoise = as.double(str_extract(porpoise, &quot;\\d*&quot;))) %&gt;% 
+    #raptors
+  mutate(raptor = str_extract(other, &quot;\\d*.tv&quot;)) %&gt;% 
+  mutate(raptor = str_extract(raptor, &quot;\\d*&quot;)) %&gt;% 
+  mutate(raptor = as.double(raptor))
   return(r)
 }
 
@@ -478,6 +481,25 @@ tower_count_2002 &lt;- tower_count_2002 %&gt;%
                values_to = &quot;count&quot;)
 
 tower_2002_clean &lt;- fixcolumns(tower_count_2002)</code></pre>
+<pre class="r"><code>tower_count_2003 &lt;- read_excel(&quot;data/tower_count/tower_count_2003.xls&quot;)
+
+tower_count_2003 &lt;- tower_count_2003 %&gt;% 
+  mutate(coei_ju = as.double(str_extract(Eider, &quot;/*.&quot;))) %&gt;% 
+  mutate(coei_ad = as.double(str_extract(Eider, &quot;d*.+/|d*.+&quot;))) %&gt;% 
+  mutate(coei_ad = as.double(str_extract(coei_ad,&quot;\\d*&quot;))) %&gt;% 
+  mutate(coei_ju = as.double(str_extract(coei_ju, &quot;\\d*&quot;))) %&gt;% 
+  mutate(gbbg = as.double(str_extract(BBGull, &quot;\\d*&quot;))) %&gt;% 
+  mutate(other = Others)</code></pre>
+<pre><code>## Warning in mask$eval_all_mutate(quo): NAs introduced by coercion</code></pre>
+<pre class="r"><code>tower_count_2003 &lt;- cleaner(tower_count_2003)
+
+tower_count_2003 &lt;- tower_count_2003 %&gt;% 
+  mutate(herg = HerGull, blgu = Guillem, date = Date, notes = other) %&gt;% 
+  pivot_longer(cols = c(herg, gbbg, coei_ad, coei_ju, blgu, puffin, dcco, ternsp, razo, lagu, comu, baea, noga, corvid, peepsp, seals, colo, cago, porpoise),
+               names_to = &quot;species&quot;,
+               values_to = &quot;count&quot;)
+
+tower_2003_clean &lt;- fixcolumns(tower_count_2003)</code></pre>
 <pre class="r"><code>tower_count_2011 &lt;- read_excel(&quot;data/tower_count/tower_count_2011.xls&quot;, skip = 2)
 tower_count_2011 &lt;- tower_count_2011[1:47,]
 tower_count_2011 &lt;- tower_count_2011 %&gt;% 

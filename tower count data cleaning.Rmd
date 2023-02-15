@@ -93,8 +93,11 @@ cleaner <- function(inputdataframe) {
   mutate(cago = as.double(cago)) %>% 
     #porpoise
   mutate(porpoise = str_extract(other, "\\d*.Harbor|\\d*.porpoise")) %>% 
-  mutate(porpoise = str_extract(porpoise, "\\d*")) %>% 
-  mutate(porpoise = as.double(porpoise))
+  mutate(porpoise = as.double(str_extract(porpoise, "\\d*"))) %>% 
+    #raptors
+  mutate(raptor = str_extract(other, "\\d*.tv")) %>% 
+  mutate(raptor = str_extract(raptor, "\\d*")) %>% 
+  mutate(raptor = as.double(raptor))
   return(r)
 }
 
@@ -158,6 +161,29 @@ tower_count_2002 <- tower_count_2002 %>%
 tower_2002_clean <- fixcolumns(tower_count_2002)
   
 
+
+```
+
+```{r}
+tower_count_2003 <- read_excel("data/tower_count/tower_count_2003.xls")
+
+tower_count_2003 <- tower_count_2003 %>% 
+  mutate(coei_ju = as.double(str_extract(Eider, "/*."))) %>% 
+  mutate(coei_ad = as.double(str_extract(Eider, "d*.+/|d*.+"))) %>% 
+  mutate(coei_ad = as.double(str_extract(coei_ad,"\\d*"))) %>% 
+  mutate(coei_ju = as.double(str_extract(coei_ju, "\\d*"))) %>% 
+  mutate(gbbg = as.double(str_extract(BBGull, "\\d*"))) %>% 
+  mutate(other = Others)
+
+tower_count_2003 <- cleaner(tower_count_2003)
+
+tower_count_2003 <- tower_count_2003 %>% 
+  mutate(herg = HerGull, blgu = Guillem, date = Date, notes = other) %>% 
+  pivot_longer(cols = c(herg, gbbg, coei_ad, coei_ju, blgu, puffin, dcco, ternsp, razo, lagu, comu, baea, noga, corvid, peepsp, seals, colo, cago, porpoise),
+               names_to = "species",
+               values_to = "count")
+
+tower_2003_clean <- fixcolumns(tower_count_2003)
 
 ```
 
