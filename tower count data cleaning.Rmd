@@ -22,8 +22,7 @@ library(leaflet)
 
 ```{r 2006}
 tower_count_2006 <- read_excel("data/tower_count/tower_count_2006.xls")
-#in progress...getting there
-#Hallie swears to me that this can be done with a for loop that runs through the species of interest so that might be a next step. She's also a lot more allergic to copy/pasting than I am
+
 tower_count_2006 <- tower_count_2006 %>% 
   mutate(puffin = str_extract(other, "\\d*puff|\\d*.puff|\\d*atpu|\\d*.atpu|\\d*puffis|\\d*puffins|\\d*.puffins")) %>% 
   mutate(puffin = str_extract(puffin, "\\d*")) %>%
@@ -179,5 +178,92 @@ ggplot(tower_2001_clean, aes(x = date, y = count, color = species))+
 ```{r}
 tower <- rbind(tower_2006_clean, tower_2009_clean, tower_2001_clean)
 #use sub string to create a new column extracting the year
+```
+
+```{r}
+cleaner <- function(inputdataframe) {  
+  r <- inputdataframe %>% 
+    #puffins
+  mutate(puffin = str_extract(other, "\\d*puff|\\d*.puff|\\d*atpu|\\d*.atpu|\\d*puffis|\\d*puffins|\\d*.puffins|\\*.ATPU|\\d*.ALPU")) %>% 
+  mutate(puffin = str_extract(puffin, "\\d*")) %>%
+  mutate(puffin = as.double(puffin)) %>% 
+    #cormorants
+  mutate(dcco = str_extract(other, "\\d*corm|\\d*dcc|\\d*dcco|\\d*ddco|\\d*.DCCO|\\d*.DCC0")) %>% 
+  mutate(dcco = str_extract(dcco, "\\d*")) %>% 
+  mutate(dcco = as.double(dcco)) %>% 
+    #terns
+  mutate(ternsp = str_extract(other, "\\d*cote|\\d*.terns|\\d*.COTE|\\d*.ARTE|\\d*.Terns|\\d*.Tern")) %>% 
+  mutate(ternsp = str_extract(ternsp, "\\d*")) %>%
+  mutate(ternsp = as.double(ternsp)) %>% 
+    #razorbills
+  mutate(razo = str_extract(other, "\\d*razo|\\d*razor|\\d*.RAZO")) %>% 
+  mutate(razo = str_extract(razo, "\\d*")) %>% 
+  mutate(razo = as.double(razo)) %>%
+    #laughing gulls
+  mutate(lagu = str_extract(other, "\\d*lagu|\\d*.laughing|\\d*.LAGU")) %>% 
+  mutate(lagu = str_extract(lagu, "\\d*")) %>% 
+  mutate(lagu = as.double(lagu)) %>% 
+    #common murre
+  mutate(comu = str_extract(other, "\\d*murre")) %>% 
+  mutate(comu = str_extract(comu, "\\d*")) %>% 
+  mutate(comu = as.double(comu)) %>% 
+    #bald eagle
+  mutate(baea = str_extract(other, "\\d*.imm|\\d*.BAEA")) %>% 
+  mutate(baea = str_extract(baea, "\\d*")) %>% 
+  mutate(baea = as.double(baea)) %>%
+    #gannet
+  mutate(noga = str_extract(other, "\\d*.gannets||\\d*.NOGA")) %>% 
+  mutate(noga = str_extract(noga, "\\d*")) %>% 
+  mutate(noga = as.double(noga)) %>% 
+    #corvids
+  mutate(corvid = str_extract(other, "\\d*.crow|\\d*.Corvid|\\d*.AMCR|\\d*.Corvids")) %>% 
+  mutate(corvid = str_extract(corvid, "\\d*")) %>%
+  mutate(corvid = as.double(corvid)) %>% 
+    #sandpipers
+  mutate(peepsp = str_extract(other, "\\d*.SPSA|"))
+  return(r)
+}
+
+fixcolumns <- function(inputdataframe) {
+  r <- inputdataframe %>% 
+    mutate(notes = notes, date = Date) %>% 
+    select(date, species, count, notes) %>% 
+    mutate(species = case_when(species == "GBBG" ~ "gbbg",
+                            species == "HERG" ~ "herg",
+                            species == "COEI" ~ "coei_ad",
+                            species == "chix" ~ "coei_ju",
+                            species == "BLGU" ~ "blgu",
+                            species == "puffin" ~ "atpu",
+                            TRUE ~ as.character(species)))
+  return(r)
+}
+
+```
+
+```{r}
+tower_count_2011 <- read_excel("data/tower_count/tower_count_2011.xls", skip = 2)
+tower_count_2011 <- tower_count_2011[1:47,]
+
+tower_count_2011 <- tower_count_2011 %>% 
+  mutate(other = Others, date = Date)
+
+tower_count_2011 <- cleaner(tower_count_2011)
+
+
+```
+
+```{r}
+# Fix dates
+##fixdates <- function(df, year){
+ # if(length(df$Date > 1)){
+#    rename(df, "Date" = "date")
+#  }
+  #df$month <- lubridate::month(df$date)
+  #df$year <- year
+ # df$day <- lubridate::day(df$date)
+  
+ # df$new_date <- paste0(df$year, "-", df$month, "-", df$day)
+ # return(df)
+#}
 ```
 
