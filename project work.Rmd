@@ -147,6 +147,13 @@ ggplot(tower_count_2006, aes(x = date, y = count, color = species))+
   labs(title = "2006 Tower Count")
 ```
 
+
+```{r cleaning 2006 tower, fig.height=3, fig.width=8}
+ggplot(tower_count_2006, aes(x = date, y = count, fill = species)) +
+  geom_col(position = "dodge")
+
+```
+
 Run this code chunk to understand my feelings about the stringr package:
 ```{r}
 #browseURL("https://xkcd.com/2347/")
