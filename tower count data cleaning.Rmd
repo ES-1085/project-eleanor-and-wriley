@@ -167,6 +167,11 @@ fixcolumns <- function(inputdataframe) {
   return(r)
 }
 
+#pivoter <- function(inputdataframe) {
+ # r <- inputdataframe %>%
+  #if(colnames(inputdataframe) %in% c("HERG","hegu","gulls","HEGU")))
+#}
+
 ```
 
 ```{r 2001}
@@ -186,6 +191,14 @@ tower_count_2001 <- tower_count_2001 %>%
 
 tower_2001_clean <- fixcolumns(tower_count_2001)
 ```
+
+```{r 2002}
+tower_count_2002 <- read_excel("data/tower_count/tower_count_2002.xlsx", skip = 2)
+tower_count_2002 <- tower_count_2002 %>% 
+  mutate(other = notes)
+
+```
+
 
 
 ```{r 2011}
