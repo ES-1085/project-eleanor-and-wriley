@@ -148,9 +148,16 @@ ggplot(tower_count_2006, aes(x = date, y = count, color = species))+
 ```
 
 
-```{r cleaning 2006 tower, fig.height=3, fig.width=8}
+```{r cleaning 2006 tower, fig.height=2, fig.width=6}
 ggplot(tower_count_2006, aes(x = date, y = count, fill = species)) +
   geom_col(position = "dodge")
+
+tower_count_2006 %>%
+  filter(species == "hegu" | species == "bbgu" | species == "eider" | species == "squee" | species == "puffin") %>%
+  ggplot(aes(x = date, y = count, fill = species)) +
+  geom_col(position = "dodge")
+
+unique(tower_count_2006$species)
 
 ```
 
