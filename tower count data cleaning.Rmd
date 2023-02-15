@@ -221,9 +221,21 @@ cleaner <- function(inputdataframe) {
   mutate(corvid = str_extract(corvid, "\\d*")) %>%
   mutate(corvid = as.double(corvid)) %>% 
     #sandpipers
-  mutate(peepsp = str_extract(other, "\\d*.SPSA|\\d*.WHIM")) %>% 
+  mutate(peepsp = str_extract(other, "\\d*.SPSA|\\d*.WHIM|\\d*..SPSA")) %>% 
   mutate(peepsp = str_extract(peepsp, "\\d*")) %>% 
-  mutate(peepsp = as.double(peepsp))
+  mutate(peepsp = as.double(peepsp)) %>% 
+    #seals
+  mutate(seals = str_extract(other, "\\d*.Seal|\\d*.Seals|\\d*.Harbor|\\d*.Gray")) %>% 
+  mutate(seals = str_extract(seals, "\\d*")) %>% 
+  mutate(seals = as.double(seals)) %>% 
+    #Loons
+  mutate(colo = str_extract(other, "\\d*.COLO|\\d*.loon")) %>% 
+  mutate(colo = str_extract(other, "\\d*")) %>% 
+  mutate(colo = as.double(colo)) %>% 
+    #geese
+  mutate(cago = str_extract(other, "\\d*.CAGO|\\d*.goose")) %>% 
+  mutate(cago = str_extract(other, "\\d*")) %>% 
+  mutate(cago = as.double(cago)) 
   return(r)
 }
 
@@ -248,7 +260,7 @@ fixcolumns <- function(inputdataframe) {
 
 ```
 
-```{r}
+```{r 2011}
 tower_count_2011 <- read_excel("data/tower_count/tower_count_2011.xls", skip = 2)
 tower_count_2011 <- tower_count_2011[1:47,]
 tower_count_2011 <- tower_count_2011 %>% 
@@ -271,7 +283,7 @@ tower_count_2011 <- tower_count_2011 %>%
   
 
 tower_count_2011 <- tower_count_2011 %>% 
-  mutate(other = Others, date = Date)
+  mutate(other = Others)
 
 tower_count_2011 <- cleaner(tower_count_2011)
 
