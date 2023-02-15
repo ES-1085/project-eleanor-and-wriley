@@ -19,6 +19,8 @@ library(lubridate)
 
 ##FIX THE READ EXCEL IS READING EVERY YEAR IN AS 2013
 
+##It should be possible to turn the pivoting into a function if I can tell it to select from a list of possible columns
+
 
 ```{r 2000}
 tower_count_2000 <- read_excel("data/tower_count/tower_count_2000.XLS")
@@ -28,58 +30,6 @@ tower_count_2000 <- read_excel("data/tower_count/tower_count_2000.XLS")
 
 ```
 
-```{r 2001}
-tower_count_2001 <- read_excel("data/tower_count/tower_count_2001.xlsx", skip = 2)
-
-tower_count_2001 <- tower_count_2001 %>% 
-  #dcco
-  mutate(dcco = str_extract(notes, "\\d*DCCO|\\d*.DCCO")) %>% 
-  mutate(dcco = str_extract(dcco, "\\d*")) %>% 
-  mutate(dcco = as.double(dcco)) %>% 
-  #atpu
-  mutate(atpu= str_extract(notes, "\\d*.ALPU")) %>% 
-  mutate(atpu = str_extract(atpu, "\\d*")) %>% 
-  mutate(atpu = as.double(atpu)) %>% 
-  #razo
-  mutate(razo = str_extract(notes, "\\d*.razorbills")) %>% 
-  mutate(razo = str_extract(razo, "\\d*")) %>% 
-  mutate(razo = as.double(razo)) %>% 
-  #noga
-  mutate(noga = str_extract(notes, "\\d*.gannets")) %>% 
-  mutate(noga = str_extract(noga, "\\d*")) %>% 
-  mutate(noga = as.double(noga)) %>% 
-  #baea
-  mutate(baea = str_extract(notes, "\\d*.imm")) %>% 
-  mutate(baea = str_extract(baea, "\\d*")) %>% 
-  mutate(baea = as.double(baea)) %>%
-  #lagu
-  mutate(lagu = str_extract(notes, "\\d*.laughing")) %>% 
-  mutate(lagu = str_extract(lagu, "\\d*")) %>% 
-  mutate(lagu = as.double(lagu)) %>% 
-  mutate(herg = as.double(gulls)) %>% 
-  mutate(gbbg = as.double(GBBG))
-
-tower_count_2001 <- tower_count_2001 %>% 
-  pivot_longer(cols = c(herg, gbbg, COEI, chix, BLGU, dcco, atpu, razo, noga, baea, lagu),
-               names_to = "species",
-               values_to = "count")
-
-
-tower_2001_clean <- tower_count_2001 %>% 
-  mutate(notes = notes, date = Date) %>% 
-  select(date, species, count, notes) %>% 
-  mutate(species = case_when(species == "GBBG" ~ "gbbg",
-                            species == "HERG" ~ "herg",
-                            species == "COEI" ~ "coei_ad",
-                            species == "chix" ~ "coei_ju",
-                            species == "BLGU" ~ "blgu",
-                            species == "puffin" ~ "atpu",
-                            TRUE ~ as.character(species)))
-
-ggplot(tower_2001_clean, aes(x = date, y = count, color = species))+
-  geom_point()
-  
-```
 
 ```{r}
 #tower <- rbind(tower_2006_clean, tower_2009_clean, tower_2001_clean)
@@ -110,7 +60,7 @@ cleaner <- function(inputdataframe) {
   mutate(lagu = str_extract(lagu, "\\d*")) %>% 
   mutate(lagu = as.double(lagu)) %>% 
     #common murre
-  mutate(comu = str_extract(other, "\\d*murre|\\d*.COMU")) %>% 
+  mutate(comu = str_extract(other, "\\d*murre|\\d*.COMU|\\d*.common murre")) %>% 
   mutate(comu = str_extract(comu, "\\d*")) %>% 
   mutate(comu = as.double(comu)) %>% 
     #bald eagle
@@ -126,11 +76,11 @@ cleaner <- function(inputdataframe) {
   mutate(corvid = str_extract(corvid, "\\d*")) %>%
   mutate(corvid = as.double(corvid)) %>% 
     #sandpipers
-  mutate(peepsp = str_extract(other, "\\d*.SPSA|\\d*.WHIM|\\d*..SPSA")) %>% 
+  mutate(peepsp = str_extract(other, "\\d*.SPSA|\\d*.WHIM|\\d*..SPSA|\\d*.spotted sandpiper")) %>% 
   mutate(peepsp = str_extract(peepsp, "\\d*")) %>% 
   mutate(peepsp = as.double(peepsp)) %>% 
     #seals
-  mutate(seals = str_extract(other, "\\d*.Seal|\\d*.Seals|\\d*.Harbor|\\d*.Gray|\\d*.seals|\\d*.grey")) %>% 
+  mutate(seals = str_extract(other, "\\d*.Seal|\\d*.Seals|\\d*.Harbor|\\d*.Gray|\\d*.seals|\\d*.grey|\\d*.seal")) %>% 
   mutate(seals = str_extract(seals, "\\d*")) %>% 
   mutate(seals = as.double(seals)) %>% 
     #Loons
@@ -196,6 +146,18 @@ tower_2001_clean <- fixcolumns(tower_count_2001)
 tower_count_2002 <- read_excel("data/tower_count/tower_count_2002.xlsx", skip = 2)
 tower_count_2002 <- tower_count_2002 %>% 
   mutate(other = notes)
+
+tower_count_2002 <- cleaner(tower_count_2002)
+
+tower_count_2002 <- tower_count_2002 %>% 
+  mutate(herg = as.numeric(HERG), gbbg = as.numeric(GBBG),coei_ad = as.numeric(COEI), coei_ju = as.numeric(chix), blgu = as.numeric(BLGU), date = Date) %>% 
+  pivot_longer(cols = c (herg, gbbg, coei_ad, coei_ju, blgu, puffin, dcco, ternsp, razo, lagu, comu, baea, noga, corvid, peepsp, seals, colo, cago, porpoise),
+               names_to = "species",
+               values_to = "count")
+
+tower_2002_clean <- fixcolumns(tower_count_2002)
+  
+
 
 ```
 
