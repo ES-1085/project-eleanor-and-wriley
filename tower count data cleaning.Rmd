@@ -22,20 +22,6 @@ library(lubridate)
 ##It should be possible to turn the pivoting into a function if I can tell it to select from a list of possible columns
 
 
-```{r 2000}
-tower_count_2000 <- read_excel("data/tower_count/tower_count_2000.XLS")
-#will have fun times trying to break up adult and juvenile eiders
-
-
-
-```
-
-
-```{r}
-#tower <- rbind(tower_2006_clean, tower_2009_clean, tower_2001_clean)
-#use sub string to create a new column extracting the year
-```
-
 ```{r}
 cleaner <- function(inputdataframe) {  
   r <- inputdataframe %>% 
@@ -44,7 +30,7 @@ cleaner <- function(inputdataframe) {
   mutate(puffin = str_extract(puffin, "\\d*")) %>%
   mutate(puffin = as.double(puffin)) %>% 
     #cormorants
-  mutate(dcco = str_extract(other, "\\d*corm|\\d*dcc|\\d*dcco|\\d*ddco|\\d*.DCCO|\\d*.DCC0")) %>% 
+  mutate(dcco = str_extract(other, "\\d*corm|\\d*dcc|\\d*dcco|\\d*ddco|\\d*.DCCO|\\d*.DCC0|\\d*.commorants")) %>% 
   mutate(dcco = str_extract(dcco, "\\d*")) %>% 
   mutate(dcco = as.double(dcco)) %>% 
     #terns
@@ -126,6 +112,26 @@ fixcolumns <- function(inputdataframe) {
 #}
 
 ```
+
+```{r 2000}
+tower_count_2000 <- read_excel("data/tower_count/tower_count_2000.XLS")
+tower_count_2000 <- tower_count_2000[2:48,]
+tower_count_2000 <- tower_count_2000 %>% 
+  mutate(coei_ad = as.double(str_extract(`# eiders`, "\\d*"))) %>% 
+  mutate(coei_ju = as.double(str_extract(`# eiders`, "(?<=\\().*(?=\\))"))) %>% 
+  mutate(herg = as.double(`# gulls`), blgu = as.double(`# squees`), other = others)
+
+tower_count_2000 <- cleaner(tower_count_2000)
+
+tower_count_2000 <- tower_count_2000 %>% 
+  pivot_longer(cols = c(herg, coei_ad, coei_ju, blgu, puffin, dcco, ternsp, razo, lagu, comu, baea, noga, corvid, peepsp, seals, colo, cago, porpoise),
+               names_to = "species",
+               values_to = "count")
+
+tower_2000_clean <- fixcolumns(tower_count_2000)
+
+```
+
 
 ```{r 2001}
 tower_count_2001 <- read_excel("data/tower_count/tower_count_2001.xlsx", skip = 2)
@@ -241,6 +247,7 @@ tower_2006_clean <- fixcolumns(tower_count_2006)
 
 
 ```
+
 
 ```{r}
 # Fix dates
