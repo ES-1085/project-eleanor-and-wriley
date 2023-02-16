@@ -361,7 +361,7 @@ display: none;
 hergs &lt;- c(&quot;gulls&quot;,&quot;hegu&quot;,&quot;HERG&quot;,&quot;Gull&quot;,&quot;# gulls&quot;, &quot;HeGu&quot;,&quot;HerGull&quot;)
 gbbgs &lt;- c(&quot;bbgu&quot;,&quot;GBBG&quot;,&quot;BBGull&quot;)
 blgus &lt;- c(&quot;# squees&quot;, &quot;squees&quot;,&quot;BLGU&quot;,&quot;Guillem&quot;, &quot;BGUY&quot;, &quot;squee&quot;)
-coei_jus &lt;-c(&quot;chix&quot;,&quot;eider chicks&quot;, &quot;COEI ducklings&quot;, &quot;Eider Chicks&quot;)
+coei_jus &lt;-c(&quot;chix&quot;,&quot;eider chicks&quot;, &quot;COEI ducklings&quot;, &quot;Eider Chicks&quot;,&quot;COEI chix&quot;)
 coei_ads &lt;- c(&quot;COEI&quot;,&quot;Eiders&quot;, &quot;# eiders&quot;, &quot;eider&quot;,&quot;eiders&quot;)
 others &lt;- c(&quot;Other&quot;,&quot;notes&quot;,&quot;comments&quot;,&quot;others&quot;, &quot;Others&quot;, &quot;comment&quot;)
 dates &lt;- c(&quot;Date&quot;)
@@ -557,6 +557,7 @@ tower_count_2007 &lt;- cleancolumns(tower_count_2007)</code></pre>
 ## [1] &quot;other&quot;</code></pre>
 <pre class="r"><code>tower_count_2007 &lt;- splitcomments(tower_count_2007)
 tower_2007_clean &lt;- selectcolumns(tower_count_2007)</code></pre>
+<pre class="r"><code>tower_count_2008 &lt;- read_excel(&quot;data/tower_count/tower_count_2008.xlsx&quot;, skip = 2)</code></pre>
 <pre class="r"><code>tower_count_2011 &lt;- read_excel(&quot;data/tower_count/tower_count_2011.xls&quot;, skip = 2)
 tower_count_2011 &lt;- tower_count_2011[1:47,]
 tower_count_2011 &lt;- tower_count_2011 %&gt;% 
