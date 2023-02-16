@@ -361,7 +361,7 @@ display: none;
 hergs &lt;- c(&quot;gulls&quot;,&quot;hegu&quot;,&quot;HERG&quot;,&quot;Gull&quot;,&quot;# gulls&quot;, &quot;HeGu&quot;,&quot;HerGull&quot;)
 gbbgs &lt;- c(&quot;bbgu&quot;,&quot;GBBG&quot;,&quot;BBGull&quot;)
 blgus &lt;- c(&quot;# squees&quot;, &quot;squees&quot;,&quot;BLGU&quot;,&quot;Guillem&quot;, &quot;BGUY&quot;, &quot;squee&quot;)
-coei_jus &lt;-c(&quot;chix&quot;,&quot;eider chicks&quot;, &quot;COEI ducklings&quot;, &quot;Eider Chicks&quot;,&quot;COEI chix&quot;)
+coei_jus &lt;-c(&quot;chix&quot;,&quot;eider chicks&quot;, &quot;COEI ducklings&quot;, &quot;Eider Chicks&quot;,&quot;COEI chix&quot;,&quot;COEI  chix&quot;)
 coei_ads &lt;- c(&quot;COEI&quot;,&quot;Eiders&quot;, &quot;# eiders&quot;, &quot;eider&quot;,&quot;eiders&quot;)
 others &lt;- c(&quot;Other&quot;,&quot;notes&quot;,&quot;comments&quot;,&quot;others&quot;, &quot;Others&quot;, &quot;comment&quot;)
 dates &lt;- c(&quot;Date&quot;)
@@ -406,10 +406,10 @@ cleancolumns &lt;- function(inputdataframe) {
   mutate(dcco = str_extract(other, &quot;\\d*corm|\\d*dcc|\\d*dcco|\\d*ddco|\\d*.DCCO|\\d*.DCC0|\\d*.commorants|\\d*.corm|\\d*.cormorants|d*..corm&quot;)) %&gt;% 
   mutate(dcco = as.double(str_extract(dcco, &quot;\\d*&quot;))) %&gt;% 
     #terns
-  mutate(ternsp = str_extract(other, &quot;\\d*cote|\\d*.terns|\\d*.COTE|\\d*.ARTE|\\d*.Terns|\\d*.Tern|\\d*.arte&quot;)) %&gt;% 
+  mutate(ternsp = str_extract(other, &quot;\\d*cote|\\d*.terns|\\d*.COTE|\\d*.ARTE|\\d*.Terns|\\d*.Tern|\\d*.arte|\\d*.common tern|\\d*.common term&quot;)) %&gt;% 
   mutate(ternsp = as.double(str_extract(ternsp, &quot;\\d*&quot;))) %&gt;%
     #razorbills
-  mutate(razo = str_extract(other, &quot;\\d*razo|\\d*razor|\\d*.RAZO|\\d*.razorbills|\\d*.bills|\\d*.bill&quot;)) %&gt;% 
+  mutate(razo = str_extract(other, &quot;\\d*razo|\\d*razor|\\d*.RAZO|\\d*.razorbills|\\d*.bills|\\d*.bill|\\d*.RAZ0&quot;)) %&gt;% 
   mutate(razo = as.double(str_extract(razo, &quot;\\d*&quot;))) %&gt;% 
     #laughing gulls
   mutate(lagu = str_extract(other, &quot;\\d*lagu|\\d*.laughing|\\d*.LAGU|\\d*lagus&quot;)) %&gt;% 
@@ -421,16 +421,16 @@ cleancolumns &lt;- function(inputdataframe) {
   mutate(baea = str_extract(other, &quot;\\d*.imm|\\d*.BAEA|\\d*.eagle&quot;)) %&gt;% 
   mutate(baea = as.double(str_extract(baea, &quot;\\d*&quot;))) %&gt;% 
     #gannet
-  mutate(noga = str_extract(other, &quot;\\d*.gannets||\\d*.NOGA&quot;)) %&gt;% 
+  mutate(noga = str_extract(other, &quot;\\d*.gannets||\\d*.NOGA|\\d*.gannet&quot;)) %&gt;% 
   mutate(noga = as.double(str_extract(noga, &quot;\\d*&quot;))) %&gt;% 
     #corvids
-  mutate(corvid = str_extract(other, &quot;\\d*.crow|\\d*.Corvid|\\d*.AMCR|\\d*.Corvids|\\d*.crows|\\d*.crow&quot;)) %&gt;% 
+  mutate(corvid = str_extract(other, &quot;\\d*.crow|\\d*.Corvid|\\d*.AMCR|\\d*.Corvids|\\d*.crows|\\d*crow&quot;)) %&gt;% 
   mutate(corvid = as.double(str_extract(corvid, &quot;\\d*&quot;))) %&gt;%
     #sandpipers
-  mutate(peepsp = str_extract(other, &quot;\\d*.SPSA|\\d*.WHIM|\\d*..SPSA|\\d*.spotted sandpiper&quot;)) %&gt;% 
+  mutate(peepsp = str_extract(other, &quot;\\d*.SPSA|\\d*.WHIM|\\d*..SPSA|\\d*.spotted sandpiper|\\d*.least sandpiper&quot;)) %&gt;% 
   mutate(peepsp = as.double(str_extract(peepsp, &quot;\\d*&quot;))) %&gt;% 
     #seals
-  mutate(seals = str_extract(other, &quot;\\d*.Seal|\\d*.Seals|\\d*.Harbor|\\d*.Gray|\\d*.seals|\\d*.grey|\\d*.seal|\\d*.harbor&quot;)) %&gt;% 
+  mutate(seals = str_extract(other, &quot;\\d*.Seal|\\d*.Seals|\\d*.Harbor|\\d*.Gray|\\d*.seals|\\d*.grey|\\d*.seal|\\d*.harbor|\\d*.gray&quot;)) %&gt;% 
   mutate(seals = as.double(str_extract(seals, &quot;\\d*&quot;))) %&gt;% 
     #Loons
   mutate(colo = str_extract(other, &quot;\\d*.COLO|\\d*.loon|\\d*.loons&quot;)) %&gt;% 
@@ -444,6 +444,15 @@ cleancolumns &lt;- function(inputdataframe) {
     #raptors
   mutate(raptor = str_extract(other, &quot;\\d*.tv&quot;)) %&gt;% 
   mutate(raptor = as.double(str_extract(raptor, &quot;\\d*&quot;))) %&gt;% 
+    #shearwater
+  mutate(shearwater = str_extract(other, &quot;\\d*.shearwater&quot;)) %&gt;% 
+  mutate(shearwater = as.double(str_extract(shearwater, &quot;\\d*&quot;))) %&gt;% 
+    #heron
+  mutate(gbhe = str_extract(other, &quot;\\d*.heron|\\d*.GBHE&quot;)) %&gt;% 
+  mutate(gbhe = as.double(str_extract(gbhe, &quot;\\d*&quot;))) %&gt;% 
+    #scoter
+  mutate(scoter = str_extract(other, &quot;\\d*.scoter|\\d*.Scoter&quot;)) %&gt;% 
+  mutate(scoter = as.double(str_extract(scoter, &quot;\\d*&quot;)))
   return(r)
 }</code></pre>
 <pre class="r"><code>selectcolumns &lt;- function(inputdataframe) {
@@ -557,7 +566,33 @@ tower_count_2007 &lt;- cleancolumns(tower_count_2007)</code></pre>
 ## [1] &quot;other&quot;</code></pre>
 <pre class="r"><code>tower_count_2007 &lt;- splitcomments(tower_count_2007)
 tower_2007_clean &lt;- selectcolumns(tower_count_2007)</code></pre>
-<pre class="r"><code>tower_count_2008 &lt;- read_excel(&quot;data/tower_count/tower_count_2008.xlsx&quot;, skip = 2)</code></pre>
+<pre class="r"><code>tower_count_2008 &lt;- read_excel(&quot;data/tower_count/tower_count_2008.xlsx&quot;, skip = 2)
+
+tower_count_2008 &lt;- cleancolumns(tower_count_2008)</code></pre>
+<pre><code>## [1] &quot;dates&quot;
+## [1] &quot;hergs&quot;
+## [1] &quot;gbbgs&quot;
+## [1] &quot;blgus&quot;
+## [1] &quot;coei_ads&quot;
+## [1] &quot;coei_jus&quot;</code></pre>
+<pre class="r"><code>tower_count_2008 &lt;- splitcomments(tower_count_2008)
+tower_2008_clean &lt;- selectcolumns(tower_count_2008)</code></pre>
+<pre><code>## Warning in mask$eval_all_mutate(quo): NAs introduced by coercion
+
+## Warning in mask$eval_all_mutate(quo): NAs introduced by coercion
+
+## Warning in mask$eval_all_mutate(quo): NAs introduced by coercion</code></pre>
+<pre class="r"><code>tower_count_2009 &lt;- read_excel(&quot;data/tower_count/tower_count_2009.xlsx&quot;, skip = 2)
+
+tower_count_2009 &lt;- cleancolumns(tower_count_2009)</code></pre>
+<pre><code>## [1] &quot;dates&quot;
+## [1] &quot;hergs&quot;
+## [1] &quot;gbbgs&quot;
+## [1] &quot;blgus&quot;
+## [1] &quot;coei_ads&quot;
+## [1] &quot;coei_jus&quot;</code></pre>
+<pre class="r"><code>tower_count_2009 &lt;- splitcomments(tower_count_2009)
+tower_2009_clean &lt;- selectcolumns(tower_count_2009)</code></pre>
 <pre class="r"><code>tower_count_2011 &lt;- read_excel(&quot;data/tower_count/tower_count_2011.xls&quot;, skip = 2)
 tower_count_2011 &lt;- tower_count_2011[1:47,]
 tower_count_2011 &lt;- tower_count_2011 %&gt;% 
