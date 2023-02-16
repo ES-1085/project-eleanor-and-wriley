@@ -11,7 +11,7 @@
 
 <meta name="author" content="Eleanor and Wriley" />
 
-<meta name="date" content="2023-02-15" />
+<meta name="date" content="2023-02-16" />
 
 <title>tower count data cleaning</title>
 
@@ -352,154 +352,187 @@ display: none;
 
 <h1 class="title toc-ignore">tower count data cleaning</h1>
 <h4 class="author">Eleanor and Wriley</h4>
-<h4 class="date">2023-02-15</h4>
+<h4 class="date">2023-02-16</h4>
 
 </div>
 
 
-<p>##FIX THE READ EXCEL IS READING EVERY YEAR IN AS 2013</p>
-<p>##It should be possible to turn the pivoting into a function if I can
-tell it to select from a list of possible columns</p>
-<pre class="r"><code>tower_count_2000 &lt;- read_excel(&quot;data/tower_count/tower_count_2000.XLS&quot;)
-#will have fun times trying to break up adult and juvenile eiders</code></pre>
-<pre class="r"><code>#tower &lt;- rbind(tower_2006_clean, tower_2009_clean, tower_2001_clean)
-#use sub string to create a new column extracting the year</code></pre>
-<pre class="r"><code>cleaner &lt;- function(inputdataframe) {  
+<pre class="r"><code>#lists of possible columns names for our usual birds, add as new ones arise
+hergs &lt;- c(&quot;gulls&quot;,&quot;hegu&quot;,&quot;HERG&quot;,&quot;Gull&quot;,&quot;# gulls&quot;, &quot;HeGu&quot;,&quot;HerGull&quot;)
+gbbgs &lt;- c(&quot;bbgu&quot;,&quot;GBBG&quot;,&quot;BBGull&quot;)
+blgus &lt;- c(&quot;# squees&quot;, &quot;squees&quot;,&quot;BLGU&quot;,&quot;Guillem&quot;, &quot;BGUY&quot;)
+coei_jus &lt;-c(&quot;chix&quot;,&quot;eider chicks&quot;, &quot;COEI ducklings&quot;, &quot;Eider Chicks&quot;)
+coei_ads &lt;- c(&quot;COEI&quot;,&quot;Eiders&quot;, &quot;# eiders&quot;)
+others &lt;- c(&quot;Other&quot;,&quot;notes&quot;,&quot;comments&quot;,&quot;others&quot;, &quot;Others&quot;)
+dates &lt;- c(&quot;Date&quot;)
+puffins &lt;- c(&quot;ATPU&quot;,&quot;AtPu&quot;)
+
+cleancolumns &lt;- function(inputdataframe) {
+  for (i in 1:length(colnames(inputdataframe))){
+      if (colnames(inputdataframe)[i] %in% hergs) {
+        colnames(inputdataframe)[i] &lt;- &quot;herg&quot;
+        print(&quot;hergs&quot;)
+    } else if(colnames(inputdataframe)[i] %in% gbbgs) {
+        colnames(inputdataframe)[i] &lt;- &quot;gbbg&quot;
+        print(&quot;gbbgs&quot;)
+    } else if (colnames(inputdataframe)[i] %in% blgus) {
+      colnames(inputdataframe)[i] &lt;- &quot;blgu&quot;
+      print(&quot;blgus&quot;)
+    } else if (colnames(inputdataframe)[i] %in% coei_jus) {
+      colnames(inputdataframe)[i] &lt;- &quot;coei_ju&quot;
+      print(&quot;coei_jus&quot;)
+    } else if (colnames(inputdataframe)[i] %in% coei_ads) {
+      colnames(inputdataframe)[i] &lt;- &quot;coei_ad&quot;
+      print(&quot;coei_ads&quot;)
+    } else if (colnames(inputdataframe)[i] %in% others) {
+      colnames(inputdataframe)[i] &lt;- &quot;other&quot;
+      print(&quot;other&quot;)
+    } else if (colnames(inputdataframe)[i] %in% dates) {
+      colnames(inputdataframe)[i] &lt;- &quot;date&quot;
+      print(&quot;dates&quot;)
+    } else if (colnames(inputdataframe)[i] %in% puffins) {
+      colnames(inputdataframe)[i] &lt;- &quot;puffin&quot;
+      print(&quot;puffins&quot;)
+    }
+  }
+  return(inputdataframe)
+}</code></pre>
+<pre class="r"><code>splitcomments &lt;- function(inputdataframe) {  
   r &lt;- inputdataframe %&gt;% 
     #puffins
-  mutate(puffin = str_extract(other, &quot;\\d*puff|\\d*.puff|\\d*atpu|\\d*.atpu|\\d*puffis|\\d*puffins|\\d*.puffins|\\*.ATPU|\\d*.ALPU&quot;)) %&gt;% 
-  mutate(puffin = str_extract(puffin, &quot;\\d*&quot;)) %&gt;%
-  mutate(puffin = as.double(puffin)) %&gt;% 
+  mutate(puffin = str_extract(other, &quot;\\d*puff|\\d*.puff|\\d*atpu|\\d*.atpu|\\d*puffis|\\d*puffins|\\d*.puffins|\\*.ATPU|\\d*.ALPU|\\d*.puffin&quot;)) %&gt;% 
+  mutate(puffin = as.double(str_extract(puffin, &quot;\\d*&quot;))) %&gt;%
     #cormorants
-  mutate(dcco = str_extract(other, &quot;\\d*corm|\\d*dcc|\\d*dcco|\\d*ddco|\\d*.DCCO|\\d*.DCC0&quot;)) %&gt;% 
-  mutate(dcco = str_extract(dcco, &quot;\\d*&quot;)) %&gt;% 
-  mutate(dcco = as.double(dcco)) %&gt;% 
+  mutate(dcco = str_extract(other, &quot;\\d*corm|\\d*dcc|\\d*dcco|\\d*ddco|\\d*.DCCO|\\d*.DCC0|\\d*.commorants&quot;)) %&gt;% 
+  mutate(dcco = as.double(str_extract(dcco, &quot;\\d*&quot;))) %&gt;% 
     #terns
   mutate(ternsp = str_extract(other, &quot;\\d*cote|\\d*.terns|\\d*.COTE|\\d*.ARTE|\\d*.Terns|\\d*.Tern&quot;)) %&gt;% 
-  mutate(ternsp = str_extract(ternsp, &quot;\\d*&quot;)) %&gt;%
-  mutate(ternsp = as.double(ternsp)) %&gt;% 
+  mutate(ternsp = as.double(str_extract(ternsp, &quot;\\d*&quot;))) %&gt;%
     #razorbills
   mutate(razo = str_extract(other, &quot;\\d*razo|\\d*razor|\\d*.RAZO|\\d*.razorbills&quot;)) %&gt;% 
-  mutate(razo = str_extract(razo, &quot;\\d*&quot;)) %&gt;% 
-  mutate(razo = as.double(razo)) %&gt;%
+  mutate(razo = as.double(str_extract(razo, &quot;\\d*&quot;))) %&gt;% 
     #laughing gulls
   mutate(lagu = str_extract(other, &quot;\\d*lagu|\\d*.laughing|\\d*.LAGU&quot;)) %&gt;% 
-  mutate(lagu = str_extract(lagu, &quot;\\d*&quot;)) %&gt;% 
-  mutate(lagu = as.double(lagu)) %&gt;% 
+  mutate(lagu = as.double(str_extract(lagu, &quot;\\d*&quot;))) %&gt;% 
     #common murre
   mutate(comu = str_extract(other, &quot;\\d*murre|\\d*.COMU|\\d*.common murre&quot;)) %&gt;% 
-  mutate(comu = str_extract(comu, &quot;\\d*&quot;)) %&gt;% 
-  mutate(comu = as.double(comu)) %&gt;% 
+  mutate(comu = as.double(str_extract(comu, &quot;\\d*&quot;))) %&gt;% 
     #bald eagle
   mutate(baea = str_extract(other, &quot;\\d*.imm|\\d*.BAEA&quot;)) %&gt;% 
-  mutate(baea = str_extract(baea, &quot;\\d*&quot;)) %&gt;% 
-  mutate(baea = as.double(baea)) %&gt;%
+  mutate(baea = as.double(str_extract(baea, &quot;\\d*&quot;))) %&gt;% 
     #gannet
   mutate(noga = str_extract(other, &quot;\\d*.gannets||\\d*.NOGA&quot;)) %&gt;% 
-  mutate(noga = str_extract(noga, &quot;\\d*&quot;)) %&gt;% 
-  mutate(noga = as.double(noga)) %&gt;% 
+  mutate(noga = as.double(str_extract(noga, &quot;\\d*&quot;))) %&gt;% 
     #corvids
   mutate(corvid = str_extract(other, &quot;\\d*.crow|\\d*.Corvid|\\d*.AMCR|\\d*.Corvids&quot;)) %&gt;% 
-  mutate(corvid = str_extract(corvid, &quot;\\d*&quot;)) %&gt;%
-  mutate(corvid = as.double(corvid)) %&gt;% 
+  mutate(corvid = as.double(str_extract(corvid, &quot;\\d*&quot;))) %&gt;%
     #sandpipers
   mutate(peepsp = str_extract(other, &quot;\\d*.SPSA|\\d*.WHIM|\\d*..SPSA|\\d*.spotted sandpiper&quot;)) %&gt;% 
-  mutate(peepsp = str_extract(peepsp, &quot;\\d*&quot;)) %&gt;% 
-  mutate(peepsp = as.double(peepsp)) %&gt;% 
+  mutate(peepsp = as.double(str_extract(peepsp, &quot;\\d*&quot;))) %&gt;% 
     #seals
-  mutate(seals = str_extract(other, &quot;\\d*.Seal|\\d*.Seals|\\d*.Harbor|\\d*.Gray|\\d*.seals|\\d*.grey|\\d*.seal&quot;)) %&gt;% 
-  mutate(seals = str_extract(seals, &quot;\\d*&quot;)) %&gt;% 
-  mutate(seals = as.double(seals)) %&gt;% 
+  mutate(seals = str_extract(other, &quot;\\d*.Seal|\\d*.Seals|\\d*.Harbor|\\d*.Gray|\\d*.seals|\\d*.grey|\\d*.seal|\\d*.harbor&quot;)) %&gt;% 
+  mutate(seals = as.double(str_extract(seals, &quot;\\d*&quot;))) %&gt;% 
     #Loons
   mutate(colo = str_extract(other, &quot;\\d*.COLO|\\d*.loon&quot;)) %&gt;% 
-  mutate(colo = str_extract(colo, &quot;\\d*&quot;)) %&gt;% 
-  mutate(colo = as.double(colo)) %&gt;% 
+  mutate(colo = as.double(str_extract(colo, &quot;\\d*&quot;))) %&gt;% 
     #geese
   mutate(cago = str_extract(other, &quot;\\d*.CAGO|\\d*.goose&quot;)) %&gt;% 
-  mutate(cago = str_extract(cago, &quot;\\d*&quot;)) %&gt;% 
-  mutate(cago = as.double(cago)) %&gt;% 
+  mutate(cago = as.double(str_extract(cago, &quot;\\d*&quot;))) %&gt;% 
     #porpoise
   mutate(porpoise = str_extract(other, &quot;\\d*.Harbor|\\d*.porpoise&quot;)) %&gt;% 
   mutate(porpoise = as.double(str_extract(porpoise, &quot;\\d*&quot;))) %&gt;% 
     #raptors
   mutate(raptor = str_extract(other, &quot;\\d*.tv&quot;)) %&gt;% 
-  mutate(raptor = str_extract(raptor, &quot;\\d*&quot;)) %&gt;% 
-  mutate(raptor = as.double(raptor))
+  mutate(raptor = as.double(str_extract(raptor, &quot;\\d*&quot;))) %&gt;% 
   return(r)
-}
-
-fixcolumns &lt;- function(inputdataframe) {
+}</code></pre>
+<pre class="r"><code>selectcolumns &lt;- function(inputdataframe) {
   r &lt;- inputdataframe %&gt;% 
     mutate(notes = other) %&gt;% 
-    select(date, species, count, notes) %&gt;% 
-    mutate(species = case_when(species == &quot;GBBG&quot; ~ &quot;gbbg&quot;,
-                            species == &quot;HERG&quot; ~ &quot;herg&quot;,
-                            species == &quot;gulls&quot; ~ &quot;herg&quot;,
-                            species == &quot;COEI&quot; ~ &quot;coei_ad&quot;,
-                            species == &quot;chix&quot; ~ &quot;coei_ju&quot;,
-                            species == &quot;BLGU&quot; ~ &quot;blgu&quot;,
-                            species == &quot;hegu&quot; ~ &quot;herg&quot;,
-                            species == &quot;bbgu&quot; ~ &quot;gbbg&quot;,
-                            species == &quot;puffin&quot; ~ &quot;atpu&quot;,
-                            species == &quot;eider&quot; ~ &quot;coei_ad&quot;,
-                            species == &quot;squee&quot; ~ &quot;blgu&quot;,
-                            TRUE ~ as.character(species)))
+    select(&quot;date&quot;,&quot;herg&quot;,&quot;gbbg&quot;,&quot;coei_ad&quot;,&quot;coei_ju&quot;,&quot;blgu&quot;,&quot;other&quot;,&quot;puffin&quot;,&quot;dcco&quot;,&quot;ternsp&quot;,&quot;razo&quot;,&quot;lagu&quot;,&quot;comu&quot;,&quot;baea&quot;,&quot;noga&quot;,&quot;corvid&quot;,&quot;peepsp&quot;,&quot;seals&quot;,&quot;colo&quot;,&quot;cago&quot;,&quot;porpoise&quot;,&quot;raptor&quot;,&quot;notes&quot;) %&gt;% 
+    mutate(herg = as.numeric(herg), gbbg = as.numeric(gbbg), coei_ad = as.double(coei_ad), coei_ju = as.double(coei_ju), blgu = as.double(blgu)) %&gt;% 
+    pivot_longer(cols = c(&quot;herg&quot;,&quot;gbbg&quot;,&quot;coei_ad&quot;,&quot;coei_ju&quot;,&quot;blgu&quot;,&quot;puffin&quot;,&quot;dcco&quot;,&quot;ternsp&quot;,&quot;razo&quot;,&quot;lagu&quot;,&quot;comu&quot;,&quot;baea&quot;,&quot;noga&quot;,&quot;corvid&quot;,&quot;peepsp&quot;,&quot;seals&quot;,&quot;colo&quot;,&quot;cago&quot;,&quot;porpoise&quot;,&quot;raptor&quot;),
+                 names_to = &quot;species&quot;,
+                 values_to = &quot;count&quot;) %&gt;% 
+    select(date, species, count, notes)
   return(r)
-}
-
-#pivoter &lt;- function(inputdataframe) {
- # r &lt;- inputdataframe %&gt;%
-  #if(colnames(inputdataframe) %in% c(&quot;HERG&quot;,&quot;hegu&quot;,&quot;gulls&quot;,&quot;HEGU&quot;)))
-#}</code></pre>
+}</code></pre>
+<pre class="r"><code>tower_count_2000 &lt;- read_excel(&quot;data/tower_count/tower_count_2000.XLS&quot;)
+tower_count_2000 &lt;- tower_count_2000[2:48,]
+tower_count_2000 &lt;- tower_count_2000 %&gt;%
+  mutate(coei_ju = as.double(str_extract(`# eiders`, &quot;(?&lt;=\\().*(?=\\))&quot;))) %&gt;% 
+  mutate(`# eiders` = as.double(str_extract(`# eiders`, &quot;\\d*&quot;))) %&gt;% 
+  mutate(gbbg = NA)</code></pre>
+<pre><code>## Warning in mask$eval_all_mutate(quo): NAs introduced by coercion</code></pre>
+<pre class="r"><code>tower_count_2000 &lt;- cleancolumns(tower_count_2000)</code></pre>
+<pre><code>## [1] &quot;blgus&quot;
+## [1] &quot;hergs&quot;
+## [1] &quot;coei_ads&quot;
+## [1] &quot;other&quot;</code></pre>
+<pre class="r"><code>tower_count_2000 &lt;- splitcomments(tower_count_2000)
+tower_2000_clean &lt;- selectcolumns(tower_count_2000)</code></pre>
 <pre class="r"><code>tower_count_2001 &lt;- read_excel(&quot;data/tower_count/tower_count_2001.xlsx&quot;, skip = 2)
 tower_count_2001 &lt;- tower_count_2001 %&gt;% 
   mutate(GBBG = case_when(GBBG == &quot;-&quot; ~ &quot;NA&quot;,
-         TRUE ~ as.character(GBBG))) %&gt;% 
-  mutate(other = notes)
+         TRUE ~ as.character(GBBG)))
 
-tower_count_2001 &lt;- cleaner(tower_count_2001)
-
-tower_count_2001 &lt;- tower_count_2001 %&gt;% 
-  mutate(herg = as.numeric(gulls), gbbg = as.numeric(GBBG), date = Date) %&gt;% 
-  pivot_longer(cols = c(herg, gbbg, COEI, chix, BLGU, puffin, dcco, ternsp, razo, lagu, comu, baea, noga, corvid, peepsp, seals, colo, cago, porpoise),
-               names_to = &quot;species&quot;,
-               values_to = &quot;count&quot;)</code></pre>
+tower_count_2001 &lt;- cleancolumns(tower_count_2001)</code></pre>
+<pre><code>## [1] &quot;dates&quot;
+## [1] &quot;hergs&quot;
+## [1] &quot;gbbgs&quot;
+## [1] &quot;coei_ads&quot;
+## [1] &quot;coei_jus&quot;
+## [1] &quot;blgus&quot;
+## [1] &quot;other&quot;</code></pre>
+<pre class="r"><code>tower_count_2001 &lt;- splitcomments(tower_count_2001)
+tower_2001_clean &lt;- selectcolumns(tower_count_2001)</code></pre>
 <pre><code>## Warning in mask$eval_all_mutate(quo): NAs introduced by coercion
 
 ## Warning in mask$eval_all_mutate(quo): NAs introduced by coercion</code></pre>
-<pre class="r"><code>tower_2001_clean &lt;- fixcolumns(tower_count_2001)</code></pre>
 <pre class="r"><code>tower_count_2002 &lt;- read_excel(&quot;data/tower_count/tower_count_2002.xlsx&quot;, skip = 2)
-tower_count_2002 &lt;- tower_count_2002 %&gt;% 
-  mutate(other = notes)
 
-tower_count_2002 &lt;- cleaner(tower_count_2002)
-
-tower_count_2002 &lt;- tower_count_2002 %&gt;% 
-  mutate(herg = as.numeric(HERG), gbbg = as.numeric(GBBG),coei_ad = as.numeric(COEI), coei_ju = as.numeric(chix), blgu = as.numeric(BLGU), date = Date) %&gt;% 
-  pivot_longer(cols = c (herg, gbbg, coei_ad, coei_ju, blgu, puffin, dcco, ternsp, razo, lagu, comu, baea, noga, corvid, peepsp, seals, colo, cago, porpoise),
-               names_to = &quot;species&quot;,
-               values_to = &quot;count&quot;)
-
-tower_2002_clean &lt;- fixcolumns(tower_count_2002)</code></pre>
+tower_2002_clean &lt;- tower_count_2002 %&gt;% 
+  cleancolumns() %&gt;% 
+  splitcomments() %&gt;% 
+  selectcolumns()</code></pre>
+<pre><code>## [1] &quot;dates&quot;
+## [1] &quot;hergs&quot;
+## [1] &quot;gbbgs&quot;
+## [1] &quot;coei_ads&quot;
+## [1] &quot;coei_jus&quot;
+## [1] &quot;blgus&quot;
+## [1] &quot;other&quot;</code></pre>
 <pre class="r"><code>tower_count_2003 &lt;- read_excel(&quot;data/tower_count/tower_count_2003.xls&quot;)
 
 tower_count_2003 &lt;- tower_count_2003 %&gt;% 
-  mutate(coei_ju = as.double(str_extract(Eider, &quot;/*.&quot;))) %&gt;% 
-  mutate(coei_ad = as.double(str_extract(Eider, &quot;d*.+/|d*.+&quot;))) %&gt;% 
-  mutate(coei_ad = as.double(str_extract(coei_ad,&quot;\\d*&quot;))) %&gt;% 
-  mutate(coei_ju = as.double(str_extract(coei_ju, &quot;\\d*&quot;))) %&gt;% 
-  mutate(gbbg = as.double(str_extract(BBGull, &quot;\\d*&quot;))) %&gt;% 
-  mutate(other = Others)</code></pre>
+  mutate(coei_ad = str_extract(Eider, &quot;^(.+)/|^(.+)&quot;)) %&gt;% 
+  mutate(coei_ad = as.double(str_extract(coei_ad,&quot;\\d*&quot;))) %&gt;%
+  mutate(coei_ju = str_extract(Eider, &quot;\\/.*&quot;)) %&gt;% 
+  mutate(coei_ju = as.double(str_extract(coei_ju, &quot;\\d*$&quot;)))
+
+tower_count_2003 &lt;- cleancolumns(tower_count_2003)</code></pre>
+<pre><code>## [1] &quot;dates&quot;
+## [1] &quot;hergs&quot;
+## [1] &quot;gbbgs&quot;
+## [1] &quot;blgus&quot;
+## [1] &quot;other&quot;</code></pre>
+<pre class="r"><code>tower_count_2003 &lt;- splitcomments(tower_count_2003)
+tower_2003_clean &lt;- selectcolumns(tower_count_2003)</code></pre>
 <pre><code>## Warning in mask$eval_all_mutate(quo): NAs introduced by coercion</code></pre>
-<pre class="r"><code>tower_count_2003 &lt;- cleaner(tower_count_2003)
+<pre class="r"><code>tower_count_2005 &lt;- read_excel(&quot;data/tower_count/tower_count_2005.xls&quot;)
 
-tower_count_2003 &lt;- tower_count_2003 %&gt;% 
-  mutate(herg = HerGull, blgu = Guillem, date = Date, notes = other) %&gt;% 
-  pivot_longer(cols = c(herg, gbbg, coei_ad, coei_ju, blgu, puffin, dcco, ternsp, razo, lagu, comu, baea, noga, corvid, peepsp, seals, colo, cago, porpoise),
-               names_to = &quot;species&quot;,
-               values_to = &quot;count&quot;)
+tower_count_2005 &lt;- tower_count_2005 %&gt;% 
+  mutate(other = NA)
 
-tower_2003_clean &lt;- fixcolumns(tower_count_2003)</code></pre>
+tower_count_2005 &lt;- cleancolumns(tower_count_2005)</code></pre>
+<pre><code>## [1] &quot;dates&quot;
+## [1] &quot;hergs&quot;
+## [1] &quot;gbbgs&quot;
+## [1] &quot;blgus&quot;
+## [1] &quot;coei_ads&quot;
+## [1] &quot;coei_jus&quot;</code></pre>
+<pre class="r"><code>tower_count_2005 &lt;- splitcomments(tower_count_2005)
+tower_2005_clean &lt;- selectcolumns(tower_count_2005)</code></pre>
 <pre class="r"><code>tower_count_2011 &lt;- read_excel(&quot;data/tower_count/tower_count_2011.xls&quot;, skip = 2)
 tower_count_2011 &lt;- tower_count_2011[1:47,]
 tower_count_2011 &lt;- tower_count_2011 %&gt;% 
@@ -513,51 +546,19 @@ tower_count_2011 &lt;- tower_count_2011 %&gt;%
                            monthch %in% &quot;July&quot; ~ &quot;7&quot;,
                            monthch %in% &quot;August&quot; ~ &quot;8&quot;,
                            TRUE ~ &quot;&quot;
-                           )) %&gt;% 
-  mutate(month = as.numeric(month), day = as.numeric(day), year = as.numeric(year)) %&gt;% 
-  mutate(datereal = make_date(year, month, day)) %&gt;% 
-  select(-year, -day, -month, -monthch, -Date) %&gt;% 
-  mutate(date = datereal) %&gt;% 
-  select(-datereal)
-  
+                           )) 
 
-tower_count_2011 &lt;- tower_count_2011 %&gt;% 
-  mutate(other = Others)
-
-tower_count_2011 &lt;- cleaner(tower_count_2011)
-
-tower_count_2011 &lt;- tower_count_2011 %&gt;% 
-  mutate(herg = as.double(HERG), gbbg = as.double(GBBG), blgu = as.double(BLGU), coei_ad = as.double(COEI), atpu = as.double(ATPU), coei_ju = as.double(`Eider Chicks`)) %&gt;% 
-  pivot_longer(cols = c(herg, gbbg, coei_ad, coei_ju, blgu, atpu, dcco, ternsp, razo, lagu, comu, baea, noga, corvid, peepsp),
-               names_to = &quot;species&quot;,
-               values_to = &quot;count&quot;)
-
-
-tower_2011_clean &lt;- fixcolumns(tower_count_2011)</code></pre>
-<pre class="r"><code>tower_count_2006 &lt;- read_excel(&quot;data/tower_count/tower_count_2006.xls&quot;)</code></pre>
-<pre><code>## New names:
-## • `` -&gt; `...7`
-## • `` -&gt; `...8`</code></pre>
-<pre class="r"><code>tower_count_2006 &lt;- cleaner(tower_count_2006)
-
-tower_count_2006 &lt;- tower_count_2006 %&gt;% 
-  pivot_longer(cols = c(hegu, bbgu, eider, squee, puffin, dcco, ternsp, razo, lagu, comu, baea, noga, corvid, peepsp),
-             names_to = &quot;species&quot;,
-             values_to = &quot;count&quot;)
-
-tower_2006_clean &lt;- fixcolumns(tower_count_2006)</code></pre>
-<pre class="r"><code># Fix dates
-##fixdates &lt;- function(df, year){
- # if(length(df$Date &gt; 1)){
-#    rename(df, &quot;Date&quot; = &quot;date&quot;)
-#  }
-  #df$month &lt;- lubridate::month(df$date)
-  #df$year &lt;- year
- # df$day &lt;- lubridate::day(df$date)
-  
- # df$new_date &lt;- paste0(df$year, &quot;-&quot;, df$month, &quot;-&quot;, df$day)
- # return(df)
-#}</code></pre>
+tower_count_2011 &lt;- cleancolumns(tower_count_2011)</code></pre>
+<pre><code>## [1] &quot;dates&quot;
+## [1] &quot;hergs&quot;
+## [1] &quot;gbbgs&quot;
+## [1] &quot;blgus&quot;
+## [1] &quot;coei_ads&quot;
+## [1] &quot;puffins&quot;
+## [1] &quot;coei_jus&quot;
+## [1] &quot;other&quot;</code></pre>
+<pre class="r"><code>tower_count_2011 &lt;- splitcomments(tower_count_2011)
+tower_2011_clean &lt;- selectcolumns(tower_count_2011)</code></pre>
 
 
 
