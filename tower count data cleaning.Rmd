@@ -22,11 +22,51 @@ library(lubridate)
 ##It should be possible to turn the pivoting into a function if I can tell it to select from a list of possible columns
 
 
-```{r}
-cleaner <- function(inputdataframe) {  
+```{r column rename function}
+hergs <- c("gulls","hegu","HERG","Gull","# gulls", "HeGu")
+gbbgs <- c("bbgu","GBBG","BBGull")
+blgus <- c("# squees", "squees","BLGU","Guillem")
+coei_jus <-c("chix","eider chicks")
+coei_ads <- c("COEI","Eiders", "# eiders")
+others <- c("Other","notes","comments","others")
+dates <- c("Date","day")
+#fix the puffin issue
+cleancolumns <- function(inputdataframe) {
+  for (i in 1:length(colnames(inputdataframe))){
+    print(i)
+      if (colnames(inputdataframe)[i] %in% hergs) {
+        colnames(inputdataframe)[i] <- "herg"
+        print("hergs")
+    } else if(colnames(inputdataframe)[i] %in% gbbgs) {
+        colnames(inputdataframe)[i] <- "gbbg"
+        print("gbbgs")
+    } else if (colnames(inputdataframe)[i] %in% blgus) {
+      colnames(inputdataframe)[i] <- "blgu"
+      print("blgus")
+    } else if (colnames(inputdataframe)[i] %in% coei_jus) {
+      colnames(inputdataframe)[i] <- "coei_ju"
+      print("coei_jus")
+    } else if (colnames(inputdataframe)[i] %in% coei_ads) {
+      colnames(inputdataframe)[i] <- "coei_ad"
+      print("coei_ads")
+    } else if (colnames(inputdataframe)[i] %in% others) {
+      colnames(inputdataframe)[i] <- "other"
+      print("other")
+    } else if (colnames(inputdataframe)[i] %in% dates) {
+      colnames(inputdataframe)[i] <- "date"
+      print("dates")
+    }
+  }
+  return(inputdataframe)
+}
+
+```
+
+```{r comment split function}
+splitcomments <- function(inputdataframe) {  
   r <- inputdataframe %>% 
     #puffins
-  mutate(puffin = str_extract(other, "\\d*puff|\\d*.puff|\\d*atpu|\\d*.atpu|\\d*puffis|\\d*puffins|\\d*.puffins|\\*.ATPU|\\d*.ALPU")) %>% 
+  mutate(puffin = str_extract(other, "\\d*puff|\\d*.puff|\\d*atpu|\\d*.atpu|\\d*puffis|\\d*puffins|\\d*.puffins|\\*.ATPU|\\d*.ALPU|\\d*.puffin")) %>% 
   mutate(puffin = str_extract(puffin, "\\d*")) %>%
   mutate(puffin = as.double(puffin)) %>% 
     #cormorants
@@ -66,7 +106,7 @@ cleaner <- function(inputdataframe) {
   mutate(peepsp = str_extract(peepsp, "\\d*")) %>% 
   mutate(peepsp = as.double(peepsp)) %>% 
     #seals
-  mutate(seals = str_extract(other, "\\d*.Seal|\\d*.Seals|\\d*.Harbor|\\d*.Gray|\\d*.seals|\\d*.grey|\\d*.seal")) %>% 
+  mutate(seals = str_extract(other, "\\d*.Seal|\\d*.Seals|\\d*.Harbor|\\d*.Gray|\\d*.seals|\\d*.grey|\\d*.seal|\\d*.harbor")) %>% 
   mutate(seals = str_extract(seals, "\\d*")) %>% 
   mutate(seals = as.double(seals)) %>% 
     #Loons
@@ -87,90 +127,64 @@ cleaner <- function(inputdataframe) {
   return(r)
 }
 
-fixcolumns <- function(inputdataframe) {
-  r <- inputdataframe %>% 
-    mutate(notes = other) %>% 
-    select(date, species, count, notes) %>% 
-    mutate(species = case_when(species == "GBBG" ~ "gbbg",
-                            species == "HERG" ~ "herg",
-                            species == "gulls" ~ "herg",
-                            species == "COEI" ~ "coei_ad",
-                            species == "chix" ~ "coei_ju",
-                            species == "BLGU" ~ "blgu",
-                            species == "hegu" ~ "herg",
-                            species == "bbgu" ~ "gbbg",
-                            species == "puffin" ~ "atpu",
-                            species == "eider" ~ "coei_ad",
-                            species == "squee" ~ "blgu",
-                            TRUE ~ as.character(species)))
-  return(r)
-}
-
-#pivoter <- function(inputdataframe) {
- # r <- inputdataframe %>%
-  #if(colnames(inputdataframe) %in% c("HERG","hegu","gulls","HEGU")))
-#}
 
 ```
+
+
+```{r select columns and pivot}
+selectcolumns <- function(inputdataframe) {
+  r <- inputdataframe %>% 
+    mutate(notes = other) %>% 
+    select("date","herg","gbbg","coei_ad","coei_ju","blgu","other","puffin","dcco","ternsp","razo","lagu","comu","baea","noga","corvid","peepsp","seals","colo","cago","porpoise","raptor","notes") %>% 
+    mutate(herg = as.double(herg), gbbg = as.double(gbbg)) %>% 
+    pivot_longer(cols = c("herg","gbbg","coei_ad","coei_ju","blgu","puffin","dcco","ternsp","razo","lagu","comu","baea","noga","corvid","peepsp","seals","colo","cago","porpoise","raptor"),
+                 names_to = "species",
+                 values_to = "count") %>% 
+    select(date, species, count, notes)
+  return(r)
+}
+```
+
 
 ```{r 2000}
 tower_count_2000 <- read_excel("data/tower_count/tower_count_2000.XLS")
 tower_count_2000 <- tower_count_2000[2:48,]
-tower_count_2000 <- tower_count_2000 %>% 
-  mutate(coei_ad = as.double(str_extract(`# eiders`, "\\d*"))) %>% 
+tower_count_2000 <- tower_count_2000 %>%
   mutate(coei_ju = as.double(str_extract(`# eiders`, "(?<=\\().*(?=\\))"))) %>% 
-  mutate(herg = as.double(`# gulls`), blgu = as.double(`# squees`), other = others)
+  mutate(`# eiders` = as.double(str_extract(`# eiders`, "\\d*"))) %>% 
+  mutate(gbbg = NA)
 
-tower_count_2000 <- cleaner(tower_count_2000)
 
-tower_count_2000 <- tower_count_2000 %>% 
-  pivot_longer(cols = c(herg, coei_ad, coei_ju, blgu, puffin, dcco, ternsp, razo, lagu, comu, baea, noga, corvid, peepsp, seals, colo, cago, porpoise),
-               names_to = "species",
-               values_to = "count")
-
-tower_2000_clean <- fixcolumns(tower_count_2000)
-
+tower_count_2000 <- cleancolumns(tower_count_2000)
+tower_count_2000 <- splitcomments(tower_count_2000)
+tower_2000_clean <- selectcolumns(tower_count_2000)
 ```
+
+
 
 
 ```{r 2001}
 tower_count_2001 <- read_excel("data/tower_count/tower_count_2001.xlsx", skip = 2)
 tower_count_2001 <- tower_count_2001 %>% 
   mutate(GBBG = case_when(GBBG == "-" ~ "NA",
-         TRUE ~ as.character(GBBG))) %>% 
-  mutate(other = notes)
+         TRUE ~ as.character(GBBG)))
 
-tower_count_2001 <- cleaner(tower_count_2001)
-
-tower_count_2001 <- tower_count_2001 %>% 
-  mutate(herg = as.numeric(gulls), gbbg = as.numeric(GBBG), date = Date) %>% 
-  pivot_longer(cols = c(herg, gbbg, COEI, chix, BLGU, puffin, dcco, ternsp, razo, lagu, comu, baea, noga, corvid, peepsp, seals, colo, cago, porpoise),
-               names_to = "species",
-               values_to = "count")
-
-tower_2001_clean <- fixcolumns(tower_count_2001)
+tower_count_2001 <- cleancolumns(tower_count_2001)
+tower_count_2001 <- splitcomments(tower_count_2001)
+tower_2001_clean <- selectcolumns(tower_count_2001)
 ```
 
 ```{r 2002}
 tower_count_2002 <- read_excel("data/tower_count/tower_count_2002.xlsx", skip = 2)
-tower_count_2002 <- tower_count_2002 %>% 
-  mutate(other = notes)
 
-tower_count_2002 <- cleaner(tower_count_2002)
-
-tower_count_2002 <- tower_count_2002 %>% 
-  mutate(herg = as.numeric(HERG), gbbg = as.numeric(GBBG),coei_ad = as.numeric(COEI), coei_ju = as.numeric(chix), blgu = as.numeric(BLGU), date = Date) %>% 
-  pivot_longer(cols = c (herg, gbbg, coei_ad, coei_ju, blgu, puffin, dcco, ternsp, razo, lagu, comu, baea, noga, corvid, peepsp, seals, colo, cago, porpoise),
-               names_to = "species",
-               values_to = "count")
-
-tower_2002_clean <- fixcolumns(tower_count_2002)
+tower_2002_clean <- tower_count_2002 %>% 
+  cleancolumns() %>% 
+  splitcomments() %>% 
+  selectcolumns()
   
-
-
 ```
 
-```{r}
+```{r 2003}
 tower_count_2003 <- read_excel("data/tower_count/tower_count_2003.xls")
 
 tower_count_2003 <- tower_count_2003 %>% 
@@ -245,22 +259,7 @@ tower_count_2006 <- tower_count_2006 %>%
 
 tower_2006_clean <- fixcolumns(tower_count_2006)
 
-
 ```
 
 
-```{r}
-# Fix dates
-##fixdates <- function(df, year){
- # if(length(df$Date > 1)){
-#    rename(df, "Date" = "date")
-#  }
-  #df$month <- lubridate::month(df$date)
-  #df$year <- year
- # df$day <- lubridate::day(df$date)
-  
- # df$new_date <- paste0(df$year, "-", df$month, "-", df$day)
- # return(df)
-#}
-```
 
