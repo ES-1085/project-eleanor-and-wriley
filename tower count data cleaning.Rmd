@@ -72,7 +72,7 @@ splitcomments <- function(inputdataframe) {
   mutate(dcco = str_extract(other, "\\d*corm|\\d*dcc|\\d*dcco|\\d*ddco|\\d*.DCCO|\\d*.DCC0|\\d*.commorants|\\d*.corm|\\d*.cormorants|d*..corm")) %>% 
   mutate(dcco = as.double(str_extract(dcco, "\\d*"))) %>% 
     #terns
-  mutate(ternsp = str_extract(other, "\\d*cote|\\d*.terns|\\d*.COTE|\\d*.ARTE|\\d*.Terns|\\d*.Tern|\\d*.arte")) %>% 
+  mutate(ternsp = str_extract(other, "\\d*cote|\\d*.terns|\\d*.COTE|\\d*.ARTE|\\d*.Terns|\\d*.Tern|\\d*.arte|\\d*.common tern")) %>% 
   mutate(ternsp = as.double(str_extract(ternsp, "\\d*"))) %>%
     #razorbills
   mutate(razo = str_extract(other, "\\d*razo|\\d*razor|\\d*.RAZO|\\d*.razorbills|\\d*.bills|\\d*.bill")) %>% 
@@ -110,6 +110,9 @@ splitcomments <- function(inputdataframe) {
     #raptors
   mutate(raptor = str_extract(other, "\\d*.tv")) %>% 
   mutate(raptor = as.double(str_extract(raptor, "\\d*"))) %>% 
+    #shearwater
+  mutate(shearwater = str_extract(other, "\\d*.shearwater")) %>% 
+  mutate(shearwater = as.double(str_extract(shearwater, "\\d*")))
   return(r)
 }
 
