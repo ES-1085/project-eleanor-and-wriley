@@ -6,7 +6,12 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, 
+                      cache = TRUE, 
+                      fig.width = 10,
+                      fig.height = 5,
+                      fig.align = "center", 
+                      message = FALSE)
 library(tidyverse)
 library(readxl)
 library(viridis)
@@ -14,6 +19,9 @@ library(hrbrthemes)
 library(sf)
 library(leaflet)
 library(lubridate)
+library(gganimate)
+library(ggimage)
+library(gifski)
 ```
 
 
@@ -332,5 +340,49 @@ tower_count_2015 <- cleancolumns(tower_count_2015)
 tower_count_2015 <- splitcomments(tower_count_2015)
 tower_2015_clean <- selectcolumns(tower_count_2015)
 tower_2015_clean$year = 2015
+```
+```{r}
+tower <- rbind(tower_2000_clean,tower_2001_clean,tower_2002_clean,tower_2003_clean,tower_2005_clean,tower_2006_clean,tower_2007_clean,tower_2008_clean,tower_2009_clean,tower_2010_clean,tower_2011_clean,tower_2012_clean,tower_2013_clean,tower_2014_clean,tower_2015_clean)
+               
+```
+
+
+```{r}
+tower %>%
+  filter(!is.na(count)) %>% 
+  group_by(species, year) %>% 
+  summarize(max = max(count)) %>% 
+  ggplot(aes(x = year, 
+             y = max, 
+             fill= species
+             )) +
+  geom_col(position = "dodge")
+```
+```{r eval = FALSE, echo = TRUE}
+tower %>%
+  filter(!is.na(count)) %>% 
+  group_by(species, year) %>% 
+  summarize(max = max(count)) %>%
+  ggplot(aes(x = species, y = max, fill = species))+
+  geom_col()+
+  transition_states(states = year, 
+                    transition_length = 2,
+                    state_length = 1)+
+    labs(title = 'Year: {year}', 
+       x = 'max count', 
+       y = 'species')
+```
+```{r eval = FALSE, echo = TRUE}
+tower %>%
+  filter(!is.na(count)) %>% 
+  group_by(species, year) %>% 
+  summarize(max = max(count)) %>%
+  filter(max >= 5) %>% 
+  ggplot(aes(x = species, y = max, fill = species))+
+  geom_col()+
+  transition_states(states = year,
+                    transition_length = 3,
+                    state_length = 5)
+
 ```
 
