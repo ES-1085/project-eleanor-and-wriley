@@ -63,6 +63,8 @@ cleancolumns <- function(inputdataframe) {
 ```
 
 ```{r comment split function}
+
+#there is a way to update this so that it leaves existing columns alone. In short, there should be a way to tell it to loop through the column names in a dataframe and not create a new column if the column already exists. Probably an if_else statement.
 splitcomments <- function(inputdataframe) {
   r <- inputdataframe %>% 
     #puffins
