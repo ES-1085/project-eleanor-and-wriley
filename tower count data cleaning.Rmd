@@ -24,7 +24,7 @@ hergs <- c("gulls","hegu","HERG","Gull","# gulls", "HeGu","HerGull")
 gbbgs <- c("bbgu","GBBG","BBGull")
 blgus <- c("# squees", "squees","BLGU","Guillem", "BGUY", "squee")
 coei_jus <-c("chix","eider chicks", "COEI ducklings", "Eider Chicks","COEI chix","COEI  chix")
-coei_ads <- c("COEI","Eiders", "# eiders", "eider","eiders")
+coei_ads <- c("COEI","Eiders", "# eiders", "eider","eiders", "coei")
 others <- c("Other","notes","comments","others", "Others", "comment","Comments")
 dates <- c("Date")
 puffins <- c("ATPU","AtPu")
@@ -66,7 +66,7 @@ cleancolumns <- function(inputdataframe) {
 splitcomments <- function(inputdataframe) {  
   r <- inputdataframe %>% 
     #puffins
-  mutate(puffin = str_extract(other, "\\d*puff|\\d*.puff|\\d*atpu|\\d*.atpu|\\d*puffis|\\d*puffins|\\d*.puffins|\\d*.ATPU|\\d*.ALPU|\\d*.puffin")) %>% 
+  mutate(puffin = str_extract(other, "\\d*puff|\\d*.puff|\\d*atpu|\\d*.atpu|\\d*puffis|\\d*puffins|\\d*.puffins|\\d*.ATPU|\\d*.ALPU|\\d*.puffin|\\d*..ATPU")) %>% 
   mutate(puffin = as.double(str_extract(puffin, "\\d*"))) %>%
     #cormorants
   mutate(dcco = str_extract(other, "\\d*corm|\\d*dcc|\\d*dcco|\\d*ddco|\\d*.DCCO|\\d*.DCC0|\\d*.commorants|\\d*.corm|\\d*.cormorants|d*..corm|\\d*.dcco")) %>% 
@@ -96,16 +96,16 @@ splitcomments <- function(inputdataframe) {
   mutate(peepsp = str_extract(other, "\\d*.SPSA|\\d*.WHIM|\\d*..SPSA|\\d*.spotted sandpiper|\\d*.least sandpiper|\\d*.pipers|\\d*.common sandpipers|\\d*.piper")) %>% 
   mutate(peepsp = as.double(str_extract(peepsp, "\\d*"))) %>% 
     #seals
-  mutate(seals = str_extract(other, "\\d*.Seal|\\d*.Seals|\\d*.Harbor|\\d*.Gray|\\d*.seals|\\d*.grey|\\d*.seal|\\d*.harbor|\\d*.gray|\\*.Grey|\\d*.Grey Seal|\\d*.Grey Seals")) %>% 
+  mutate(seals = str_extract(other, "\\d*.Seal|\\d*.Seals|\\d*.Harbor|\\d*.Gray|\\d*.seals|\\d*.grey|\\d*.seal|\\d*.harbor|\\d*.gray|\\*.Grey|\\d*.Grey Seal|\\d*.Grey Seals|\\d*.harbor seal|\\d*.gray seal")) %>% 
   mutate(seals = as.double(str_extract(seals, "\\d*"))) %>% 
     #Loons
   mutate(colo = str_extract(other, "\\d*.COLO|\\d*.loon|\\d*.loons")) %>% 
   mutate(colo = as.double(str_extract(colo, "\\d*"))) %>% 
     #geese
-  mutate(cago = str_extract(other, "\\d*.CAGO|\\d*.goose")) %>% 
+  mutate(cago = str_extract(other, "\\d*.CAGO|\\d*.goose|\\d*.canada goose")) %>% 
   mutate(cago = as.double(str_extract(cago, "\\d*"))) %>% 
     #porpoise
-  mutate(porpoise = str_extract(other, "\\d*.Harbor|\\d*.porpoise|\\d*.Porpoises")) %>% 
+  mutate(porpoise = str_extract(other, "\\d*.Harbor|\\d*.porpoise|\\d*.Porpoises|\\d*.porpoises")) %>% 
   mutate(porpoise = as.double(str_extract(porpoise, "\\d*"))) %>% 
     #raptors
   mutate(raptor = str_extract(other, "\\d*.tv")) %>% 
@@ -117,7 +117,7 @@ splitcomments <- function(inputdataframe) {
   mutate(gbhe = str_extract(other, "\\d*.heron|\\d*.GBHE")) %>% 
   mutate(gbhe = as.double(str_extract(gbhe, "\\d*"))) %>% 
     #scoter
-  mutate(scoter = str_extract(other, "\\d*.scoter|\\d*.Scoter")) %>% 
+  mutate(scoter = str_extract(other, "\\d*.scoter|\\d*.Scoter|\\d*.BLSC")) %>% 
   mutate(scoter = as.double(str_extract(scoter, "\\d*")))
   return(r)
 }
@@ -301,6 +301,19 @@ tower_2013_clean <- selectcolumns(tower_count_2013)
 ```
 
 ```{r}
+tower_count_2014 <- read_excel("data/tower_count/tower_count_2014.xlsx")
+#thank god a normal one
 
+tower_count_2014 <- cleancolumns(tower_count_2014)
+tower_count_2014 <- splitcomments(tower_count_2014)
+tower_2014_clean <- selectcolumns(tower_count_2014)
+```
+
+```{r}
+tower_count_2015 <- read_excel("data/tower_count/tower_count_2015.xlsx")
+
+tower_count_2015 <- cleancolumns(tower_count_2015)
+tower_count_2015 <- splitcomments(tower_count_2015)
+tower_2015_clean <- selectcolumns(tower_count_2015)
 ```
 
