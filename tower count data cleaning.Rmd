@@ -30,8 +30,8 @@ library(gifski)
 #lists of possible columns names for our usual birds, add as new ones arise
 hergs <- c("gulls","hegu","HERG","Gull","# gulls", "HeGu","HerGull")
 gbbgs <- c("bbgu","GBBG","BBGull")
-blgus <- c("# squees", "squees","BLGU","Guillem", "BGUY", "squee")
-coei_jus <-c("chix","eider chicks", "COEI ducklings", "Eider Chicks","COEI chix","COEI  chix")
+blgus <- c("# squees", "squees","BLGU","Guillem", "BGUY", "squee","SQUEE")
+coei_jus <-c("chix","eider chicks", "COEI ducklings", "Eider Chicks","COEI chix","COEI  chix","EICHICK")
 coei_ads <- c("COEI","Eiders", "# eiders", "eider","eiders", "coei")
 others <- c("Other","notes","comments","others", "Others", "comment","Comments")
 dates <- c("Date")
@@ -81,7 +81,7 @@ splitcomments <- function(inputdataframe) {
   mutate(ternsp = str_extract(other, "\\d*cote|\\d*.terns|\\d*.COTE|\\d*.ARTE|\\d*.Terns|\\d*.Tern|\\d*.arte|\\d*.common tern|\\d*.common term")) %>% 
   mutate(ternsp = as.double(str_extract(ternsp, "\\d*"))) %>%
     #razorbills
-  mutate(razo = str_extract(other, "\\d*razo|\\d*razor|\\d*.RAZO|\\d*.razorbills|\\d*.bills|\\d*.bill|\\d*.RAZ0")) %>% 
+  mutate(razo = str_extract(other, "\\d*razo|\\d*razor|\\d*.RAZO|\\d*.razorbills|\\d*.bills|\\d*.bill|\\d*.RAZ0|\\d*.RABI|\\d*.razo|\\d*razo")) %>% 
   mutate(razo = as.double(str_extract(razo, "\\d*"))) %>% 
     #laughing gulls
   mutate(lagu = str_extract(other, "\\d*lagu|\\d*.laughing|\\d*.LAGU|\\d*lagus")) %>% 
@@ -90,7 +90,7 @@ splitcomments <- function(inputdataframe) {
   mutate(comu = str_extract(other, "\\d*murre|\\d*.COMU|\\d*.common murre|\\d*.murre")) %>% 
   mutate(comu = as.double(str_extract(comu, "\\d*"))) %>% 
     #bald eagle
-  mutate(baea = str_extract(other, "\\d*.imm|\\d*.BAEA|\\d*.eagle")) %>% 
+  mutate(baea = str_extract(other, "\\d*.imm|\\d*.BAEA|\\d*.eagle|\\d*.juv")) %>% 
   mutate(baea = as.double(str_extract(baea, "\\d*"))) %>% 
     #gannet
   mutate(noga = str_extract(other, "\\d*.gannets||\\d*.NOGA|\\d*.gannet")) %>% 
@@ -99,7 +99,7 @@ splitcomments <- function(inputdataframe) {
   mutate(corvid = str_extract(other, "\\d*.crow|\\d*.Corvid|\\d*.AMCR|\\d*.Corvids|\\d*.crows|\\d*crow")) %>% 
   mutate(corvid = as.double(str_extract(corvid, "\\d*"))) %>%
     #sandpipers
-  mutate(peepsp = str_extract(other, "\\d*.SPSA|\\d*.WHIM|\\d*..SPSA|\\d*.spotted sandpiper|\\d*.least sandpiper|\\d*.pipers|\\d*.common sandpipers|\\d*.piper")) %>% 
+  mutate(peepsp = str_extract(other, "\\d*.SPSA|\\d*.WHIM|\\d*..SPSA|\\d*.spotted sandpiper|\\d*.least sandpiper|\\d*.pipers|\\d*.common sandpipers|\\d*.piper|\\d*.red knots|\\d*.wimbrel|\\d*.spotted sandpipers|\\d*.sandpiper|\\d*.sandpipers")) %>% 
   mutate(peepsp = as.double(str_extract(peepsp, "\\d*"))) %>% 
     #seals
   mutate(seals = str_extract(other, "\\d*.Seal|\\d*.Seals|\\d*.Harbor|\\d*.Gray|\\d*.seals|\\d*.grey|\\d*.seal|\\d*.harbor|\\d*.gray|\\*.Grey|\\d*.Grey Seal|\\d*.Grey Seals|\\d*.harbor seal|\\d*.gray seal")) %>% 
@@ -108,22 +108,22 @@ splitcomments <- function(inputdataframe) {
   mutate(colo = str_extract(other, "\\d*.COLO|\\d*.loon|\\d*.loons")) %>% 
   mutate(colo = as.double(str_extract(colo, "\\d*"))) %>% 
     #geese
-  mutate(cago = str_extract(other, "\\d*.CAGO|\\d*.goose|\\d*.canada goose")) %>% 
+  mutate(cago = str_extract(other, "\\d*.CAGO|\\d*.goose|\\d*.canada goose|\\d*.canada geese")) %>% 
   mutate(cago = as.double(str_extract(cago, "\\d*"))) %>% 
     #porpoise
   mutate(porpoise = str_extract(other, "\\d*.Harbor|\\d*.porpoise|\\d*.Porpoises|\\d*.porpoises")) %>% 
   mutate(porpoise = as.double(str_extract(porpoise, "\\d*"))) %>% 
     #raptors
-  mutate(raptor = str_extract(other, "\\d*.tv")) %>% 
+  mutate(raptor = str_extract(other, "\\d*.tv|\\d*.peregrine|\\d*.PEFA")) %>% 
   mutate(raptor = as.double(str_extract(raptor, "\\d*"))) %>% 
     #shearwater
   mutate(shearwater = str_extract(other, "\\d*.shearwater")) %>% 
   mutate(shearwater = as.double(str_extract(shearwater, "\\d*"))) %>% 
     #heron
-  mutate(gbhe = str_extract(other, "\\d*.heron|\\d*.GBHE")) %>% 
+  mutate(gbhe = str_extract(other, "\\d*.heron|\\d*.GBHE|\\d*.great blue heron")) %>% 
   mutate(gbhe = as.double(str_extract(gbhe, "\\d*"))) %>% 
     #scoter
-  mutate(scoter = str_extract(other, "\\d*.scoter|\\d*.Scoter|\\d*.BLSC")) %>% 
+  mutate(scoter = str_extract(other, "\\d*.scoter|\\d*.Scoter|\\d*.BLSC|\\d*.surf scoter")) %>% 
   mutate(scoter = as.double(str_extract(scoter, "\\d*")))
   return(r)
 }
@@ -323,7 +323,7 @@ tower_2013_clean <- selectcolumns(tower_count_2013)
 tower_2013_clean$year = 2013
 ```
 
-```{r}
+```{r 2014}
 tower_count_2014 <- read_excel("data/tower_count/tower_count_2014.xlsx")
 #thank god a normal one
 
@@ -333,7 +333,7 @@ tower_2014_clean <- selectcolumns(tower_count_2014)
 tower_2014_clean$year = 2014
 ```
 
-```{r}
+```{r 2015}
 tower_count_2015 <- read_excel("data/tower_count/tower_count_2015.xlsx")
 
 tower_count_2015 <- cleancolumns(tower_count_2015)
@@ -341,8 +341,51 @@ tower_count_2015 <- splitcomments(tower_count_2015)
 tower_2015_clean <- selectcolumns(tower_count_2015)
 tower_2015_clean$year = 2015
 ```
+
+```{r 2016}
+tower_count_2016 <- read_excel("data/tower_count/tower_count_2016.xlsx")
+
+tower_count_2016 <- cleancolumns(tower_count_2016)
+tower_count_2016 <- splitcomments(tower_count_2016)
+tower_2016_clean <- selectcolumns(tower_count_2016)
+tower_2016_clean$year = 2016
+```
+
+
+```{r 2017}
+tower_count_2017 <- read_excel("data/tower_count/tower_count_2017.xlsx") %>% 
+  mutate(coei_ad = str_extract(`COEI + chix`, "^(.+)[\\+]|\\d*")) %>% 
+  mutate(coei_ad = as.double(str_extract(coei_ad,"\\d*"))) %>%
+  mutate(coei_ju = str_extract(`COEI + chix`, "[\\+].*")) %>% 
+  mutate(coei_ju = as.double(str_extract(coei_ju, "\\d*$"))) %>% #I am a regex genuis now
+  select(-`COEI + chix`)
+
+tower_count_2017 <- cleancolumns(tower_count_2017)
+tower_count_2017 <- splitcomments(tower_count_2017)
+tower_2017_clean <- selectcolumns(tower_count_2017)
+tower_2017_clean$year = 2017
+```
+
+```{r 2018}
+tower_count_2018 <- read_excel("data/tower_count/tower_count_2018.xlsx")
+
+tower_count_2018 <- cleancolumns(tower_count_2018)
+tower_count_2018 <- splitcomments(tower_count_2018)
+tower_2018_clean <- selectcolumns(tower_count_2018)
+tower_2018_clean$year = 2018
+```
+
+```{r 2019}
+tower_count_2019 <- read_excel("data/tower_count/tower_count_2019.xlsx")
+
+tower_count_2019 <- cleancolumns(tower_count_2019)
+tower_count_2019 <- splitcomments(tower_count_2019)
+tower_2019_clean <- selectcolumns(tower_count_2019)
+tower_2019_clean$year = 2019
+```
+##Need to find 2020, update 2021 to include incidental species, and enter 2022 data
 ```{r}
-tower <- rbind(tower_2000_clean,tower_2001_clean,tower_2002_clean,tower_2003_clean,tower_2005_clean,tower_2006_clean,tower_2007_clean,tower_2008_clean,tower_2009_clean,tower_2010_clean,tower_2011_clean,tower_2012_clean,tower_2013_clean,tower_2014_clean,tower_2015_clean)
+tower <- rbind(tower_2000_clean,tower_2001_clean,tower_2002_clean,tower_2003_clean,tower_2005_clean,tower_2006_clean,tower_2007_clean,tower_2008_clean,tower_2009_clean,tower_2010_clean,tower_2011_clean,tower_2012_clean,tower_2013_clean,tower_2014_clean,tower_2015_clean, tower_2016_clean,tower_2017_clean,tower_2018_clean,tower_2019_clean)
                
 ```
 
@@ -358,7 +401,7 @@ tower %>%
              )) +
   geom_col(position = "dodge")
 ```
-```{r eval = FALSE, echo = TRUE}
+``{r eval = FALSE, echo = TRUE}
 tower %>%
   filter(!is.na(count)) %>% 
   group_by(species, year) %>% 
@@ -371,8 +414,8 @@ tower %>%
     labs(title = 'Year: {year}', 
        x = 'max count', 
        y = 'species')
-```
-```{r eval = FALSE, echo = TRUE}
+``
+``{r eval = FALSE, echo = TRUE}
 tower %>%
   filter(!is.na(count)) %>% 
   group_by(species, year) %>% 
@@ -384,5 +427,5 @@ tower %>%
                     transition_length = 3,
                     state_length = 5)
 
-```
+``
 
