@@ -27,7 +27,6 @@ coei_jus <-c("chix","eider chicks", "COEI ducklings", "Eider Chicks","COEI chix"
 coei_ads <- c("COEI","Eiders", "# eiders", "eider","eiders", "coei")
 others <- c("Other","notes","comments","others", "Others", "comment","Comments")
 dates <- c("Date")
-puffins <- c("ATPU","AtPu")
 
 cleancolumns <- function(inputdataframe) {
   for (i in 1:length(colnames(inputdataframe))){
@@ -52,9 +51,6 @@ cleancolumns <- function(inputdataframe) {
     } else if (colnames(inputdataframe)[i] %in% dates) {
       colnames(inputdataframe)[i] <- "date"
       print("dates")
-    } else if (colnames(inputdataframe)[i] %in% puffins) {
-      colnames(inputdataframe)[i] <- "puffin"
-      print("puffins")
     }
   }
   return(inputdataframe)
@@ -155,6 +151,7 @@ tower_count_2000 <- tower_count_2000 %>%
 tower_count_2000 <- cleancolumns(tower_count_2000)
 tower_count_2000 <- splitcomments(tower_count_2000)
 tower_2000_clean <- selectcolumns(tower_count_2000)
+tower_2000_clean$year = 2000
 ```
 
 
@@ -169,6 +166,7 @@ tower_count_2001 <- tower_count_2001 %>%
 tower_count_2001 <- cleancolumns(tower_count_2001)
 tower_count_2001 <- splitcomments(tower_count_2001)
 tower_2001_clean <- selectcolumns(tower_count_2001)
+tower_2001_clean$year = 2001
 ```
 
 ```{r 2002}
@@ -178,7 +176,8 @@ tower_2002_clean <- tower_count_2002 %>%
   cleancolumns() %>% 
   splitcomments() %>% 
   selectcolumns()
-  
+
+tower_2002_clean$year = 2002
 ```
 
 ```{r 2003}
@@ -193,6 +192,7 @@ tower_count_2003 <- tower_count_2003 %>%
 tower_count_2003 <- cleancolumns(tower_count_2003)
 tower_count_2003 <- splitcomments(tower_count_2003)
 tower_2003_clean <- selectcolumns(tower_count_2003)
+tower_2003_clean$year = 2003
 ```
 
 ```{r 2005}
@@ -204,6 +204,7 @@ tower_count_2005 <- tower_count_2005 %>%
 tower_count_2005 <- cleancolumns(tower_count_2005)
 tower_count_2005 <- splitcomments(tower_count_2005)
 tower_2005_clean <- selectcolumns(tower_count_2005)
+tower_2005_clean$year = 2005
 ```
 
 ```{r 2006}
@@ -214,6 +215,7 @@ tower_count_2006 <- splitcomments(tower_count_2006)
 tower_count_2006 <- tower_count_2006 %>% 
   mutate(coei_ju = as.double(str_extract(other, "\\d*eiderchix")))
 tower_2006_clean <- selectcolumns(tower_count_2006)
+tower_2006_clean$year = 2006
 ```
 
 ```{r 2007}
@@ -222,6 +224,7 @@ tower_count_2007 <- read_excel("data/tower_count/tower_count_2007.xls")
 tower_count_2007 <- cleancolumns(tower_count_2007)
 tower_count_2007 <- splitcomments(tower_count_2007)
 tower_2007_clean <- selectcolumns(tower_count_2007)
+tower_2007_clean$year = 2007
 ```
 
 ```{r 2008}
@@ -230,6 +233,7 @@ tower_count_2008 <- read_excel("data/tower_count/tower_count_2008.xlsx", skip = 
 tower_count_2008 <- cleancolumns(tower_count_2008)
 tower_count_2008 <- splitcomments(tower_count_2008)
 tower_2008_clean <- selectcolumns(tower_count_2008)
+tower_2008_clean$year = 2008
 
 ```
 
@@ -239,6 +243,7 @@ tower_count_2009 <- read_excel("data/tower_count/tower_count_2009.xlsx", skip = 
 tower_count_2009 <- cleancolumns(tower_count_2009)
 tower_count_2009 <- splitcomments(tower_count_2009)
 tower_2009_clean <- selectcolumns(tower_count_2009)
+tower_2009_clean$year = 2009
 ```
 
 ```{r 2010}
@@ -248,6 +253,8 @@ tower_2010_clean <- tower_count_2010 %>%
   cleancolumns() %>% 
   splitcomments() %>% 
   selectcolumns()
+
+tower_2010_clean$year = 2010
 
 ```
 
@@ -266,11 +273,15 @@ tower_count_2011 <- tower_count_2011 %>%
                            monthch %in% "July" ~ "7",
                            monthch %in% "August" ~ "8",
                            TRUE ~ ""
-                           )) 
+                           )) %>% 
+  mutate(ATPU = paste(ATPU, "ATPU")) %>% 
+  mutate(Others = paste(Others, ATPU, sep = ",")) %>% #good way to fix puffin columns
+  select(-ATPU, -Comments)
 
 tower_count_2011 <- cleancolumns(tower_count_2011)
 tower_count_2011 <- splitcomments(tower_count_2011)
 tower_2011_clean <- selectcolumns(tower_count_2011)
+tower_2011_clean$year = 2011
 
 ```
 
@@ -287,6 +298,7 @@ tower_count_2012 <- read_excel("data/tower_count/tower_count_2012.xls", skip = 2
 tower_count_2012 <- cleancolumns(tower_count_2012)
 tower_count_2012 <- splitcomments(tower_count_2012)
 tower_2012_clean <- selectcolumns(tower_count_2012)
+tower_2012_clean$year = 2012
 ```
 
 ```{r 2013}
@@ -300,6 +312,7 @@ tower_count_2013 <- cleancolumns(tower_count_2013)
 #worth checking if puffins are carrying over correctly
 tower_count_2013 <- splitcomments(tower_count_2013)
 tower_2013_clean <- selectcolumns(tower_count_2013)
+tower_2013_clean$year = 2013
 ```
 
 ```{r}
@@ -309,6 +322,7 @@ tower_count_2014 <- read_excel("data/tower_count/tower_count_2014.xlsx")
 tower_count_2014 <- cleancolumns(tower_count_2014)
 tower_count_2014 <- splitcomments(tower_count_2014)
 tower_2014_clean <- selectcolumns(tower_count_2014)
+tower_2014_clean$year = 2014
 ```
 
 ```{r}
@@ -317,5 +331,6 @@ tower_count_2015 <- read_excel("data/tower_count/tower_count_2015.xlsx")
 tower_count_2015 <- cleancolumns(tower_count_2015)
 tower_count_2015 <- splitcomments(tower_count_2015)
 tower_2015_clean <- selectcolumns(tower_count_2015)
+tower_2015_clean$year = 2015
 ```
 
