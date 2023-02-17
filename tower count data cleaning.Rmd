@@ -93,7 +93,7 @@ splitcomments <- function(inputdataframe) {
   mutate(corvid = str_extract(other, "\\d*.crow|\\d*.Corvid|\\d*.AMCR|\\d*.Corvids|\\d*.crows|\\d*crow")) %>% 
   mutate(corvid = as.double(str_extract(corvid, "\\d*"))) %>%
     #sandpipers
-  mutate(peepsp = str_extract(other, "\\d*.SPSA|\\d*.WHIM|\\d*..SPSA|\\d*.spotted sandpiper|\\d*.least sandpiper|\\d*.pipers")) %>% 
+  mutate(peepsp = str_extract(other, "\\d*.SPSA|\\d*.WHIM|\\d*..SPSA|\\d*.spotted sandpiper|\\d*.least sandpiper|\\d*.pipers|\\d*.common sandpipers|\\d*.piper")) %>% 
   mutate(peepsp = as.double(str_extract(peepsp, "\\d*"))) %>% 
     #seals
   mutate(seals = str_extract(other, "\\d*.Seal|\\d*.Seals|\\d*.Harbor|\\d*.Gray|\\d*.seals|\\d*.grey|\\d*.seal|\\d*.harbor|\\d*.gray|\\*.Grey|\\d*.Grey Seal|\\d*.Grey Seals")) %>% 
@@ -274,20 +274,28 @@ tower_2011_clean <- selectcolumns(tower_count_2011)
 
 
 ```{r 2012}
+#this isn't working, may have to be done by hand. Unfortunately the splitcomments function overwrites the contents of the pre-existing columns. The best thing to do may be to somehow pivot those columns so they appear as comments in a different column, then paste them together. 
 
 tower_count_2012 <- read_excel("data/tower_count/tower_count_2012.xls", skip = 2)
 colnames(tower_count_2012) = c("date","herg","gbbg","blgu","coei_ad","coei_ju","puffin","razo","dcco","corvid","corvid2","colo","noga","grco","baea","lagu","peepsp","ternsp","Comments")
 
 
-tower_count_2012 <- cleancolumns(tower_count_2012)
-tower_count_2012 <- splitcomments(tower_count_2012)
-tower_2012_clean <- selectcolumns(tower_count_2012)
+#tower_count_2012 <- cleancolumns(tower_count_2012)
+#tower_2012_clean <- selectcolumns(tower_count_2012)
 ```
 
 ```{r 2013}
-tower_count_2013 <- read_excel("data/tower_count/tower_count_2013.xls", skip = 1)
-tower_count_2013 <- tower_count_2013[3:82,]
-colnames(tower_count_2013) = c()
+
+#same problem as above
+tower_count_2013 <- read_excel("data/tower_count/tower_count_2013.xls")
+colnames(tower_count_2013) = c("date","herg","gbbg","blgu","coei_ad","coei_ju","puffin","dcco","colo","ternsp","noga","baea","scoter","corvid","seal","other","razo","lagu")
+
+tower_count_2013 <- cleancolumns(tower_count_2013)
+tower_count_2013 <- splitcomments(tower_count_2013)
+tower_2013_clean <- selectcolumns(tower_count_2013)
 ```
 
+```{r}
+
+```
 
