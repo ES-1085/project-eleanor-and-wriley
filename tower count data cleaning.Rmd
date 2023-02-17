@@ -405,9 +405,10 @@ tower %>%
              )) +
   geom_col(position = "dodge")
 ```
-``{r eval = FALSE, echo = TRUE}
+```{r eval = FALSE, echo = TRUE}
 tower %>%
   filter(!is.na(count)) %>% 
+  filter(species == c("herg","coei_ju","coei_ad","gbbg","blgu","puffin")) %>%
   group_by(species, year) %>% 
   summarize(max = max(count)) %>%
   ggplot(aes(x = species, y = max, fill = species))+
@@ -415,10 +416,10 @@ tower %>%
   transition_states(states = year, 
                     transition_length = 2,
                     state_length = 1)+
-    labs(title = 'Year: {year}', 
+    labs(title = 'Year: {frame_time}', 
        x = 'max count', 
        y = 'species')
-``
+```
 ``{r eval = FALSE, echo = TRUE}
 tower %>%
   filter(!is.na(count)) %>% 

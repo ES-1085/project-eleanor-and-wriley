@@ -118,6 +118,14 @@ ggplot(outline) +
 ```{r fun tower times}
 towerclean <- read_csv("data/towerclean.csv")
 
+towerclean %>% 
+  filter(species == c ("herg","gbbg","coei_ad","coei_ju","blgu")) %>% 
+  group_by(year, species) %>% 
+  summarize(sum = sum(count)) %>% 
+  ggplot(aes(x = year, y = sum, fill = species))+
+  geom_col(position = "dodge")
+  
+
 ```
 
 
