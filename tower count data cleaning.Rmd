@@ -69,7 +69,7 @@ splitcomments <- function(inputdataframe) {
   mutate(puffin = str_extract(other, "\\d*puff|\\d*.puff|\\d*atpu|\\d*.atpu|\\d*puffis|\\d*puffins|\\d*.puffins|\\d*.ATPU|\\d*.ALPU|\\d*.puffin")) %>% 
   mutate(puffin = as.double(str_extract(puffin, "\\d*"))) %>%
     #cormorants
-  mutate(dcco = str_extract(other, "\\d*corm|\\d*dcc|\\d*dcco|\\d*ddco|\\d*.DCCO|\\d*.DCC0|\\d*.commorants|\\d*.corm|\\d*.cormorants|d*..corm")) %>% 
+  mutate(dcco = str_extract(other, "\\d*corm|\\d*dcc|\\d*dcco|\\d*ddco|\\d*.DCCO|\\d*.DCC0|\\d*.commorants|\\d*.corm|\\d*.cormorants|d*..corm|\\d*.dcco")) %>% 
   mutate(dcco = as.double(str_extract(dcco, "\\d*"))) %>% 
     #terns
   mutate(ternsp = str_extract(other, "\\d*cote|\\d*.terns|\\d*.COTE|\\d*.ARTE|\\d*.Terns|\\d*.Tern|\\d*.arte|\\d*.common tern|\\d*.common term")) %>% 
@@ -130,9 +130,9 @@ splitcomments <- function(inputdataframe) {
 selectcolumns <- function(inputdataframe) {
   r <- inputdataframe %>% 
     mutate(notes = other) %>% 
-    select("date","herg","gbbg","coei_ad","coei_ju","blgu","other","puffin","dcco","ternsp","razo","lagu","comu","baea","noga","corvid","peepsp","seals","colo","cago","porpoise","raptor","notes") %>% 
+    select("date","herg","gbbg","coei_ad","coei_ju","blgu","other","puffin","dcco","ternsp","razo","lagu","comu","baea","noga","corvid","peepsp","seals","colo","cago","porpoise","raptor","gbhe","scoter","shearwater","notes") %>% 
     mutate(herg = as.numeric(herg), gbbg = as.numeric(gbbg), coei_ad = as.double(coei_ad), coei_ju = as.double(coei_ju), blgu = as.double(blgu)) %>% 
-    pivot_longer(cols = c("herg","gbbg","coei_ad","coei_ju","blgu","puffin","dcco","ternsp","razo","lagu","comu","baea","noga","corvid","peepsp","seals","colo","cago","porpoise","raptor"),
+    pivot_longer(cols = c("herg","gbbg","coei_ad","coei_ju","blgu","puffin","dcco","ternsp","razo","lagu","comu","baea","noga","corvid","peepsp","seals","colo","cago","porpoise","raptor", "gbhe","scoter","shearwater"),
                  names_to = "species",
                  values_to = "count") %>% 
     select(date, species, count, notes)
@@ -276,21 +276,26 @@ tower_2011_clean <- selectcolumns(tower_count_2011)
 ```{r 2012}
 #this isn't working, may have to be done by hand. Unfortunately the splitcomments function overwrites the contents of the pre-existing columns. The best thing to do may be to somehow pivot those columns so they appear as comments in a different column, then paste them together. 
 
-tower_count_2012 <- read_excel("data/tower_count/tower_count_2012.xls", skip = 2)
-colnames(tower_count_2012) = c("date","herg","gbbg","blgu","coei_ad","coei_ju","puffin","razo","dcco","corvid","corvid2","colo","noga","grco","baea","lagu","peepsp","ternsp","Comments")
+#this is an extremely inelegant solution to this problem but it does seem to work. It is probably possible to write a loop to do it. 
+tower_count_2012 <- read_excel("data/tower_count/tower_count_2012.xls", skip = 2) %>% 
+  mutate(ATPU = paste(ATPU, "atpu"),RAZO = paste(RAZO, "razo"), DCCO = paste(DCCO, "dcco"),AMCR = paste(AMCR, "crow"),CORA = paste(CORA, "corvid"), COLO = paste(COLO, "COLO"), NOGA = paste(NOGA, "gannet"),BAEA = paste(BAEA, "eagle"),LAGU = paste(LAGU,"lagu"),COTE = paste(COTE, "tern"), SPSA = paste(SPSA, "piper")) %>% 
+  mutate(Comments = paste(Comments, ATPU, RAZO, DCCO, AMCR, CORA, COLO, NOGA, BAEA, LAGU, COTE, sep = "," ))
+#This is very unlikely to be adding the corvids together properly, but that should only be a problem if there are crows and ravens observed on the same day. Not sure if worth fixing, though would be interesting to try. 
 
-
-#tower_count_2012 <- cleancolumns(tower_count_2012)
-#tower_2012_clean <- selectcolumns(tower_count_2012)
+tower_count_2012 <- cleancolumns(tower_count_2012)
+tower_count_2012 <- splitcomments(tower_count_2012)
+tower_2012_clean <- selectcolumns(tower_count_2012)
 ```
 
 ```{r 2013}
 
 #same problem as above
-tower_count_2013 <- read_excel("data/tower_count/tower_count_2013.xls")
-colnames(tower_count_2013) = c("date","herg","gbbg","blgu","coei_ad","coei_ju","puffin","dcco","colo","ternsp","noga","baea","scoter","corvid","seal","other","razo","lagu")
+tower_count_2013 <- read_excel("data/tower_count/tower_count_2013.xls")%>% 
+  mutate(ATPU = paste(ATPU, "atpu"),RAZO = paste(RAZO, "razo"), DCCO = paste(DCCO, "dcco"), COLO = paste(COLO, "COLO"), NOGA = paste(NOGA, "gannet"),BAEA = paste(BAEA, "eagle"),LAGU = paste(LAGU,"lagu"),tern = paste(tern, "tern"), scoter = paste(scoter, "scoter"), seal = paste(seal, "seal")) %>% 
+  mutate(other = paste(other, ATPU, RAZO, DCCO, COLO, NOGA, BAEA, LAGU, tern, scoter, seal, sep = "," ))
 
 tower_count_2013 <- cleancolumns(tower_count_2013)
+#worth checking if puffins are carrying over correctly
 tower_count_2013 <- splitcomments(tower_count_2013)
 tower_2013_clean <- selectcolumns(tower_count_2013)
 ```
