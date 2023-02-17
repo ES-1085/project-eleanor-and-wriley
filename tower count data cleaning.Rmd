@@ -63,7 +63,7 @@ cleancolumns <- function(inputdataframe) {
 ```
 
 ```{r comment split function}
-splitcomments <- function(inputdataframe) {  
+splitcomments <- function(inputdataframe) {
   r <- inputdataframe %>% 
     #puffins
   mutate(puffin = str_extract(other, "\\d*puff|\\d*.puff|\\d*atpu|\\d*.atpu|\\d*puffis|\\d*puffins|\\d*.puffins|\\d*.ATPU|\\d*.ALPU|\\d*.puffin|\\d*..ATPU")) %>% 
