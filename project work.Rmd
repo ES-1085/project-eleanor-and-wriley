@@ -109,10 +109,13 @@ leaflet(data = gullshape) %>%
 
 
 
-```{r}
+```{r fig.height=4, fig.width=4}
 ggplot(outline) +
-  geom_sf(data = outline)+
-  geom_sf(data = gullshape)
+  geom_sf(data = outline, fill = "lightblue")+
+  geom_sf(data = gullshape, color = "midnightblue") +
+  coord_sf(ylim = c(44.140385, 44.145726), xlim = c(-68.25038, -68.242629), expand = FALSE) + 
+  theme_bw()
+
 ```
 
 ```{r cleaning 2006 tower}
