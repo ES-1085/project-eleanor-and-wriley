@@ -84,10 +84,10 @@ splitcomments <- function(inputdataframe) {
   mutate(razo = str_extract(other, "\\d*razo|\\d*razor|\\d*.RAZO|\\d*.razorbills|\\d*.bills|\\d*.bill|\\d*.RAZ0|\\d*.RABI|\\d*.razo|\\d*razo")) %>% 
   mutate(razo = as.double(str_extract(razo, "\\d*"))) %>% 
     #laughing gulls
-  mutate(lagu = str_extract(other, "\\d*lagu|\\d*.laughing|\\d*.LAGU|\\d*lagus")) %>% 
+  mutate(lagu = str_extract(other, "\\d*lagu|\\d*.laughing|\\d*.LAGU|\\d*lagus|\\d*.laughing gull|\\d*.lagu|\\d*LAGU|\\d*.laughing gulls")) %>% 
   mutate(lagu = as.double(str_extract(lagu, "\\d*"))) %>% 
     #common murre
-  mutate(comu = str_extract(other, "\\d*murre|\\d*.COMU|\\d*.common murre|\\d*.murre")) %>% 
+  mutate(comu = str_extract(other, "\\d*murre|\\d*.COMU|\\d*.common murre|\\d*.murre|\\d*.comu|\\d*.common murres|\\d*COMU")) %>% 
   mutate(comu = as.double(str_extract(comu, "\\d*"))) %>% 
     #bald eagle
   mutate(baea = str_extract(other, "\\d*.imm|\\d*.BAEA|\\d*.eagle|\\d*.juv")) %>% 
@@ -390,7 +390,7 @@ tower <- rbind(tower_2000_clean,tower_2001_clean,tower_2002_clean,tower_2003_cle
 towertowrite <- tower %>% 
   filter(!is.na(count))
 
-#write.csv(towertowrite, "data/towerclean.csv")
+write.csv(towertowrite, "data/towerclean.csv")
 ```
 
 
