@@ -118,99 +118,17 @@ ggplot(outline) +
 
 ```
 
-```{r cleaning 2006 tower}
-tower_count_2006 <- read_excel("data/tower_count/tower_count_2006.xls")
-#in progress...getting there
-#Hallie swears to me that this can be done with a for loop that runs through the species of interest so that might be a next step. She's also a lot more allergic to copy/pasting than I am
-tower_count_2006 <- tower_count_2006 %>% 
-  mutate(puffin = str_extract(other, "\\d*puff|\\d*.puff|\\d*atpu|\\d*.atpu|\\d*puffis|\\d*puffins|\\d*.puffins")) %>% 
-  mutate(puffin = str_extract(puffin, "\\d*")) %>%
-  mutate(puffin = as.double(puffin)) %>% 
-  mutate(dcco = str_extract(other, "\\d*corm|\\d*dcc|\\d*dcco|\\d*ddco")) %>% 
-  mutate(dcco = str_extract(dcco, "\\d*")) %>% 
-  mutate(dcco = as.double(dcco)) %>% 
-  mutate(ternsp = str_extract(other, "\\d*cote|\\d*.terns")) %>% 
-  mutate(ternsp = str_extract(ternsp, "\\d*")) %>%
-  mutate(ternsp = as.double(ternsp)) %>% 
-  mutate(razo = str_extract(other, "\\d*razo|\\d*razor")) %>% 
-  mutate(razo = str_extract(razo, "\\d*")) %>% 
-  mutate(razo = as.double(razo)) %>%  #likewise there's gotta be a more efficient way to turn these all into doubles
-  mutate(lagu = str_extract(other, "\\d*lagu")) %>% 
-  mutate(lagu = str_extract(lagu, "\\d*")) %>% 
-  mutate(lagu = as.double(lagu))
+```{r fun tower times}
+towerclean <- read_csv("data/towerclean.csv")
 
-tower_count_2006 <- tower_count_2006 %>% 
-  pivot_longer(cols = c(hegu, bbgu, eider, squee, puffin, dcco, ternsp, razo, lagu),
-             names_to = "species",
-             values_to = "count")
-#literally so powerful
-
-ggplot(tower_count_2006, aes(x = date, y = count, color = species))+
-  geom_point()+
-  labs(title = "2006 Tower Count")
-```
-
-
-```{r 2006 barplot, fig.height=2, fig.width=6}
-ggplot(tower_count_2006, aes(x = date, y = count, fill = species)) +
+towerclean %>% 
+  filter(species == c ("razo","puffin","comu","colo","lagu","peepsp")) %>% 
+  group_by(year, species) %>% 
+  summarize(max = max(count)) %>% 
+  ggplot(aes(x = year, y = max, fill = species))+
   geom_col(position = "dodge")
-
-tower_count_2006 %>%
-  filter(species == "hegu" | species == "bbgu" | species == "eider" | species == "squee" | species == "puffin") %>%
-  ggplot(aes(x = date, y = count, fill = species)) +
-  geom_col(position = "dodge")
-
-unique(tower_count_2006$species)
+  
 
 ```
 
-Run this code chunk to understand my feelings about the stringr package:
-```{r}
-#browseURL("https://xkcd.com/2347/")
-```
-
-```{r cleaning 2009 data}
-
-tower_count_2009 <- read_excel("data/tower_count/tower_count_2009.xlsx", skip = 2)
-#If we're going to do this in such an inefficient way I'm going to ask Laurie how to comment/space the code so it isn't agonizing to read
-tower_count_2009 <- tower_count_2009 %>% 
-#puff
-  mutate(puffin = str_extract(other, "\\d*ATPU|\\d*.ATPU")) %>% 
-  mutate(puffin = str_extract(puffin, "\\d*")) %>% 
-  mutate(puffin = as.double(puffin)) %>% 
- #corm
-  mutate(dcco = str_extract(other, "\\d*DCCO|\\d*.DCCO")) %>% 
-  mutate(dcco = str_extract(dcco, "\\d*")) %>% 
-  mutate(dcco = as.double(dcco)) %>%
-#razo
-  mutate(razo = str_extract(other, "\\d*RAZO|\\d*.RAZO")) %>% 
-  mutate(razo = str_extract(razo, "\\d*")) %>% 
-  mutate(razo = as.double(razo)) %>%
- #baea
-  mutate(baea = str_extract(other, "\\d*BAEA|\\d*.BAEA")) %>% 
-  mutate(baea = str_extract(baea, "\\d*")) %>% 
-  mutate(baea = as.double(baea)) %>%
- #scoter
-  mutate(scoter = str_extract(other, "\\d*.scoter")) %>% 
-  mutate(scoter = str_extract(scoter, "\\d*")) %>% 
-  mutate(scoter = as.double(scoter)) %>% 
-#corvid
-  mutate(corvid = str_extract(other, "\\d*.crow")) %>% 
-  mutate(corvid = str_extract(corvid, "\\d*")) %>%
-  mutate(corvid = as.double(corvid)) %>% 
-#gannet
-  mutate(noga = str_extract(other, "\\d*.gannet")) %>% 
-  mutate(noga = str_extract(noga, "\\d*")) %>% 
-  mutate(noga = as.double(noga)) %>% 
-  mutate(HERG = as.double(HERG))
-
-tower_count_2009 <- tower_count_2009 %>% 
-  pivot_longer(cols = c(HERG, GBBG, BLGU, COEI, `COEI  chix`, puffin, dcco, razo, baea, scoter, corvid, noga ),
-               names_to = "species",
-               values_to = "count")
-
-
-ggplot(tower_count_2009, aes(x = Date, y = count, color = species))+
-  geom_point()
-```
 
