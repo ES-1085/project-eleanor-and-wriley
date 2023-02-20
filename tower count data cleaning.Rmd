@@ -404,6 +404,16 @@ tower %>%
              fill= species
              )) +
   geom_col(position = "dodge")
+
+tower %>%
+  filter(!is.na(count)) %>% 
+  group_by(species, year) %>% 
+  summarize(max = max(count)) %>% 
+  ggplot(aes(x = year, 
+             y = max, 
+             color = species
+             )) +
+  geom_line()
 ```
 ```{r eval = FALSE, echo = TRUE}
 tower %>%
