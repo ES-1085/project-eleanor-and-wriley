@@ -1,0 +1,78 @@
+---
+title: "function fixing"
+author: "Eleanor and Wriley"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+hergs <- c("gulls","hegu","HERG","Gull","# gulls", "HeGu","HerGull")
+gbbgs <- c("bbgu","GBBG","BBGull")
+blgus <- c("# squees", "squees","BLGU","Guillem", "BGUY", "squee","SQUEE")
+coei_jus <-c("chix","eider chicks", "COEI ducklings", "Eider Chicks","COEI chix","COEI  chix","EICHICK")
+coei_ads <- c("COEI","Eiders", "# eiders", "eider","eiders", "coei")
+others <- c("Other","notes","comments","others", "Others", "comment","Comments")
+dates <- c("Date")
+puffins <- c("ATPU","puff")
+
+cleancolumns <- function(inputdataframe) {
+  for (i in 1:length(colnames(inputdataframe))){
+      if (colnames(inputdataframe)[i] %in% hergs) {
+        colnames(inputdataframe)[i] <- "herg"
+        print("hergs")
+    } else if(colnames(inputdataframe)[i] %in% gbbgs) {
+        colnames(inputdataframe)[i] <- "gbbg"
+        print("gbbgs")
+    } else if (colnames(inputdataframe)[i] %in% blgus) {
+      colnames(inputdataframe)[i] <- "blgu"
+      print("blgus")
+    } else if (colnames(inputdataframe)[i] %in% coei_jus) {
+      colnames(inputdataframe)[i] <- "coei_ju"
+      print("coei_jus")
+    } else if (colnames(inputdataframe)[i] %in% coei_ads) {
+      colnames(inputdataframe)[i] <- "coei_ad"
+      print("coei_ads")
+    } else if (colnames(inputdataframe)[i] %in% others) {
+      colnames(inputdataframe)[i] <- "other"
+      print("other")
+    } else if (colnames(inputdataframe)[i] %in% dates) {
+      colnames(inputdataframe)[i] <- "date"
+      print("dates")
+    } else if (colnames(inputdataframe)[i] %in% puffins) {
+      colnames(inputdataframe)[i] <- "puffin"
+      print("puffin")
+    }
+  }
+  return(inputdataframe)
+}
+```
+
+```{r}
+splitcomments <- function(inputdataframe) {
+  for (i in 1:length(colnames(inputdataframe))){
+    if("puffin" %in% colnames(inputdataframe)[i]) {
+    #puffins
+  mutate(inputdataframe, puffin = str_extract(other, "\\d*puff|\\d*.puff|\\d*atpu|\\d*.atpu|\\d*puffis|\\d*puffins|\\d*.puffins|\\d*.ATPU|\\d*.ALPU|\\d*.puffin|\\d*..ATPU")) %>% 
+  mutate(puffin = as.double(str_extract(puffin, "\\d*")))
+    } else if (colnames(inputdataframe)[i] %in% "dcco") {
+    #cormorants
+  mutate(inputdataframe, dcco = str_extract(other, "\\d*corm|\\d*dcc|\\d*dcco|\\d*ddco|\\d*.DCCO|\\d*.DCC0|\\d*.commorants|\\d*.corm|\\d*.cormorants|d*..corm|\\d*.dcco")) %>% 
+  mutate(dcco = as.double(str_extract(dcco, "\\d*")))
+    }
+  }
+  return(inputdataframe)
+}
+```
+
+
+```{r}
+tower_count_2013 <- read_excel("data/tower_count/tower_count_2013.xls")
+
+tower_count_2013 <- cleancolumns(tower_count_2013)
+tower_count_2013 <- splitcomments(tower_count_2013)
+```
+
