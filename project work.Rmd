@@ -122,11 +122,9 @@ ggplot(outline) +
 towerclean <- read_csv("data/towerclean.csv")
 
 towerclean %>% 
-  filter(species == c ("razo","puffin","comu","colo","lagu","peepsp")) %>% 
-  group_by(year, species) %>% 
-  summarize(max = max(count)) %>% 
-  ggplot(aes(x = year, y = max, fill = species))+
-  geom_col(position = "dodge")
+  filter(species == "lagu") %>% 
+  group_by(year) %>% 
+  summarize(count)
   
 
 ```
