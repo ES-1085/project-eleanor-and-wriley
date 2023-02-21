@@ -58,7 +58,7 @@ splitcomments <- function(inputdataframe) {
     #puffins
   mutate(inputdataframe, puffin = str_extract(other, "\\d*puff|\\d*.puff|\\d*atpu|\\d*.atpu|\\d*puffis|\\d*puffins|\\d*.puffins|\\d*.ATPU|\\d*.ALPU|\\d*.puffin|\\d*..ATPU")) %>% 
   mutate(puffin = as.double(str_extract(puffin, "\\d*")))
-    } else if (colnames(inputdataframe)[i] %in% "dcco") {
+    } else if ("dcco" %in% (colnames(inputdataframe)[i])) {
     #cormorants
   mutate(inputdataframe, dcco = str_extract(other, "\\d*corm|\\d*dcc|\\d*dcco|\\d*ddco|\\d*.DCCO|\\d*.DCC0|\\d*.commorants|\\d*.corm|\\d*.cormorants|d*..corm|\\d*.dcco")) %>% 
   mutate(dcco = as.double(str_extract(dcco, "\\d*")))

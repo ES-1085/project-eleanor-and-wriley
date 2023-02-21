@@ -10,43 +10,44 @@ library(shiny)
 
 
 
-tower <- read.csv("towercount/towerclean.csv")
+tower <- read.csv("Data/towerclean.csv")
+yearlist <- as.list(unique(towerclean$year))
 # Define UI for application that draws a histogram
 ui <- fluidPage(
+  titlePanel("Tower Count Data"),
+  
+  sidebarLayout(
+    sidebarPanel("Year"),
+    mainPanel("High Count", align = "center")
+  ),
 
-    # Application title
-    titlePanel("Old Faithful Geyser Data"),
-
-    # Sidebar with a slider input for number of bins 
-    sidebarLayout(
-        sidebarPanel(
-            sliderInput("bins",
-                        "Number of bins:",
-                        min = 1,
-                        max = 50,
-                        value = 30)
-        ),
-
-        # Show a plot of the generated distribution
-        mainPanel(
-           plotOutput("distPlot")
-        )
-    )
+column(3,
+         selectInput("select", h3("Select box"), 
+                     choices = yearlist, selected = 1)),
 )
-
-# Define server logic required to draw a histogram
+# Define server logic to plot various variables against mpg ----
 server <- function(input, output) {
-
-    output$distPlot <- renderPlot({
-        # generate bins based on input$bins from ui.R
-        x    <- tower[, 2]
-        bins <- seq(min(x), max(x), length.out = input$year + 1)
-
-        # draw the histogram with the specified number of bins
-        hist(x, breaks = bins, col = 'darkgray', border = 'white',
-             xlab = 'Waiting time to next eruption (in mins)',
-             main = 'Histogram of waiting times')
-    })
+  
+  # Compute the formula text ----
+  # This is in a reactive expression since it is shared by the
+  # output$caption and output$mpgPlot functions
+  formulaText <- reactive({
+    paste("mpg ~", input$year)
+  })
+  
+  # Return the formula text for printing as a caption ----
+  output$caption <- renderText({
+    formulaText()
+  })
+  
+  # Generate a plot of the requested variable against mpg ----
+  # and only exclude outliers if requested
+  output$plot <- renderPlot({
+    barplot(as.formula(formulaText()),
+            data = tower, x = species,
+            col = "#75AADB", pch = 19)
+  })
+  
 }
 
 # Run the application 

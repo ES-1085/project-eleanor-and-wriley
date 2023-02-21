@@ -25,7 +25,6 @@ library(gifski)
 ```
 
 
-
 ```{r column rename function}
 #lists of possible columns names for our usual birds, add as new ones arise
 hergs <- c("gulls","hegu","HERG","Gull","# gulls", "HeGu","HerGull")
@@ -96,7 +95,7 @@ splitcomments <- function(inputdataframe) {
   mutate(noga = str_extract(other, "\\d*.gannets||\\d*.NOGA|\\d*.gannet")) %>% 
   mutate(noga = as.double(str_extract(noga, "\\d*"))) %>% 
     #corvids
-  mutate(corvid = str_extract(other, "\\d*.crow|\\d*.Corvid|\\d*.AMCR|\\d*.Corvids|\\d*.crows|\\d*crow")) %>% 
+  mutate(corvid = str_extract(other, "\\d*.crow|\\d*.Corvid|\\d*.AMCR|\\d*.Corvids|\\d*.crows|\\d*crow|\\d*.CORA")) %>% 
   mutate(corvid = as.double(str_extract(corvid, "\\d*"))) %>%
     #sandpipers
   mutate(peepsp = str_extract(other, "\\d*.SPSA|\\d*.WHIM|\\d*..SPSA|\\d*.spotted sandpiper|\\d*.least sandpiper|\\d*.pipers|\\d*.common sandpipers|\\d*.piper|\\d*.red knots|\\d*.wimbrel|\\d*.spotted sandpipers|\\d*.sandpiper|\\d*.sandpipers")) %>% 
@@ -415,6 +414,7 @@ tower %>%
              )) +
   geom_line()
 ```
+
 ```{r eval = FALSE, echo = TRUE}
 tower %>%
   filter(!is.na(count)) %>% 
