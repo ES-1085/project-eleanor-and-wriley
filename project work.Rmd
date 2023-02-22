@@ -13,6 +13,9 @@ library(viridis)
 library(hrbrthemes)
 library(sf)
 library(leaflet)
+library(gganimate)
+library(ggimage)
+library(gifski)
 ```
 
 ## R Markdown
@@ -89,15 +92,15 @@ population_distribution_gulls %>%
 
 ```{r practice leaflet}
 
-gullshape <- read_sf("data/gullshapefiles/gulls2021")
+gullshape2021 <- read_sf("data/gullshapefiles/gulls2021")
 outline <- read_sf("data/outlinecolored")
-head(gullshape)
-plot(gullshape)
+head(gullshape2021)
+plot(gullshape2021)
 
-gullshape <- st_transform(gullshape, "+init=epsg:4326")
+gullshape2021 <- st_transform(gullshape2021, "+init=epsg:4326")
 outline <- st_transform(outline, "+init=epsg:4326")
 
-leaflet(data = gullshape) %>% 
+leaflet(data = gullshape2021) %>% 
   addProviderTiles(providers$Esri.WorldImagery) %>% 
     setView(lng = -68, 
           lat = 44, 
@@ -108,11 +111,29 @@ leaflet(data = gullshape) %>%
 ```
 
 
+```{r join-shapefile-nestcount}
+##2022
+gullshape2022 <- read_sf("data/gullshapefiles/Gulls2022")
+nest_count_clean_2022 <- read.csv("data/nest_count_clean_2022.csv")
+gullshape2022 <- st_transform(gullshape2022, "+init=epsg:4326") %>%
+  select(Comment, geometry) %>%
+  rename("Flag" = "Comment") %>%
+  mutate(Flag = as.integer(Flag))
 
-```{r fig.height=4, fig.width=4}
+gullshape2022 %>%
+  full_join(nest_count_clean_2022, by = "Flag")
+##2021
+
+nest_count_clean_2021 <- read.csv("data/nest_count_clean_2021.csv")
+gullshape2021 <- select(Comment, geometry)
+
+
+```
+
+```{r eval = FALSE, echo = TRUE, fig.height=4, fig.width=4}
 ggplot(outline) +
   geom_sf(data = outline, fill = "lightblue")+
-  geom_sf(data = gullshape, color = "midnightblue") +
+  geom_sf(data = gullshape2021, color = "midnightblue") +
   coord_sf(ylim = c(44.140385, 44.145726), xlim = c(-68.25038, -68.242629), expand = FALSE) + 
   theme_bw()
 

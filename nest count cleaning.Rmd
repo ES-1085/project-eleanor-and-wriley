@@ -26,14 +26,35 @@ nest_count_2022 <- nest_count_2022 %>%
   mutate(species = str_replace(species, "GBBG", "gbbg")) %>%
   replace_na(list(species = "herg"))
 
-nest_count_2022$species %>% replace_na("herg")
 ```
 
 ```{r}
 nest_count_2021 <- read_excel("data/nest_count/nest_count_2021.xlsx", na = "NA")
 
+# nest_count_2021 <- 
 nest_count_2021 <- nest_count_2021 %>%
-  mutate(year = "2021") 
+  mutate(year = "2021") %>%
+    mutate(detect.gbbg = str_detect(comment, "GBBG")) %>%
+    mutate(species.gbbg = str_replace(detect.gbbg, "TRUE", "gbbg")) %>% 
+    mutate(detect.gbbg.2 = str_detect(`...7`, "GBBG")) %>%
+    mutate(species.gbbg.2 = str_replace(detect.gbbg.2, "TRUE", "gbbg")) %>%
+    mutate(detect.coei = str_detect(comment, "eider")) %>%
+    mutate(species.coei = str_replace(detect.coei, "TRUE", "coei")) %>% 
+    mutate(detect.coei.2 = str_detect(`...7`, "COEI")) %>%
+    mutate(species.coei.2 = str_replace(detect.coei.2, "TRUE", "coei")) %>%
+    mutate(species = case_when(
+      species.gbbg == "gbbg" | species.gbbg.2 == "gbbg" ~ "gbbg",
+      species.coei == "coei" | species.coei.2 == "coei" ~ "coei")) %>%
+  replace_na(list(species = "herg")) %>%
+  select(flag, clutch, location, year, species)
+      
+   
+    
+  
+  
+  
+  # mutate(species = str_extract(comment, "\\d*GBBG|\\d*gbbg\\d*COEI|\\d*eider")) %>%
+  # mutate(species1 = str_extract`...7`)  
 
 # %>%
 #   mutate(species = str_extract(comment, "\\d*GBBG|\\d*gbbg\\d*COEI|\\d*eider")) %>%
@@ -43,7 +64,7 @@ nest_count_2021 <- nest_count_2021 %>%
 #   mutate(species1 = str_extract(`...7`, "\\d*GBBG|\\d*COEI")) %>%
 #   mutate(species1 = str_replace(species1, "COEI", "coei")) %>%
 #   mutate(species1 = str_replace(species1, "GBBG", "gbbg"))
-#   
+# 
 # nest_count_2021$species2 <- paste(nest_count_2021$species, nest_count_2021$species1)
 # 
 # nest_count_2021 <- nest_count_2021 %>%
@@ -51,6 +72,7 @@ nest_count_2021 <- nest_count_2021 %>%
 #   mutate(species3 = str_extract(species2, "\\d*.BBG|\\*.gbbg\\d*COEI|\\d*eider|\\d*.coei"))
   
 ```
+
 ```{r}
 write.csv(nest_count_2021, "data/nest_count_clean_2021.csv")
 
