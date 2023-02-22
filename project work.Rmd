@@ -119,7 +119,7 @@ ggplot(outline) +
 ```
 
 ```{r fun tower times}
-#towerclean <- read_csv("data/towerclean.csv")
+towerclean <- read_csv("data/towerclean.csv")
 
 towerclean %>%  
   group_by(species) %>% 
@@ -169,6 +169,13 @@ towerclean %>%
 ```
 
 ```{r}
+towerclean %>%
+  filter(species == c("herg","gbbg","coei_ad","blgu")) %>%
+  mutate(year = as.character(year)) %>% 
+  group_by(year, species) %>% 
+  ggplot(aes(x = year, y = count, fill = species))+
+  geom_boxplot(position = "dodge")
+  
 
 ```
 
