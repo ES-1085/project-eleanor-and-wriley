@@ -18,6 +18,7 @@ coei_ads <- c("COEI","Eiders", "# eiders", "eider","eiders", "coei")
 others <- c("Other","notes","comments","others", "Others", "comment","Comments")
 dates <- c("Date")
 puffins <- c("ATPU","puff")
+corms <- c("DCCO", "Cormorants")
 
 cleancolumns <- function(inputdataframe) {
   for (i in 1:length(colnames(inputdataframe))){
@@ -45,6 +46,9 @@ cleancolumns <- function(inputdataframe) {
     } else if (colnames(inputdataframe)[i] %in% puffins) {
       colnames(inputdataframe)[i] <- "puffin"
       print("puffin")
+    } else if (colnames(inputdataframe)[i] %in% corms) {
+      colnames(inputdataframe)[i] <- "dcco"
+      print("dcco")
     }
   }
   return(inputdataframe)
@@ -53,17 +57,7 @@ cleancolumns <- function(inputdataframe) {
 
 ```{r}
 splitcomments <- function(inputdataframe) {
-  for (i in 1:length(colnames(inputdataframe))){
-    if("puffin" %in% colnames(inputdataframe)[i]) {
-    #puffins
-  mutate(inputdataframe, puffin = str_extract(other, "\\d*puff|\\d*.puff|\\d*atpu|\\d*.atpu|\\d*puffis|\\d*puffins|\\d*.puffins|\\d*.ATPU|\\d*.ALPU|\\d*.puffin|\\d*..ATPU")) %>% 
-  mutate(puffin = as.double(str_extract(puffin, "\\d*")))
-    } else if ("dcco" %in% (colnames(inputdataframe)[i])) {
-    #cormorants
-  mutate(inputdataframe, dcco = str_extract(other, "\\d*corm|\\d*dcc|\\d*dcco|\\d*ddco|\\d*.DCCO|\\d*.DCC0|\\d*.commorants|\\d*.corm|\\d*.cormorants|d*..corm|\\d*.dcco")) %>% 
-  mutate(dcco = as.double(str_extract(dcco, "\\d*")))
-    }
-  }
+    mutate(puffin = ifelse(puffins %in% colnames(inputdataframe), puffin, str_extract(other, "\\d*puff|\\d*.puff|\\d*atpu|\\d*.atpu|\\d*puffis|\\d*puffins|\\d*.puffins|\\d*.ATPU|\\d*.ALPU|\\d*.puffin|\\d*..ATPU")))
   return(inputdataframe)
 }
 ```

@@ -144,4 +144,31 @@ ggplot()+
   coord_sf(ylim = c(44.5, 45), xlim = c(-68.1, -68.4), expand = FALSE)
 ```
 
+```{r}
+
+pop_dist_clean <- population_distribution_gulls %>%
+  rename(little_point = `Little Point (near Boathouse)`) %>%
+  mutate(West = as.numeric(`West`)) %>%
+  mutate(south_end = East + West + Extension) %>%
+  mutate(north_end = Point + Cabin + Hell) %>%
+  select(YEAR, south_end, north_end, Borofsky, little_point) %>%
+  pivot_longer( cols = south_end:little_point,
+               names_to = "location",
+               values_to = "total") %>% 
+  filter(location == "south_end") %>% 
+  mutate(year = as.character(YEAR))
+
+towerclean %>%
+  mutate(year = as.character(year)) %>% 
+  filter(species == "herg") %>% 
+  group_by(year) %>% 
+  mutate(year = as.character(year)) %>% 
+  ggplot()+
+  geom_boxplot(aes(x = year, y = count))+
+  geom_point(data = pop_dist_clean, aes(x = year, y = total), color = "aquamarine4")
+```
+
+```{r}
+
+```
 
