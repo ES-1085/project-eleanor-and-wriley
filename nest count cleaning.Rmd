@@ -1,0 +1,60 @@
+---
+title: "Project Work"
+author: "Eleanor and Wriley"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(readxl)
+library(sf)
+library(leaflet)
+library(glue)
+```
+
+```{r}
+nest_count_2022 <- read_excel("data/nest_count/nest_count_2022.xlsx", na = "NA")
+```
+
+```{r}
+nest_count_2022 <- nest_count_2022 %>%
+  mutate(year = "2022") %>%
+  mutate(species = str_extract(comment, "\\d*GBBG|\\d*COEI")) %>%
+  mutate(species = str_replace(species, "COEI", "coei")) %>%
+  mutate(species = str_replace(species, "GBBG", "gbbg")) %>%
+  replace_na(list(species = "herg"))
+
+nest_count_2022$species %>% replace_na("herg")
+```
+
+```{r}
+nest_count_2021 <- read_excel("data/nest_count/nest_count_2021.xlsx", na = "NA")
+
+nest_count_2021 <- nest_count_2021 %>%
+  mutate(year = "2021") 
+
+# %>%
+#   mutate(species = str_extract(comment, "\\d*GBBG|\\d*gbbg\\d*COEI|\\d*eider")) %>%
+#   mutate(species = str_replace(species, "COEI", "coei")) %>%
+#   mutate(species = str_replace(species, "GBBG", "gbbg")) %>%
+#   mutate(species = str_replace(species, "eider", "coei")) %>%
+#   mutate(species1 = str_extract(`...7`, "\\d*GBBG|\\d*COEI")) %>%
+#   mutate(species1 = str_replace(species1, "COEI", "coei")) %>%
+#   mutate(species1 = str_replace(species1, "GBBG", "gbbg"))
+#   
+# nest_count_2021$species2 <- paste(nest_count_2021$species, nest_count_2021$species1)
+# 
+# nest_count_2021 <- nest_count_2021 %>%
+#   mutate(year = "2021") %>%
+#   mutate(species3 = str_extract(species2, "\\d*.BBG|\\*.gbbg\\d*COEI|\\d*eider|\\d*.coei"))
+  
+```
+```{r}
+write.csv(nest_count_2021, "data/nest_count_clean_2021.csv")
+
+write.csv(nest_count_2022, "data/nest_count_clean_2022.csv")
+
+```
+
