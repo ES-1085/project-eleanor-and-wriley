@@ -7,6 +7,7 @@
 #
 
 library(shiny)
+library(tidyverse)
 
 
 
@@ -18,34 +19,20 @@ ui <- fluidPage(
   
   sidebarLayout(
     sidebarPanel("Year"),
-    mainPanel("High Count", align = "center")
-  ),
 
 column(3,
          selectInput("select", h3("Select box"), 
                      choices = yearlist, selected = 1)),
+mainPanel(
+  textOutput("selected_year"))
 )
+)
+
 # Define server logic to plot various variables against mpg ----
 server <- function(input, output) {
   
-  # Compute the formula text ----
-  # This is in a reactive expression since it is shared by the
-  # output$caption and output$mpgPlot functions
-  formulaText <- reactive({
-    paste("mpg ~", input$year)
-  })
-  
-  # Return the formula text for printing as a caption ----
-  output$caption <- renderText({
-    formulaText()
-  })
-  
-  # Generate a plot of the requested variable against mpg ----
-  # and only exclude outliers if requested
-  output$plot <- renderPlot({
-    barplot(as.formula(formulaText()),
-            data = tower, x = species,
-            col = "#75AADB", pch = 19)
+  output$selected_year <- renderText({ 
+    "You have selected this"
   })
   
 }

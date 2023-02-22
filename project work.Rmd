@@ -119,14 +119,29 @@ ggplot(outline) +
 ```
 
 ```{r fun tower times}
-towerclean <- read_csv("data/towerclean.csv")
+#towerclean <- read_csv("data/towerclean.csv")
 
-towerclean %>% 
-  filter(species == "lagu") %>% 
-  group_by(year) %>% 
-  summarize(count)
+towerclean %>%  
+  group_by(species) %>% 
+  summarize(max = max(count)) %>%
+  filter(max >= 5) %>% 
+  ggplot(aes( y = species, x = max, fill = species))+
+  geom_col()+
+  scale_fill_viridis_d()+
+  labs(main = "Species High Counts")
   
 
+```
+
+```{r}
+
+GUL01 <- gulltrack %>% 
+  filter(`Logger ID` == "GUL01")
+ 
+ggplot()+
+  geom_path(data = GUL01, aes(x = Longitude, y = Latitude))+
+  geom_sf(data = outline, fill = "lightblue")+
+  coord_sf(ylim = c(44.5, 45), xlim = c(-68.1, -68.4), expand = FALSE)
 ```
 
 
