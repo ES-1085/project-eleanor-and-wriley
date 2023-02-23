@@ -194,8 +194,8 @@ towerclean %>%
   filter(species == c("herg","gbbg","coei_ad","blgu")) %>%
   mutate(year = as.character(year)) %>% 
   group_by(year, species) %>% 
-  ggplot(aes(x = year, y = count, fill = species))+
-  geom_boxplot(position = "dodge")
+  ggplot(aes(x = count, y = year, fill = species))+
+  geom_col(position = "dodge")
   
 
 ```
