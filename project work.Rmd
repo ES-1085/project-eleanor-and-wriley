@@ -200,3 +200,11 @@ towerclean %>%
 
 ```
 
+```{r}
+towerclean %>% 
+  group_by(species, year) %>%
+  ggplot(aes(x = year, y = count, fill = species))+
+  geom_boxplot(position = "dodge")
+  
+```
+

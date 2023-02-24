@@ -8,9 +8,11 @@
 
 library(shiny)
 library(tidyverse)
+library(lubridate)
 
 #Import Data
 tower <- read.csv("Data/towerclean.csv")
+tower$year <- year(as.Date(as.character(tower$year), format = "%Y"))
 yearlist <- as.list(unique(tower$year))
 specieslist <- as.list(unique(tower$species))
 
@@ -22,9 +24,10 @@ ui <- fluidPage(
   titlePanel("Tower Count Data"),
   sidebarLayout(
     sidebarPanel(
-        selectInput("yearIn", "Year:", choices = yearlist, multiple = TRUE, selected = 2000),
+        selectInput("yearIn", "Year:", choices = yearlist, multiple = TRUE, selected = c(2000,2001)),
         checkboxGroupInput("speciesIn", "Species", choices = specieslist, selected  = c("herg","gbbg","coei_ad","blgu")),
-        selectInput("plottype","Plot Type", choices = c("barplot","boxplot"))
+        selectInput("plottype","Plot Type", choices = c("barplot","boxplot","multi-year barplot","lines")),
+        selectInput("barstat","Statistic to Use (won't affect boxplots)", choices = c("median", "mean", "max", "season total"), selected = "total")
     ),
     mainPanel(
       plotOutput("plot"))
@@ -35,13 +38,23 @@ ui <- fluidPage(
 server <- function(input, output) {
   
   output$plot <- renderPlot({
+    #stat_to_use <- as.function(input$barstat)
+    #print(stat_to_use)
      if (input$plottype == "barplot") {
         tower %>% 
         group_by(species, year) %>% 
-        summarize(max = max(count)) %>% 
+        summarize(stat = if (input$barstat == "median") {
+          median(count)
+        } else if (input$barstat == "max") {
+          max(count)
+        } else if (input$barstat == "mean") {
+          mean(count)
+        } else if (input$barstat == "season total") {
+          sum(count)
+        }) %>% 
         filter(year %in% input$yearIn) %>% 
         filter(species %in% input$speciesIn) %>% 
-        ggplot(aes(x = species, y = max, fill = species))+
+        ggplot(aes(x = species, y = stat, fill = species))+
         geom_col()+
         facet_wrap(~year)+
         labs(title= "High Counts", subtitle = "Great Duck Tower Data")+
@@ -58,7 +71,47 @@ server <- function(input, output) {
         labs(title= "All Counts", subtitle = "Great Duck Tower Data")+
         scale_fill_viridis_d()+
         theme_bw()
-    }
+    } else if (input$plottype == "multi-year barplot") {
+        tower %>% 
+        mutate(year = as.character(year)) %>% 
+        group_by(species, year) %>% 
+        filter(year %in% input$yearIn) %>% 
+        filter(species %in% input$speciesIn) %>% 
+        summarize(stat = if (input$barstat == "median") {
+          median(count)
+        } else if (input$barstat == "max") {
+          max(count)
+        } else if (input$barstat == "mean") {
+          mean(count)
+        } else if (input$barstat == "season total") {
+          sum(count)
+        }) %>% 
+        ggplot(aes(x = year, y = stat, fill = species))+
+        geom_col(position = "dodge", width = 0.5)+
+        labs(title= input$barstat, subtitle = "Great Duck Tower Data")+
+        scale_fill_viridis_d()+
+        theme_bw()
+    } else if (input$plottype == "lines") {
+        tower %>% 
+        group_by(species, year) %>% 
+        filter(year %in% input$yearIn) %>% 
+        filter(species %in% input$speciesIn) %>% 
+        summarize(stat = if (input$barstat == "median") {
+          median(count)
+        } else if (input$barstat == "max") {
+          max(count)
+        } else if (input$barstat == "mean") {
+          mean(count)
+        } else if (input$barstat == "season total") {
+          sum(count)
+        }) %>% 
+        ggplot()+
+        geom_point(aes(x = year, y = stat, color = species), size = 2)+
+        geom_line(aes(x = year, y = stat, color = species), linewidth = 1.3 )+
+        labs(title = input$barstat, subtitle = "Great Duck Tower Data")+
+        scale_color_viridis_d()+
+        theme_bw()
+    } 
   })
   
 }

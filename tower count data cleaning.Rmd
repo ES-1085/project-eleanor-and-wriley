@@ -92,13 +92,13 @@ splitcomments <- function(inputdataframe) {
   mutate(baea = str_extract(other, "\\d*.imm|\\d*.BAEA|\\d*.eagle|\\d*.juv")) %>% 
   mutate(baea = as.double(str_extract(baea, "\\d*"))) %>% 
     #gannet
-  mutate(noga = str_extract(other, "\\d*.gannets||\\d*.NOGA|\\d*.gannet")) %>% 
+  mutate(noga = str_extract(other, "\\d*.gannets|\\d*.NOGA|\\d*.gannet")) %>% 
   mutate(noga = as.double(str_extract(noga, "\\d*"))) %>% 
     #corvids
   mutate(corvid = str_extract(other, "\\d*.crow|\\d*.Corvid|\\d*.AMCR|\\d*.Corvids|\\d*.crows|\\d*crow|\\d*.CORA")) %>% 
   mutate(corvid = as.double(str_extract(corvid, "\\d*"))) %>%
     #sandpipers
-  mutate(peepsp = str_extract(other, "\\d*.SPSA|\\d*.WHIM|\\d*..SPSA|\\d*.spotted sandpiper|\\d*.least sandpiper|\\d*.pipers|\\d*.common sandpipers|\\d*.piper|\\d*.red knots|\\d*.wimbrel|\\d*.spotted sandpipers|\\d*.sandpiper|\\d*.sandpipers")) %>% 
+  mutate(peepsp = str_extract(other, "\\d*.SPSA|\\d*.WHIM|\\d*..SPSA|\\d*.spotted sandpiper|\\d*.least sandpiper|\\d*.pipers|\\d*.common sandpipers|\\d*.piper|\\d*.red knots|\\d*.wimbrel|\\d*.spotted sandpipers|\\d*.sandpiper|\\d*.sandpipers|\\d*.RUTU|\\d*.SESA|d*.SBDO|\\d*.REPH|\\d*.LESA")) %>% 
   mutate(peepsp = as.double(str_extract(peepsp, "\\d*"))) %>% 
     #seals
   mutate(seals = str_extract(other, "\\d*.Seal|\\d*.Seals|\\d*.Harbor|\\d*.Gray|\\d*.seals|\\d*.grey|\\d*.seal|\\d*.harbor|\\d*.gray|\\*.Grey|\\d*.Grey Seal|\\d*.Grey Seals|\\d*.harbor seal|\\d*.gray seal")) %>% 
@@ -113,17 +113,23 @@ splitcomments <- function(inputdataframe) {
   mutate(porpoise = str_extract(other, "\\d*.Harbor|\\d*.porpoise|\\d*.Porpoises|\\d*.porpoises")) %>% 
   mutate(porpoise = as.double(str_extract(porpoise, "\\d*"))) %>% 
     #raptors
-  mutate(raptor = str_extract(other, "\\d*.tv|\\d*.peregrine|\\d*.PEFA")) %>% 
+  mutate(raptor = str_extract(other, "\\d*.tv|\\d*.peregrine|\\d*.PEFA|\\d*.MERL")) %>% 
   mutate(raptor = as.double(str_extract(raptor, "\\d*"))) %>% 
     #shearwater
-  mutate(shearwater = str_extract(other, "\\d*.shearwater")) %>% 
+  mutate(shearwater = str_extract(other, "\\d*.shearwater|\\d*.GRSH|\\d*.GRSHE")) %>% 
   mutate(shearwater = as.double(str_extract(shearwater, "\\d*"))) %>% 
     #heron
   mutate(gbhe = str_extract(other, "\\d*.heron|\\d*.GBHE|\\d*.great blue heron")) %>% 
   mutate(gbhe = as.double(str_extract(gbhe, "\\d*"))) %>% 
     #scoter
-  mutate(scoter = str_extract(other, "\\d*.scoter|\\d*.Scoter|\\d*.BLSC|\\d*.surf scoter")) %>% 
-  mutate(scoter = as.double(str_extract(scoter, "\\d*")))
+  mutate(scoter = str_extract(other, "\\d*.scoter|\\d*.Scoter|\\d*.BLSC|\\d*.surf scoter|\\d*.SUSC")) %>% 
+  mutate(scoter = as.double(str_extract(scoter, "\\d*"))) %>% 
+    #Wilson's Storm-Petrel
+  mutate(wisp = str_extract(other, "\\d*.WISP")) %>%  
+  mutate(wisp = as.double(str_extract(wisp, "\\d*")))%>% 
+    #LBBG
+  mutate(lbbg = str_extract(other, "\\d*.LBBG")) %>%  
+  mutate(lbbg = as.double(str_extract(wisp, "\\d*"))) 
   return(r)
 }
 
@@ -135,9 +141,9 @@ splitcomments <- function(inputdataframe) {
 selectcolumns <- function(inputdataframe) {
   r <- inputdataframe %>% 
     mutate(notes = other) %>% 
-    select("date","herg","gbbg","coei_ad","coei_ju","blgu","other","puffin","dcco","ternsp","razo","lagu","comu","baea","noga","corvid","peepsp","seals","colo","cago","porpoise","raptor","gbhe","scoter","shearwater","notes") %>% 
+    select("date","herg","gbbg","coei_ad","coei_ju","blgu","other","puffin","dcco","ternsp","razo","lagu","comu","baea","noga","corvid","peepsp","seals","colo","cago","porpoise","raptor","gbhe","scoter","shearwater","notes","wisp","lbbg") %>% 
     mutate(herg = as.numeric(herg), gbbg = as.numeric(gbbg), coei_ad = as.double(coei_ad), coei_ju = as.double(coei_ju), blgu = as.double(blgu)) %>% 
-    pivot_longer(cols = c("herg","gbbg","coei_ad","coei_ju","blgu","puffin","dcco","ternsp","razo","lagu","comu","baea","noga","corvid","peepsp","seals","colo","cago","porpoise","raptor", "gbhe","scoter","shearwater"),
+    pivot_longer(cols = c("herg","gbbg","coei_ad","coei_ju","blgu","puffin","dcco","ternsp","razo","lagu","comu","baea","noga","corvid","peepsp","seals","colo","cago","porpoise","raptor", "gbhe","scoter","shearwater","wisp","lbbg"),
                  names_to = "species",
                  values_to = "count") %>% 
     select(date, species, count, notes)
@@ -392,14 +398,22 @@ tower_count_2020 <- splitcomments(tower_count_2020)
 tower_2020_clean <- selectcolumns(tower_count_2020)
 tower_2020_clean$year = 2020
 ```
+```{r}
+tower_count_2022 <- read_excel("data/tower_count/tower_count_2022.xlsx")
+
+tower_count_2022 <- cleancolumns(tower_count_2022)
+tower_count_2022 <- splitcomments(tower_count_2022)
+tower_2022_clean <- selectcolumns(tower_count_2022)
+tower_2022_clean$year = 2022
+```
 
 ##Need to find 2020, update 2021 to include incidental species, and enter 2022 data
 ```{r}
-tower <- rbind(tower_2000_clean,tower_2001_clean,tower_2002_clean,tower_2003_clean,tower_2005_clean,tower_2006_clean,tower_2007_clean,tower_2008_clean,tower_2009_clean,tower_2010_clean,tower_2011_clean,tower_2012_clean,tower_2013_clean,tower_2014_clean,tower_2015_clean, tower_2016_clean,tower_2017_clean,tower_2018_clean,tower_2019_clean, tower_2020_clean)
+tower <- rbind(tower_2000_clean,tower_2001_clean,tower_2002_clean,tower_2003_clean,tower_2005_clean,tower_2006_clean,tower_2007_clean,tower_2008_clean,tower_2009_clean,tower_2010_clean,tower_2011_clean,tower_2012_clean,tower_2013_clean,tower_2014_clean,tower_2015_clean, tower_2016_clean,tower_2017_clean,tower_2018_clean,tower_2019_clean, tower_2020_clean, tower_2022_clean)
 
 towertowrite <- tower %>% 
-  filter(!is.na(count))
-
+  mutate(count = ifelse(is.na(count), 0, count))
+           
 write.csv(towertowrite, "data/towerclean.csv")
 ```
 
