@@ -154,7 +154,7 @@ selectcolumns <- function(inputdataframe) {
 
 ```{r 2000}
 tower_count_2000 <- read_excel("data/tower_count/tower_count_2000.XLS")
-tower_count_2000 <- tower_count_2000[2:48,]
+tower_count_2000 <- tower_count_2000[2:32,]
 tower_count_2000 <- tower_count_2000 %>%
   mutate(coei_ju = as.double(str_extract(`# eiders`, "(?<=\\().*(?=\\))"))) %>% 
   mutate(`# eiders` = as.double(str_extract(`# eiders`, "\\d*"))) %>% 

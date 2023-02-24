@@ -5,9 +5,9 @@ account: udppk1-eleanor-gnam
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 8393575
-bundleId: 6884075
+bundleId: 6885290
 url: https://udppk1-eleanor-gnam.shinyapps.io/towerDRAFT/
-when: 1677256958.07323
-lastSyncTime: 1677256958.07326
+when: 1677277905.86999
+lastSyncTime: 1677277905.87001
 asMultiple: FALSE
 asStatic: FALSE
