@@ -34,7 +34,9 @@ ui <- fluidPage(
   )
 )
 
-# Define server logic to plot various variables against mpg ----
+#########################################################
+###################### SERVER ###########################
+#########################################################
 server <- function(input, output) {
   
   output$plot <- renderPlot({
