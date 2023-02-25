@@ -213,3 +213,39 @@ towerclean %>%
   
 ```
 
+```{r}
+gulls2000 <- towerclean %>% 
+  filter(species == "herg", year == 2000)
+
+gulls2022 <- towerclean %>% 
+  filter(species == "herg", year == 2022)
+
+boxplot(gulls2022$count, gulls2000$count)
+
+
+t <- t.test(gulls2000$count, gulls2022$count)
+t
+
+```
+
+```{r}
+towerclean %>%
+  filter(count > 0) %>% 
+  group_by(year) %>% 
+  summarize(n = length(unique(species)))
+```
+```{r}
+
+blgus2000 <- towerclean %>% 
+  filter(species == "blgu", year == 2000)
+
+blgus2022 <- towerclean %>% 
+  filter(species == "blgu", year == 2022)
+
+
+t <- t.test(blgus2000$count, blgus2022$count)
+t
+
+```
+
+
