@@ -60,7 +60,7 @@ server <- function(input, output) {
         geom_errorbar(aes(x = species, ymin = (stat - se), ymax = (stat + se)), alpha = 
                         (if(input$barstat %in% c("median", "mean")){0.8} else {0}), size = 0.9, width = 0.3)+
         facet_wrap(~year)+
-        labs(title = input$barstat, subtitle = "Great Duck Tower Data", caption = "Error bars represent standard error")+
+        labs(title = paste(input$barstat, "counts by species and year"), subtitle = "Great Duck Tower Data", caption = "Error bars represent standard error")+
         scale_fill_viridis_d()+
         theme_bw()
      } else if (input$plottype == "boxplot") {
@@ -71,7 +71,7 @@ server <- function(input, output) {
         ggplot(aes(x = species, y = count, fill = species))+
         geom_boxplot()+
         facet_wrap(~year)+
-        labs(title= "All Counts", subtitle = "Great Duck Tower Data")+
+        labs(title= "Counts by species and year", subtitle = "Great Duck Tower Data")+
         scale_fill_viridis_d()+
         theme_bw()
     } else if (input$plottype == "multi-year barplot") {
@@ -95,7 +95,7 @@ server <- function(input, output) {
                         (if(input$barstat %in% c("median", "mean")){0.8
                         } else {0}),
                         size = 0.9, width = 0.3, position = position_dodge(width = 0.75, preserve = "single"))+
-        labs(title= input$barstat, subtitle = "Great Duck Tower Data", caption = "error bars represent standard error")+
+        labs(title= paste(input$barstat, "counts by species and year"), subtitle = "Great Duck Tower Data", caption = "error bars represent standard error")+
         scale_fill_viridis_d()+
         theme_bw()
     } else if (input$plottype == "lines") {
@@ -118,7 +118,7 @@ server <- function(input, output) {
                         (if(input$barstat %in% c("median", "mean")){0.8}
                          else {0}), size = 0.5, width = 0.005)+
         geom_line(aes(x = year, y = stat, color = species), linewidth = 1.3 )+
-        labs(title = input$barstat, subtitle = "Great Duck Tower Data", caption = "error bars represent standard error")+
+        labs(title = paste(input$barstat, "counts by species and year"), subtitle = "Great Duck Tower Data", caption = "error bars represent standard error")+
         scale_color_viridis_d()+
         theme_bw()
     } else if (input$plottype == "multi-year boxplots") {
@@ -129,7 +129,7 @@ server <- function(input, output) {
         mutate(year = as.factor(year)) %>% 
         ggplot(aes(x = year, y = count, fill = species, color = species))+
         geom_boxplot(color = "black")+
-        labs(title= "All Counts", subtitle = "Great Duck Tower Data")+
+        labs(title= "Species Counts by Year", subtitle = "Great Duck Tower Data")+
         scale_fill_viridis_d(alpha = 0.8)+
         scale_color_viridis_d()+
         theme_bw()
