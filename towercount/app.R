@@ -32,7 +32,9 @@ ui <- fluidPage(theme = shinytheme("superhero"),
         selectInput("barstat","Statistic to Use (won't affect boxplots)", choices = c("median", "mean", "max", "season total"), selected = "total")
     ),
     mainPanel(
-      plotOutput("plot"))
+      plotOutput("plot"),
+      plotOutput("image1"),
+      plotOutput("image2"))
    )
 )
 
@@ -135,7 +137,19 @@ server <- function(input, output) {
         theme_bw()
     }
   })
-  
+
+output$image1 <- renderImage({
+  if ("gbbg" %in% input$speciesIn) {
+  list(src = "Data/gbbg.png", height = 130, width = 150, deletefile = FALSE)
+  }
+})
+ 
+output$image2 <- renderImage({
+  if ("herg" %in% input$speciesIn) {
+    list(src = "Data/herg.png", height = 130, width = 150, deletefile = FALSE)
+  }
+})
+ 
 }
 
 # Run the application 
