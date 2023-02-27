@@ -75,6 +75,7 @@ population_distribution_gulls %>%
   mutate(West = as.numeric(`West`)) %>%
   mutate(south_end = East + West + Extension) %>%
   mutate(north_end = Point + Cabin + Hell) %>%
+  filter(!is.na(south_end)) %>% 
   select(YEAR, south_end, north_end, Borofsky, little_point) %>%
   pivot_longer( cols = south_end:little_point,
                names_to = "location",
@@ -85,8 +86,28 @@ population_distribution_gulls %>%
   theme_ipsum()
 ```
 
-
 ##Tower Count Visualization (Eleanor)
+
+see shiny app for others
+
+```{r barplot animation}
+
+tower <- read_csv("data/towerclean.csv")
+tower %>%
+  filter(!is.na(count)) %>% 
+  filter(species == c("herg","coei_ju","coei_ad","gbbg","blgu","puffin")) %>%
+  group_by(species, year) %>% 
+  summarize(max = max(count)) %>%
+  ggplot(aes(x = species, y = max, fill = species))+
+  geom_col()+
+  transition_states(states = year, 
+                    transition_length = 2,
+                    state_length = 1)+
+    labs(title = 'Year: {frame_time}', 
+       x = 'max count', 
+       y = 'species')
+```
+
 
 
 ##Colony Distribution Animation
@@ -131,7 +152,7 @@ gullshape2021 <- select(Comment, geometry)
 
 ```
 
-```{r eval = FALSE, echo = TRUE, fig.height=4, fig.width=4}
+```{r map-just-colony, eval = FALSE, echo = TRUE, fig.height=4, fig.width=4}
 ggplot(outline) +
   geom_sf(data = outline, fill = "lightblue")+
   geom_sf(data = gullshape2021, color = "midnightblue") +
@@ -140,9 +161,8 @@ ggplot(outline) +
 
 ```
 
-```{r fun tower times}
-towerclean <- read_csv("data/towerclean.csv")
 
+<<<<<<< HEAD
 towerclean %>%  
   group_by(species) %>% 
   summarize(max = max(count)) %>%
@@ -152,21 +172,23 @@ towerclean %>%
   scale_fill_viridis_d()+
   labs(main = "Species High Counts")
   
+=======
+>>>>>>> e96468c442542fdaeb10f72079d7dad291863d85
 
-```
+```{r loading tracking data}
 
-```{r}
+gulltrack <- sometrackingdata <- read_delim("data/sometrackingdata.csv", 
+    delim = ";", escape_double = FALSE, trim_ws = TRUE)
+
 
 GUL01 <- gulltrack %>% 
   filter(`Logger ID` == "GUL01")
  
 ggplot()+
-  geom_path(data = GUL01, aes(x = Longitude, y = Latitude))+
-  geom_sf(data = outline, fill = "lightblue")+
-  coord_sf(ylim = c(44.5, 45), xlim = c(-68.1, -68.4), expand = FALSE)
+  geom_path(data = GUL01, aes(x = Longitude, y = Latitude))
 ```
 
-```{r}
+```{r gull colony size vs gull tower counts}
 
 pop_dist_clean <- population_distribution_gulls %>%
   rename(little_point = `Little Point (near Boathouse)`) %>%
@@ -190,18 +212,8 @@ towerclean %>%
   geom_point(data = pop_dist_clean, aes(x = year, y = total), color = "aquamarine4")
 ```
 
-```{r}
-towerclean %>%
-  filter(species == c("herg","gbbg","coei_ad","blgu")) %>%
-  mutate(year = as.character(year)) %>% 
-  group_by(year, species) %>% 
-  ggplot(aes(x = count, y = year, fill = species))+
-  geom_col(position = "dodge")
-  
 
-```
-
-```{r}
+```{r contains code to make error bars}
 se <- function(x) sd(x)/sqrt(length(x))
 towerclean %>% 
   filter(species == c("herg","gbbg","blgu")) %>%
@@ -230,12 +242,6 @@ t
 ```
 
 ```{r}
-towerclean %>%
-  filter(count > 0) %>% 
-  group_by(year) %>% 
-  summarize(n = length(unique(species)))
-```
-```{r}
 
 blgus2000 <- towerclean %>% 
   filter(species == "blgu", year == 2000)
@@ -249,4 +255,114 @@ t
 
 ```
 
+<<<<<<< HEAD
+=======
+```{r}
+towerclean %>% 
+  filter(year == 2022) %>%
+  filter(species == "herg") %>% 
+  ggplot(aes(x = date, y = count, fill = species)) + 
+  geom_col()+
+  facet_wrap(~species)
+```
+
+```{r}
+
+palvoy <- park_palette("Voyageurs", 4)
+
+se <- function(x) sd(x)/sqrt(length(x))
+
+plot1 <- towerclean %>%
+  filter(species == c("herg","gbbg","blgu","coei_ad")) %>% 
+  mutate(label = case_when(species == "herg" ~ "Herring Gull",
+                          species == "gbbg" ~ "Great Black-backed Gull",
+                          species == "blgu" ~ "Black Guillemot",
+                          species == "coei_ad" ~ "Common Eider",
+                          TRUE ~ as.character(species))) %>%
+  group_by(species, label, year) %>% 
+  mutate(med = median(count), se = se(count)) %>% 
+  ggplot()+
+  geom_point(aes(x = year, y = med, color = label), size = 1.3)+
+  geom_errorbar(aes(x = year, ymin = (med - se), ymax = (med + se), color = label), alpha = 1, size = 0.5, width = 0.003)+
+  geom_line(aes(x = year, y = med, color = label), linewidth = 1)+
+  scale_color_viridis_d(direction = -1) +
+  #scale_color_manual(values = c("tomato3","burlywood4","mediumorchid3","lightslategrey"))+
+  theme_bw()+
+  facet_wrap(~species, scales = "free")+
+  labs(title = "Median Counts of Species Breeding on Great Duck Island by Year", subtitle = "Error Bars Represent Standard Error", color = "Species")+
+  ylab("Median Daily Count")+
+  xlab("Year")
+
+```
+```{r}
+plot1
+plot2 <- plot1 + theme(legend.title = element_text(size = 8), 
+               legend.text = element_text(size = 8), title = element_text(size = 8), legend.position = "bottom")
+plot2
+
+ggsave("plot2.png",plot2, bg = "transparent", width = 12, height = 8 )
+```
+
+```{r}
+
+population_distribution_gulls$West[3]=193
+
+plot3 <- population_distribution_gulls %>%
+  rename(little_point = `Little Point (near Boathouse)`) %>%
+  mutate(West = as.numeric(`West`)) %>%
+  mutate(`South Colony` = East + West + Extension) %>%
+  mutate(`North Colony` = Point + Cabin + Hell) %>%
+  mutate(`Northeast Colony` = Borofsky) %>% 
+  select(YEAR, `South Colony`, `North Colony`, `Northeast Colony`) %>%
+  filter(!is.na(`South Colony`)) %>% 
+  pivot_longer( cols = `South Colony`:`Northeast Colony`,
+               names_to = "location",
+               values_to = "total") %>%
+  ggplot(aes(y = total, x = YEAR, fill = location)) +
+  geom_col() +
+  scale_fill_viridis_d(direction = -1) +
+  theme_bw()+
+  labs(title = "Distribution of Gull Nests across Sub-Colonies", subtitle = "by Year", fill = "Sub-Colony")+
+  ylab("# of Gull Nests")+
+  xlab("year")
+
+plot3
+
+plot3 <- plot3 + theme(legend.title = element_text(size = 8), 
+               legend.text = element_text(size = 8), title = element_text(size = 9),
+               legend.position = "bottom", plot.background = element_rect(fill = "#E1DAF6"))
+
+plot3
+
+ggsave("plot3.png", plot3, bg = "transparent", width = 8, height = 6)
+
+```
+>>>>>>> e96468c442542fdaeb10f72079d7dad291863d85
+
+```{r}
+
+hergs <- tower %>% 
+  filter(species == "herg") %>% 
+  group_by(year) %>% 
+  summarize(med = median(count))
+
+lm1 <- lm(med ~ year, data = hergs)
+
+summary(lm1)
+
+blgus <- tower %>% 
+  filter(species == "blgu") %>% 
+  group_by(year) %>%
+  summarize(med = median(count))
+
+lm2 <- lm(med ~ year, data = blgus)
+
+summary(lm2)
+```
+
+```{r}
+ggplot(hergs, aes(x = year, y = med))+
+  geom_point()+
+  geom_smooth(method = lm)
+```
 
