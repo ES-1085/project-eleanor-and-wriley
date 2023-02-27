@@ -10,13 +10,17 @@ library(shiny)
 library(tidyverse)
 library(lubridate)
 library(shinythemes)
+library(shinyWidgets)
 
 #Import Data
-tower <- read.csv("Data/towerclean.csv")
+tower <- read_csv("Data/towerclean.csv", 
+                                col_types = cols(date = col_date(format = "%Y-%m-%d")))
 tower$year <- year(as.Date(as.character(tower$year), format = "%Y"))
 yearlist <- as.list(unique(tower$year))
 specieslist <- as.list(unique(tower$species))
 se <- function(x) sd(x)/sqrt(length(x))
+
+tower$date[tower$date == "2008-05-28" & tower$year == 2018] <- "2018-05-28"
 
 #########################################################
 ###################### U I ##############################
@@ -26,15 +30,15 @@ ui <- fluidPage(theme = shinytheme("superhero"),
   titlePanel("Tower Count Data"),
   sidebarLayout(
     sidebarPanel(
-        selectInput("yearIn", "Year:", choices = yearlist, multiple = TRUE, selected = c(2000,2001)),
+        pickerInput("yearIn", "Year:", choices = yearlist, options = list(`actions-box` = TRUE),multiple = T, selected = c(2000, 2001)),
         checkboxGroupInput("speciesIn", "Species", choices = specieslist, selected  = c("herg","gbbg","coei_ad","blgu")),
-        selectInput("plottype","Plot Type", choices = c("barplot","boxplot","multi-year barplot","lines", "multi-year boxplots")),
-        selectInput("barstat","Statistic to Use (won't affect boxplots)", choices = c("median", "mean", "max", "season total"), selected = "total")
+        selectInput("plottype","Plot Type", choices = c("barplot","boxplot","multi-year barplot","lines", "multi-year boxplots","counts within season"), selected = "boxplot"),
+        selectInput("barstat","Statistic to Use (won't affect boxplots)", choices = c("median", "mean", "high count", "season total"), selected = "total")
     ),
     mainPanel(
       plotOutput("plot"),
-      plotOutput("image1"),
-      plotOutput("image2"))
+      textOutput("text")
+    )
    )
 )
 
@@ -42,6 +46,11 @@ ui <- fluidPage(theme = shinytheme("superhero"),
 ###################### SERVER ###########################
 #########################################################
 server <- function(input, output) {
+  output$text <- renderText({
+    if (input$plottype == "counts within season"){
+      print("NOTE: X and Y axes adjust to data and are no longer the same between plots")
+    }
+  })
   output$plot <- renderPlot({
      if (input$plottype == "barplot") {
         tower %>% 
@@ -50,7 +59,7 @@ server <- function(input, output) {
         group_by(species, year) %>% 
         summarize(se = se(count), stat = if (input$barstat == "median") {
          median(count)
-        } else if (input$barstat == "max") {
+        } else if (input$barstat == "high count") {
          max(count)
         } else if (input$barstat == "mean") {
          mean(count)
@@ -84,7 +93,7 @@ server <- function(input, output) {
         filter(species %in% input$speciesIn) %>% 
         summarize(se = se(count), stat = if (input$barstat == "median") {
           median(count)
-        } else if (input$barstat == "max") {
+        } else if (input$barstat == "high count") {
           max(count)
         } else if (input$barstat == "mean") {
           mean(count)
@@ -107,7 +116,7 @@ server <- function(input, output) {
         filter(species %in% input$speciesIn) %>% 
         summarize(se = se(count),stat = if (input$barstat == "median") {
           median(count)
-        } else if (input$barstat == "max") {
+        } else if (input$barstat == "high count") {
           max(count)
         } else if (input$barstat == "mean") {
           mean(count)
@@ -135,19 +144,20 @@ server <- function(input, output) {
         scale_fill_viridis_d(alpha = 0.8)+
         scale_color_viridis_d()+
         theme_bw()
+    } else if (input$plottype == "counts within season") {
+      tower %>% 
+        filter(year %in% input$yearIn) %>% 
+        filter(species %in% input$speciesIn) %>% 
+        mutate(year = as.factor(year)) %>% 
+        ggplot(aes(x = date, y = count, fill = species))+
+        geom_col(position = "dodge")+
+        labs(title= "Counts throughout season", subtitle = "Great Duck Tower Data")+
+        scale_fill_viridis_d() +
+        #scale_x_date(date_minor_breaks = "1 day")+
+        #xlim(as.Date(c("input$yearIn-06-01","input$yearIn-08-31"), format = "%y-%m-%d"))+
+        facet_wrap(~year, scales = "free")+
+        theme_bw()
     }
-  })
-
-output$image1 <- renderImage({
-  if ("gbbg" %in% input$speciesIn) {
-  list(src = "Data/gbbg.png", height = 130, width = 150, deletefile = FALSE)
-  }
-})
- 
-output$image2 <- renderImage({
-  if ("herg" %in% input$speciesIn) {
-    list(src = "Data/herg.png", height = 130, width = 150, deletefile = FALSE)
-  }
 })
  
 }
