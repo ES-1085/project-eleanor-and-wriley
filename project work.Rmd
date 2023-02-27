@@ -94,6 +94,8 @@ population_distribution_gulls %>%
 see shiny app for others
 
 ```{r barplot animation}
+
+tower <- read_csv("data/towerclean.csv")
 tower %>%
   filter(!is.na(count)) %>% 
   filter(species == c("herg","coei_ju","coei_ad","gbbg","blgu","puffin")) %>%

@@ -31,9 +31,9 @@ ui <- fluidPage(theme = shinytheme("superhero"),
   sidebarLayout(
     sidebarPanel(
         pickerInput("yearIn", "Year:", choices = yearlist, options = list(`actions-box` = TRUE),multiple = T, selected = c(2000, 2001)),
-        checkboxGroupInput("speciesIn", "Species", choices = specieslist, selected  = c("herg","gbbg","coei_ad","blgu")),
-        selectInput("plottype","Plot Type", choices = c("barplot","boxplot","multi-year barplot","lines", "multi-year boxplots","counts within season"), selected = "boxplot"),
-        selectInput("barstat","Statistic to Use (won't affect boxplots)", choices = c("median", "mean", "high count", "season total"), selected = "total")
+        selectInput("plottype","Plot Type", choices = c("barplot","boxplot","multi-year barplot","lines", "multi-year boxplots","counts within season", "lines faceted by species"), selected = "boxplot"),
+        selectInput("barstat","Statistic to Use (won't affect boxplots)", choices = c("median", "mean", "high count", "season total"), selected = "total"),
+        checkboxGroupInput("speciesIn", "Species", choices = specieslist, selected  = c("herg","gbbg","coei_ad","blgu"))
     ),
     mainPanel(
       plotOutput("plot"),
@@ -47,7 +47,7 @@ ui <- fluidPage(theme = shinytheme("superhero"),
 #########################################################
 server <- function(input, output) {
   output$text <- renderText({
-    if (input$plottype == "counts within season"){
+    if (input$plottype %in% c("counts within season","lines faceted by species")){
       print("NOTE: X and Y axes adjust to data and are no longer the same between plots")
     }
   })
@@ -156,6 +156,30 @@ server <- function(input, output) {
         #scale_x_date(date_minor_breaks = "1 day")+
         #xlim(as.Date(c("input$yearIn-06-01","input$yearIn-08-31"), format = "%y-%m-%d"))+
         facet_wrap(~year, scales = "free")+
+        theme_bw()
+    } else if (input$plottype == "lines faceted by species") {
+      tower %>% 
+        group_by(species, year) %>% 
+        filter(year %in% input$yearIn) %>% 
+        filter(species %in% input$speciesIn) %>% 
+        summarize(se = se(count),stat = if (input$barstat == "median") {
+          median(count)
+        } else if (input$barstat == "high count") {
+          max(count)
+        } else if (input$barstat == "mean") {
+          mean(count)
+        } else if (input$barstat == "season total") {
+          sum(count)
+        }) %>% 
+        ggplot()+
+        geom_point(aes(x = year, y = stat, color = species), size = 2)+
+        geom_errorbar(aes(x = year, ymin = (stat - se), ymax = (stat + se)), alpha = 
+                        (if(input$barstat %in% c("median", "mean")){0.8}
+                         else {0}), size = 0.5, width = 0.005)+
+        geom_line(aes(x = year, y = stat, color = species), linewidth = 1.3 )+
+        facet_wrap(~species, scales = "free")+
+        labs(title = paste(input$barstat, "counts by species and year"), subtitle = "Great Duck Tower Data", caption = "error bars represent standard error")+
+        scale_color_viridis_d()+
         theme_bw()
     }
 })
