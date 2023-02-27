@@ -15,7 +15,11 @@ library(sf)
 library(leaflet)
 library(gganimate)
 library(ggimage)
+library(devtools)
 library(gifski)
+library(dsbox)
+devtools::install_github("katiejolly/nationalparkcolors")
+library(nationalparkcolors)
 ```
 
 ## R Markdown
@@ -248,4 +252,85 @@ t
 
 ```
 
+```{r}
+towerclean %>% 
+  filter(year == 2022) %>%
+  filter(species == "herg") %>% 
+  ggplot(aes(x = date, y = count, fill = species)) + 
+  geom_col()+
+  facet_wrap(~species)
+```
+
+```{r}
+
+palvoy <- park_palette("Voyageurs", 4)
+
+se <- function(x) sd(x)/sqrt(length(x))
+
+plot1 <- towerclean %>%
+  filter(species == c("herg","gbbg","blgu","coei_ad")) %>% 
+  mutate(label = case_when(species == "herg" ~ "Herring Gull",
+                          species == "gbbg" ~ "Great Black-backed Gull",
+                          species == "blgu" ~ "Black Guillemot",
+                          species == "coei_ad" ~ "Common Eider",
+                          TRUE ~ as.character(species))) %>%
+  group_by(species, label, year) %>% 
+  mutate(med = median(count), se = se(count)) %>% 
+  ggplot()+
+  geom_point(aes(x = year, y = med, color = label), size = 1.3)+
+  geom_errorbar(aes(x = year, ymin = (med - se), ymax = (med + se), color = label), alpha = 1, size = 0.5, width = 0.003)+
+  geom_line(aes(x = year, y = med, color = label), linewidth = 1)+
+  scale_color_viridis_d(direction = -1) +
+  #scale_color_manual(values = c("tomato3","burlywood4","mediumorchid3","lightslategrey"))+
+  theme_bw()+
+  labs(title = "Median Counts of Species Breeding on Great Duck Island by Year", subtitle = "Error Bars Represent Standard Error", color = "Species")+
+  ylab("Median Daily Count")+
+  xlab("Year")
+
+```
+```{r}
+plot1
+plot2 <- plot1 + theme(legend.title = element_text(size = 8), 
+               legend.text = element_text(size = 8), title = element_text(size = 8), legend.position = "bottom",
+               plot.background = element_rect(fill = "transparent"))
+
+plot2
+
+ggsave("plot2.png",plot2, bg = "transparent", width = 8, height = 6 )
+```
+
+```{r}
+
+population_distribution_gulls$West[3]=193
+
+plot3 <- population_distribution_gulls %>%
+  rename(little_point = `Little Point (near Boathouse)`) %>%
+  mutate(West = as.numeric(`West`)) %>%
+  mutate(`South Colony` = East + West + Extension) %>%
+  mutate(`North Colony` = Point + Cabin + Hell) %>%
+  mutate(`Northeast Colony` = Borofsky) %>% 
+  select(YEAR, `South Colony`, `North Colony`, `Northeast Colony`) %>%
+  filter(!is.na(`South Colony`)) %>% 
+  pivot_longer( cols = `South Colony`:`Northeast Colony`,
+               names_to = "location",
+               values_to = "total") %>%
+  ggplot(aes(y = total, x = YEAR, fill = location)) +
+  geom_col() +
+  scale_fill_viridis_d(direction = -1) +
+  theme_bw()+
+  labs(title = "Distribution of Gull Nests across Sub-Colonies", subtitle = "by Year", fill = "Sub-Colony")+
+  ylab("# of Gull Nests")+
+  xlab("year")
+
+plot3
+
+plot3 <- plot3 + theme(legend.title = element_text(size = 8), 
+               legend.text = element_text(size = 8), title = element_text(size = 9),
+               legend.position = "bottom", plot.background = element_rect(fill = "#E1DAF6"))
+
+plot3
+
+ggsave("plot3.png", plot3, bg = "transparent", width = 8, height = 6)
+
+```
 
