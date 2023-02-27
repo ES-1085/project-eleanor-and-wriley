@@ -277,6 +277,7 @@ plot1 <- towerclean %>%
   scale_color_viridis_d(direction = -1) +
   #scale_color_manual(values = c("tomato3","burlywood4","mediumorchid3","lightslategrey"))+
   theme_bw()+
+  facet_wrap(~species, scales = "free")+
   labs(title = "Median Counts of Species Breeding on Great Duck Island by Year", subtitle = "Error Bars Represent Standard Error", color = "Species")+
   ylab("Median Daily Count")+
   xlab("Year")
@@ -285,12 +286,10 @@ plot1 <- towerclean %>%
 ```{r}
 plot1
 plot2 <- plot1 + theme(legend.title = element_text(size = 8), 
-               legend.text = element_text(size = 8), title = element_text(size = 8), legend.position = "bottom",
-               plot.background = element_rect(fill = "transparent"))
-
+               legend.text = element_text(size = 8), title = element_text(size = 8), legend.position = "bottom")
 plot2
 
-ggsave("plot2.png",plot2, bg = "transparent", width = 8, height = 6 )
+ggsave("plot2.png",plot2, bg = "transparent", width = 12, height = 8 )
 ```
 
 ```{r}
