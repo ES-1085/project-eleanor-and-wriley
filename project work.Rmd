@@ -194,9 +194,58 @@ towerclean %>%
   filter(species == c("herg","gbbg","coei_ad","blgu")) %>%
   mutate(year = as.character(year)) %>% 
   group_by(year, species) %>% 
-  ggplot(aes(x = year, y = count, fill = species))+
-  geom_boxplot(position = "dodge")
+  ggplot(aes(x = count, y = year, fill = species))+
+  geom_col(position = "dodge")
   
 
 ```
+
+```{r}
+se <- function(x) sd(x)/sqrt(length(x))
+towerclean %>% 
+  filter(species == c("herg","gbbg","blgu")) %>%
+  filter(year == 2022) %>% 
+  group_by(species, year) %>% 
+  summarize(mean = mean(count), se = se(count)) %>% 
+  ggplot(aes(x = species, y = mean, fill = species))+
+  geom_col()+
+  geom_errorbar(aes(x = species, ymin = (mean - se), ymax = (mean + se)), size = 1, width = 0.3, alpha = 0.5)
+  
+```
+
+```{r}
+gulls2000 <- towerclean %>% 
+  filter(species == "herg", year == 2000)
+
+gulls2022 <- towerclean %>% 
+  filter(species == "herg", year == 2022)
+
+boxplot(gulls2022$count, gulls2000$count)
+
+
+t <- t.test(gulls2000$count, gulls2022$count)
+t
+
+```
+
+```{r}
+towerclean %>%
+  filter(count > 0) %>% 
+  group_by(year) %>% 
+  summarize(n = length(unique(species)))
+```
+```{r}
+
+blgus2000 <- towerclean %>% 
+  filter(species == "blgu", year == 2000)
+
+blgus2022 <- towerclean %>% 
+  filter(species == "blgu", year == 2022)
+
+
+t <- t.test(blgus2000$count, blgus2022$count)
+t
+
+```
+
 

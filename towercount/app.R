@@ -8,31 +8,132 @@
 
 library(shiny)
 library(tidyverse)
+library(lubridate)
+library(shinythemes)
 
-
-
+#Import Data
 tower <- read.csv("Data/towerclean.csv")
-yearlist <- as.list(unique(towerclean$year))
-# Define UI for application that draws a histogram
-ui <- fluidPage(
+tower$year <- year(as.Date(as.character(tower$year), format = "%Y"))
+yearlist <- as.list(unique(tower$year))
+specieslist <- as.list(unique(tower$species))
+se <- function(x) sd(x)/sqrt(length(x))
+
+#########################################################
+###################### U I ##############################
+#########################################################
+
+ui <- fluidPage(theme = shinytheme("superhero"),
   titlePanel("Tower Count Data"),
-  
   sidebarLayout(
-    sidebarPanel("Year"),
-
-column(3,
-         selectInput("select", h3("Select box"), 
-                     choices = yearlist, selected = 1)),
-mainPanel(
-  textOutput("selected_year"))
+    sidebarPanel(
+        selectInput("yearIn", "Year:", choices = yearlist, multiple = TRUE, selected = c(2000,2001)),
+        checkboxGroupInput("speciesIn", "Species", choices = specieslist, selected  = c("herg","gbbg","coei_ad","blgu")),
+        selectInput("plottype","Plot Type", choices = c("barplot","boxplot","multi-year barplot","lines", "multi-year boxplots")),
+        selectInput("barstat","Statistic to Use (won't affect boxplots)", choices = c("median", "mean", "max", "season total"), selected = "total")
+    ),
+    mainPanel(
+      plotOutput("plot"))
+   )
 )
-)
 
-# Define server logic to plot various variables against mpg ----
+#########################################################
+###################### SERVER ###########################
+#########################################################
 server <- function(input, output) {
-  
-  output$selected_year <- renderText({ 
-    "You have selected this"
+  output$plot <- renderPlot({
+     if (input$plottype == "barplot") {
+        tower %>% 
+        filter(year %in% input$yearIn) %>% 
+        filter(species %in% input$speciesIn) %>% 
+        group_by(species, year) %>% 
+        summarize(se = se(count), stat = if (input$barstat == "median") {
+         median(count)
+        } else if (input$barstat == "max") {
+         max(count)
+        } else if (input$barstat == "mean") {
+         mean(count)
+        } else if (input$barstat == "season total") {
+         sum(count)
+        }) %>%
+        ggplot(aes(x = species, y = stat, fill = species))+
+        geom_col()+
+        geom_errorbar(aes(x = species, ymin = (stat - se), ymax = (stat + se)), alpha = 
+                        (if(input$barstat %in% c("median", "mean")){0.8} else {0}), size = 0.9, width = 0.3)+
+        facet_wrap(~year)+
+        labs(title = paste(input$barstat, "counts by species and year"), subtitle = "Great Duck Tower Data", caption = "Error bars represent standard error")+
+        scale_fill_viridis_d()+
+        theme_bw()
+     } else if (input$plottype == "boxplot") {
+        tower %>% 
+        group_by(species, year) %>% 
+        filter(year %in% input$yearIn) %>% 
+        filter(species %in% input$speciesIn) %>% 
+        ggplot(aes(x = species, y = count, fill = species))+
+        geom_boxplot()+
+        facet_wrap(~year)+
+        labs(title= "Counts by species and year", subtitle = "Great Duck Tower Data")+
+        scale_fill_viridis_d()+
+        theme_bw()
+    } else if (input$plottype == "multi-year barplot") {
+        tower %>% 
+        mutate(year = as.character(year)) %>% 
+        group_by(species, year) %>% 
+        filter(year %in% input$yearIn) %>% 
+        filter(species %in% input$speciesIn) %>% 
+        summarize(se = se(count), stat = if (input$barstat == "median") {
+          median(count)
+        } else if (input$barstat == "max") {
+          max(count)
+        } else if (input$barstat == "mean") {
+          mean(count)
+        } else if (input$barstat == "season total") {
+          sum(count)
+        }) %>% 
+        ggplot(aes(x = year, y = stat, fill = species))+
+        geom_col(position = position_dodge(preserve = "single"), width = 0.75)+
+        geom_errorbar(aes(x = year, ymin = (stat - se), ymax = (stat + se), group = species), alpha = 
+                        (if(input$barstat %in% c("median", "mean")){0.8
+                        } else {0}),
+                        size = 0.9, width = 0.3, position = position_dodge(width = 0.75, preserve = "single"))+
+        labs(title= paste(input$barstat, "counts by species and year"), subtitle = "Great Duck Tower Data", caption = "error bars represent standard error")+
+        scale_fill_viridis_d()+
+        theme_bw()
+    } else if (input$plottype == "lines") {
+        tower %>% 
+        group_by(species, year) %>% 
+        filter(year %in% input$yearIn) %>% 
+        filter(species %in% input$speciesIn) %>% 
+        summarize(se = se(count),stat = if (input$barstat == "median") {
+          median(count)
+        } else if (input$barstat == "max") {
+          max(count)
+        } else if (input$barstat == "mean") {
+          mean(count)
+        } else if (input$barstat == "season total") {
+          sum(count)
+        }) %>% 
+        ggplot()+
+        geom_point(aes(x = year, y = stat, color = species), size = 2)+
+        geom_errorbar(aes(x = year, ymin = (stat - se), ymax = (stat + se)), alpha = 
+                        (if(input$barstat %in% c("median", "mean")){0.8}
+                         else {0}), size = 0.5, width = 0.005)+
+        geom_line(aes(x = year, y = stat, color = species), linewidth = 1.3 )+
+        labs(title = paste(input$barstat, "counts by species and year"), subtitle = "Great Duck Tower Data", caption = "error bars represent standard error")+
+        scale_color_viridis_d()+
+        theme_bw()
+    } else if (input$plottype == "multi-year boxplots") {
+      tower %>% 
+        group_by(species, year) %>% 
+        filter(year %in% input$yearIn) %>% 
+        filter(species %in% input$speciesIn) %>% 
+        mutate(year = as.factor(year)) %>% 
+        ggplot(aes(x = year, y = count, fill = species, color = species))+
+        geom_boxplot(color = "black")+
+        labs(title= "Species Counts by Year", subtitle = "Great Duck Tower Data")+
+        scale_fill_viridis_d(alpha = 0.8)+
+        scale_color_viridis_d()+
+        theme_bw()
+    }
   })
   
 }
