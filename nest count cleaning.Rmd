@@ -22,8 +22,9 @@ nest_count_2022 <- nest_count_2022 %>%
   mutate(species = str_extract(comment, "\\d*GBBG|\\d*COEI")) %>%
   mutate(species = str_replace(species, "COEI", "coei")) %>%
   mutate(species = str_replace(species, "GBBG", "gbbg")) %>%
-  replace_na(list(species = "herg"))
-
+  replace_na(list(species = "herg")) %>%
+  select(Flag, clutch, location, year, species) %>%
+  rename(flag = Flag)
 ```
 
 ```{r clean-2021}
@@ -42,8 +43,97 @@ nest_count_2021 <- nest_count_2021 %>%
   select(flag, clutch, location, year, species)
 ```
 
-```{r}
+```{r clean-2020}
 nest_count_2020 <- read_excel("data/nest_count/nest_count_2020.xlsx", na = "NA")
+
+unique(nest_count_2020$comment)
+head(nest_count_2020)
+
+nest_count_2020 <- nest_count_2020 %>%
+  mutate(year = "2020") %>%
+  mutate(species = ifelse(grepl("Black-back", comment), "gbbg",
+                          ifelse(grepl("Black back", comment), "gbbg",
+                          ifelse(grepl("black-back", comment), "gbbg",
+                          ifelse(grepl("Black-Back", comment), "gbbg",
+                          ifelse(grepl("GBBG", comment), "gbbg",
+                          ifelse(grepl("gbbg", comment), "gbbg",
+                          ifelse(grepl("Eider", comment), "coei",
+                          ifelse(grepl("eider", comment), "coei", 
+                          ifelse(grepl("COEI", comment), "coei",
+                          ifelse(grepl("coei", comment), "coei",
+                          "herg"))))))))))) %>%
+  select(flag, clutch, location, year, species)
+```
+
+```{r clean-2019}
+nest_count_2019 <- read_excel("data/nest_count/nest_count_2019.xlsx", na = "NA")
+
+unique(nest_count_2019$comment)
+
+nest_count_2019 <- nest_count_2019 %>%
+  mutate(year = "2019") %>%
+  mutate(species = ifelse(grepl("Black-back", comment), "gbbg",
+                          ifelse(grepl("Black back", comment), "gbbg",
+                          ifelse(grepl("black-back", comment), "gbbg",
+                          ifelse(grepl("Black-Back", comment), "gbbg",
+                          ifelse(grepl("GBBG", comment), "gbbg",
+                          ifelse(grepl("gbbg", comment), "gbbg",
+                          ifelse(grepl("Eider", comment), "coei",
+                          ifelse(grepl("eider", comment), "coei", 
+                          ifelse(grepl("Edier", comment), "coei",
+                          ifelse(grepl("COEI", comment), "coei",
+                          ifelse(grepl("coei", comment), "coei",
+                          "herg")))))))))))) %>%
+  select(nest, clutch, location, year, species) %>%
+  rename(flag = nest)
+```
+```{r clean-2018}
+nest_count_2018 <- read_excel("data/nest_count/nest_count_2018.xlsx", na = "NA")
+
+unique(nest_count_2018$comment)
+
+nest_count_2018 <- nest_count_2018 %>%
+  mutate(year = "2018") %>%
+  mutate(species = ifelse(grepl("Black-back", comments), "gbbg",
+                          ifelse(grepl("Black back", comments), "gbbg",
+                          ifelse(grepl("black-back", comments), "gbbg",
+                          ifelse(grepl("Black-Back", comments), "gbbg",
+                          ifelse(grepl("GBBG", comments), "gbbg",
+                          ifelse(grepl("gbbg", comments), "gbbg",
+                          ifelse(grepl("Eider", comments), "coei",
+                          ifelse(grepl("eider", comments), "coei", 
+                          ifelse(grepl("Edier", comments), "coei",
+                          ifelse(grepl("COEI", comments), "coei",
+                          ifelse(grepl("coei", comments), "coei",
+                          "herg")))))))))))) %>%
+  select(nest, clutch, location, year, species) %>%
+  rename(flag = nest)
+
+```
+```{r}
+nest_count_2017 <- read_excel("data/nest_count/nest_count_2017.xlsx", na = "NA")
+
+unique(nest_count_2017$comment)
+
+nest_count_2017 <- nest_count_2017 %>%
+  mutate(year = "2017") %>%
+  rename(comment = "Desc.",
+         location = "loc.",
+         clutch = Clutch,
+         flag = Nest) %>%
+  mutate(species = ifelse(grepl("Black-back", comment), "gbbg",
+                          ifelse(grepl("Black back", comment), "gbbg",
+                          ifelse(grepl("black-back", comment), "gbbg",
+                          ifelse(grepl("Black-Back", comment), "gbbg",
+                          ifelse(grepl("GBBG", comment), "gbbg",
+                          ifelse(grepl("gbbg", comment), "gbbg",
+                          ifelse(grepl("Eider", comment), "coei",
+                          ifelse(grepl("eider", comment), "coei", 
+                          ifelse(grepl("Edier", comment), "coei",
+                          ifelse(grepl("COEI", comment), "coei",
+                          ifelse(grepl("coei", comment), "coei",
+                          "herg")))))))))))) %>%
+  select(flag, clutch, location, year, species)
 ```
 
 
