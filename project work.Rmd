@@ -16,6 +16,7 @@ library(leaflet)
 library(gganimate)
 library(ggimage)
 library(gifski)
+library(forcats)
 ```
 
 ## R Markdown
@@ -145,8 +146,8 @@ towerclean <- read_csv("data/towerclean.csv")
 towerclean %>%  
   group_by(species) %>% 
   summarize(max = max(count)) %>%
-  filter(max >= 5) %>% 
-  ggplot(aes( y = species, x = max, fill = species))+
+  filter(max >= 5) %>%
+  ggplot(aes(y = species, x = max, fill = species))+
   geom_col()+
   scale_fill_viridis_d()+
   labs(main = "Species High Counts")
