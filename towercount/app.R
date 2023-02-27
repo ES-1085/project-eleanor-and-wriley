@@ -30,9 +30,9 @@ ui <- fluidPage(theme = shinytheme("superhero"),
   titlePanel("Tower Count Data"),
   sidebarLayout(
     sidebarPanel(
-        pickerInput("yearIn", "Year:", choices = yearlist, options = list(`actions-box` = TRUE),multiple = T, selected = c(2000, 2001)),
-        selectInput("plottype","Plot Type", choices = c("barplot","boxplot","multi-year barplot","lines", "multi-year boxplots","counts within season", "lines faceted by species"), selected = "boxplot"),
-        selectInput("barstat","Statistic to Use (won't affect boxplots)", choices = c("median", "mean", "high count", "season total"), selected = "total"),
+        pickerInput("yearIn", "Year:", choices = yearlist, options = list(`actions-box` = TRUE),multiple = T, selected = c(2000:2022)),
+        selectInput("plottype","Plot Type", choices = c("barplot","boxplot","multi-year barplot","lines", "multi-year boxplots","counts within season", "lines faceted by species"), selected = "lines faceted by species"),
+        selectInput("barstat","Statistic to Use (won't affect boxplots)", choices = c("median", "mean", "high count", "season total"), selected = "median"),
         checkboxGroupInput("speciesIn", "Species", choices = specieslist, selected  = c("herg","gbbg","coei_ad","blgu"))
     ),
     mainPanel(
@@ -48,7 +48,7 @@ ui <- fluidPage(theme = shinytheme("superhero"),
 server <- function(input, output) {
   output$text <- renderText({
     if (input$plottype %in% c("counts within season","lines faceted by species")){
-      print("NOTE: X and Y axes adjust to data and are no longer the same between plots")
+      print("NOTE: When this warning is shown, X and Y axes are not consistent between plots.")
     }
   })
   output$plot <- renderPlot({
