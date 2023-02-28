@@ -377,7 +377,7 @@ tower_count_2018 <- read_excel("data/tower_count/tower_count_2018.xlsx")
 tower_count_2018 <- cleancolumns(tower_count_2018)
 tower_count_2018 <- splitcomments(tower_count_2018)
 tower_2018_clean <- selectcolumns(tower_count_2018)
-tower$date[tower$date == "2008-05-28" & tower$year == 2018] <- "2018-05-28"
+tower_2018_clean$date[tower_2018_clean$date == "2008-05-28"] <- "2018-05-28"
 tower_2018_clean$year = 2018
 ```
 
@@ -420,7 +420,7 @@ tower_2022_clean <- selectcolumns(tower_count_2022)
 tower_2022_clean$year = 2022
 ```
 
-##Need to find 2020, update 2021 to include incidental species, and enter 2022 data
+
 ```{r}
 tower <- rbind(tower_2000_clean,tower_2001_clean,tower_2002_clean,tower_2003_clean,tower_2005_clean,tower_2006_clean,tower_2007_clean,tower_2008_clean,tower_2009_clean,tower_2010_clean,tower_2011_clean,tower_2012_clean,tower_2013_clean,tower_2014_clean,tower_2015_clean, tower_2016_clean,tower_2017_clean,tower_2018_clean,tower_2019_clean, tower_2020_clean, tower_2021_clean, tower_2022_clean)
 
