@@ -125,11 +125,11 @@ splitcomments <- function(inputdataframe) {
   mutate(scoter = str_extract(other, "\\d*.scoter|\\d*.Scoter|\\d*.BLSC|\\d*.surf scoter|\\d*.SUSC")) %>% 
   mutate(scoter = as.double(str_extract(scoter, "\\d*"))) %>% 
     #Wilson's Storm-Petrel
-  mutate(wisp = str_extract(other, "\\d*.WISP|d*wisp")) %>%  
+  mutate(wisp = str_extract(other, "\\d*.WISP")) %>%  
   mutate(wisp = as.double(str_extract(wisp, "\\d*")))%>% 
     #LBBG
-  mutate(lbbg = str_extract(other, "\\d*.LBBG|\\d*lbbg")) %>%  
-  mutate(lbbg = as.double(str_extract(lbbg, "\\d*"))) 
+  mutate(lbbg = str_extract(other, "\\d*.LBBG")) %>%  
+  mutate(lbbg = as.double(str_extract(wisp, "\\d*"))) 
   return(r)
 }
 

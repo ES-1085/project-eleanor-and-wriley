@@ -15,11 +15,8 @@ library(sf)
 library(leaflet)
 library(gganimate)
 library(ggimage)
-library(devtools)
 library(gifski)
-library(dsbox)
-devtools::install_github("katiejolly/nationalparkcolors")
-library(nationalparkcolors)
+library(forcats)
 ```
 
 ## R Markdown
@@ -165,6 +162,18 @@ ggplot(outline) +
 ```
 
 
+<<<<<<< HEAD
+towerclean %>%  
+  group_by(species) %>% 
+  summarize(max = max(count)) %>%
+  filter(max >= 5) %>%
+  ggplot(aes(y = species, x = max, fill = species))+
+  geom_col()+
+  scale_fill_viridis_d()+
+  labs(main = "Species High Counts")
+  
+=======
+>>>>>>> e96468c442542fdaeb10f72079d7dad291863d85
 
 ```{r loading tracking data}
 
@@ -246,6 +255,8 @@ t
 
 ```
 
+<<<<<<< HEAD
+=======
 ```{r}
 towerclean %>% 
   filter(year == 2022) %>%
@@ -326,6 +337,7 @@ plot3
 ggsave("plot3.png", plot3, bg = "transparent", width = 8, height = 6)
 
 ```
+>>>>>>> e96468c442542fdaeb10f72079d7dad291863d85
 
 ```{r}
 
