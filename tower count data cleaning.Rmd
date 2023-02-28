@@ -30,7 +30,7 @@ library(gifski)
 hergs <- c("gulls","hegu","HERG","Gull","# gulls", "HeGu","HerGull")
 gbbgs <- c("bbgu","GBBG","BBGull")
 blgus <- c("# squees", "squees","BLGU","Guillem", "BGUY", "squee","SQUEE")
-coei_jus <-c("chix","eider chicks", "COEI ducklings", "Eider Chicks","COEI chix","COEI  chix","EICHICK")
+coei_jus <-c("chix","eider chicks", "COEI ducklings", "Eider Chicks","COEI chix","COEI  chix","EICHICK", "coei chix")
 coei_ads <- c("COEI","Eiders", "# eiders", "eider","eiders", "coei")
 others <- c("Other","notes","comments","others", "Others", "comment","Comments")
 dates <- c("Date")
@@ -377,7 +377,7 @@ tower_count_2018 <- read_excel("data/tower_count/tower_count_2018.xlsx")
 tower_count_2018 <- cleancolumns(tower_count_2018)
 tower_count_2018 <- splitcomments(tower_count_2018)
 tower_2018_clean <- selectcolumns(tower_count_2018)
-tower$date[tower$date == "2008-05-28" & tower$year == 2018] <- "2018-05-28"
+tower_2018_clean$date[tower_2018_clean$date == "2008-05-28"] <- "2018-05-28"
 tower_2018_clean$year = 2018
 ```
 
@@ -391,7 +391,7 @@ tower_2019_clean$year = 2019
 ```
 
 
-```{r}
+```{r 2020}
 tower_count_2020 <- read_excel("data/tower_count/tower_count_2020.xlsx")
 
 tower_count_2020 <- cleancolumns(tower_count_2020)
@@ -399,7 +399,19 @@ tower_count_2020 <- splitcomments(tower_count_2020)
 tower_2020_clean <- selectcolumns(tower_count_2020)
 tower_2020_clean$year = 2020
 ```
-```{r}
+
+```{r 2021}
+
+tower_count_2021 <- read_excel("data/tower_count/tower_count_2021.xlsx")
+
+tower_count_2021 <- cleancolumns(tower_count_2021)
+tower_count_2021 <- splitcomments(tower_count_2021)
+tower_2021_clean <- selectcolumns(tower_count_2021)
+tower_2021_clean$year = 2021
+
+```
+
+```{r 2022}
 tower_count_2022 <- read_excel("data/tower_count/tower_count_2022.xlsx")
 
 tower_count_2022 <- cleancolumns(tower_count_2022)
@@ -408,9 +420,9 @@ tower_2022_clean <- selectcolumns(tower_count_2022)
 tower_2022_clean$year = 2022
 ```
 
-##Need to find 2020, update 2021 to include incidental species, and enter 2022 data
+
 ```{r}
-tower <- rbind(tower_2000_clean,tower_2001_clean,tower_2002_clean,tower_2003_clean,tower_2005_clean,tower_2006_clean,tower_2007_clean,tower_2008_clean,tower_2009_clean,tower_2010_clean,tower_2011_clean,tower_2012_clean,tower_2013_clean,tower_2014_clean,tower_2015_clean, tower_2016_clean,tower_2017_clean,tower_2018_clean,tower_2019_clean, tower_2020_clean, tower_2022_clean)
+tower <- rbind(tower_2000_clean,tower_2001_clean,tower_2002_clean,tower_2003_clean,tower_2005_clean,tower_2006_clean,tower_2007_clean,tower_2008_clean,tower_2009_clean,tower_2010_clean,tower_2011_clean,tower_2012_clean,tower_2013_clean,tower_2014_clean,tower_2015_clean, tower_2016_clean,tower_2017_clean,tower_2018_clean,tower_2019_clean, tower_2020_clean, tower_2021_clean, tower_2022_clean)
 
 towertowrite <- tower %>% 
   mutate(count = ifelse(is.na(count), 0, count))
@@ -419,54 +431,4 @@ write.csv(towertowrite, "data/towerclean.csv")
 ```
 
 
-```{r}
-tower %>%
-  filter(!is.na(count)) %>% 
-  group_by(species, year) %>% 
-  summarize(max = max(count)) %>% 
-  ggplot(aes(x = year, 
-             y = max, 
-             fill= species
-             )) +
-  geom_col(position = "dodge")
-
-tower %>%
-  filter(!is.na(count)) %>% 
-  group_by(species, year) %>% 
-  summarize(max = max(count)) %>% 
-  ggplot(aes(x = year, 
-             y = max, 
-             color = species
-             )) +
-  geom_line()
-```
-
-```{r eval = FALSE, echo = TRUE}
-tower %>%
-  filter(!is.na(count)) %>% 
-  filter(species == c("herg","coei_ju","coei_ad","gbbg","blgu","puffin")) %>%
-  group_by(species, year) %>% 
-  summarize(max = max(count)) %>%
-  ggplot(aes(x = species, y = max, fill = species))+
-  geom_col()+
-  transition_states(states = year, 
-                    transition_length = 2,
-                    state_length = 1)+
-    labs(title = 'Year: {frame_time}', 
-       x = 'max count', 
-       y = 'species')
-```
-``{r eval = FALSE, echo = TRUE}
-tower %>%
-  filter(!is.na(count)) %>% 
-  group_by(species, year) %>% 
-  summarize(max = max(count)) %>%
-  filter(max >= 5) %>% 
-  ggplot(aes(x = species, y = max, fill = species))+
-  geom_col()+
-  transition_states(states = year,
-                    transition_length = 3,
-                    state_length = 5)
-
-``
 

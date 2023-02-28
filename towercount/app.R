@@ -15,12 +15,17 @@ library(shinyWidgets)
 #Import Data
 tower <- read_csv("Data/towerclean.csv", 
                                 col_types = cols(date = col_date(format = "%Y-%m-%d")))
+#Format year column
 tower$year <- year(as.Date(as.character(tower$year), format = "%Y"))
+#make lists of years and species
 yearlist <- as.list(unique(tower$year))
 specieslist <- as.list(unique(tower$species))
+
+tower$date[tower$date == "2008-05-28"] <- "2018-05-28"
+
+#define standard error function
 se <- function(x) sd(x)/sqrt(length(x))
 
-tower$date[tower$date == "2008-05-28" & tower$year == 2018] <- "2018-05-28"
 
 #########################################################
 ###################### U I ##############################
@@ -45,6 +50,7 @@ ui <- fluidPage(theme = shinytheme("superhero"),
 #########################################################
 ###################### SERVER ###########################
 #########################################################
+
 server <- function(input, output) {
   output$text <- renderText({
     if (input$plottype %in% c("counts within season","lines faceted by species")){
@@ -153,8 +159,6 @@ server <- function(input, output) {
         geom_col(position = "dodge")+
         labs(title= "Counts throughout season", subtitle = "Great Duck Tower Data")+
         scale_fill_viridis_d() +
-        #scale_x_date(date_minor_breaks = "1 day")+
-        #xlim(as.Date(c("input$yearIn-06-01","input$yearIn-08-31"), format = "%y-%m-%d"))+
         facet_wrap(~year, scales = "free")+
         theme_bw()
     } else if (input$plottype == "lines faceted by species") {
