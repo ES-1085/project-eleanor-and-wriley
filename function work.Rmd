@@ -48,25 +48,49 @@ cleancolumns <- function(inputdataframe) {
       print("puffin")
     } else if (colnames(inputdataframe)[i] %in% corms) {
       colnames(inputdataframe)[i] <- "dcco"
-      print("dcco")
     }
   }
   return(inputdataframe)
 }
 ```
 
+
 ```{r}
 splitcomments <- function(inputdataframe) {
-    mutate(puffin = ifelse(puffins %in% colnames(inputdataframe), puffin, str_extract(other, "\\d*puff|\\d*.puff|\\d*atpu|\\d*.atpu|\\d*puffis|\\d*puffins|\\d*.puffins|\\d*.ATPU|\\d*.ALPU|\\d*.puffin|\\d*..ATPU")))
+      if ("puffin" %in% colnames(inputdataframe)) {
+      inputdataframe <- inputdataframe %>% 
+      mutate(puffin = puffin)
+    } else {
+      inputdataframe <- inputdataframe %>% 
+        mutate(puffin = str_extract(other, "\\d*puff|\\d*.puff|\\d*atpu|\\d*.atpu|\\d*puffis|\\d*puffins|\\d*.puffins|\\d*.ATPU|\\d*.ALPU|\\d*.puffin|\\d*..ATPU")) %>% 
+        mutate(puffin = as.double(str_extract(puffin, "\\d*")))
+    }
+    
+    if ("dcco" %in% colnames(inputdataframe)) {
+      inputdataframe <- inputdataframe %>% 
+       mutate(dcco = dcco)
+    } else {
+      inputdataframe <- inputdataframe %>% 
+      mutate(dcco = str_extract(other, "\\d*.DCCO")) %>% 
+      mutate(dcco = as.double(str_extract(dcco, "\\d*")))  
+    }
   return(inputdataframe)
 }
 ```
 
 
 ```{r}
-tower_count_2013 <- read_excel("data/tower_count/tower_count_2013.xls")
+tower_count_2013 <- read_excel("data/tower_count/tower_count_2013.xls") 
+
 
 tower_count_2013 <- cleancolumns(tower_count_2013)
 tower_count_2013 <- splitcomments(tower_count_2013)
+```
+```{r}
+tower_count_2022 <- read_excel("data/tower_count/tower_count_2022.xlsx")
+
+tower_count_2022 <- cleancolumns(tower_count_2022)
+tower_count_2022 <- splitcomments(tower_count_2022)
+
 ```
 
