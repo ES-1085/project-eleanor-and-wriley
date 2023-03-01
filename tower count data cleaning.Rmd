@@ -312,11 +312,6 @@ splitcomments <- function(inputdataframe) {
      
 ```      
     
-  
-
-
-
-
 
 ```{r select columns and pivot}
 selectcolumns <- function(inputdataframe) {
