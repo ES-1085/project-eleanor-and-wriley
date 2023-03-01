@@ -34,7 +34,7 @@ se <- function(x) sd(x)/sqrt(length(x))
 ui <- fluidPage(theme = shinytheme("superhero"),
   titlePanel("Tower Count Data"),
   sidebarLayout(
-    sidebarPanel(width = 2,
+    sidebarPanel(
         pickerInput("yearIn", "Year:", choices = yearlist, options = list(`actions-box` = TRUE),multiple = TRUE, selected = c(2000:2022)),
         selectInput("plottype","Plot Type", choices = c("barplot","boxplot","multi-year barplot","lines", "multi-year boxplots","counts within season", "lines faceted by species", "boxplots faceted by species"), selected = "lines faceted by species"),
         selectInput("barstat","Statistic to Use (won't affect boxplots)", choices = c("median", "mean", "high count", "season total"), selected = "median"),
