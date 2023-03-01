@@ -16,6 +16,7 @@ library(leaflet)
 library(gganimate)
 library(ggimage)
 library(gifski)
+library(transformr)
 library(forcats)
 ```
 
@@ -136,27 +137,43 @@ leaflet(data = gullshape2021) %>%
 ```{r join-shapefile-nestcount}
 ##2022
 gullshape2022 <- read_sf("data/gullshapefiles/Gulls2022")
-nest_count_clean_2022 <- read.csv("data/nest_count_clean_2022.csv")
+nest_count_clean_2022 <- read.csv("data/nest_count_clean/nest_count_clean_2022.csv")
 gullshape2022 <- st_transform(gullshape2022, "+init=epsg:4326") %>%
   select(Comment, geometry) %>%
-  rename("Flag" = "Comment") %>%
-  mutate(Flag = as.integer(Flag))
+  rename(flag = "Comment") %>%
+  mutate(flag = as.integer(flag))
 
-gullshape2022 %>%
-  full_join(nest_count_clean_2022, by = "Flag")
+gullshape2022 <- gullshape2022 %>%
+  full_join(nest_count_clean_2022, by = "flag") %>%
+  mutate(year = "2022") %>%
+  select(flag, geometry, clutch, year, species)
 ##2021
+gullshape2021 <- read_sf("data/gullshapefiles/Gulls2021")
+nest_count_clean_2021 <- read.csv("data/nest_count_clean/nest_count_clean_2021.csv")
+gullshape2021 <- st_transform(gullshape2021, "+init=epsg:4326") %>%
+  select(Comment, geometry) %>%
+  rename(flag = "Comment") %>%
+  mutate(flag = as.integer(flag))
 
-nest_count_clean_2021 <- read.csv("data/nest_count_clean_2021.csv")
-gullshape2021 <- select(Comment, geometry)
+gullshape2021 <- gullshape2021 %>%
+  full_join(nest_count_clean_2022, by = "flag") %>%
+  mutate(year = "2021") %>%
+  select(flag, geometry, clutch, year, species)
+
+
+
+gullshapetest <- rbind(gullshape2022, gullshape2021)
 
 
 ```
 
 ```{r map-just-colony, eval = FALSE, echo = TRUE, fig.height=4, fig.width=4}
 ggplot(outline) +
-  geom_sf(data = outline, fill = "lightblue")+
-  geom_sf(data = gullshape2021, color = "midnightblue") +
+  # geom_sf(data = outline, fill = "lightblue")+
+  geom_sf(data = gullshapetest, color = "midnightblue", aes(group = year)) +
   coord_sf(ylim = c(44.140385, 44.145726), xlim = c(-68.25038, -68.242629), expand = FALSE) + 
+  transition_states(states = year) +
+  #  # ease_aes('linear') +
   theme_bw()
 
 ```
