@@ -57,14 +57,14 @@ cleancolumns <- function(inputdataframe) {
 
 ```{r}
 splitcomments <- function(inputdataframe) {
-    if ("puffin" %in% colnames(inputdataframe)) {
-    inputdataframe <- inputdataframe %>% 
+      if ("puffin" %in% colnames(inputdataframe)) {
+      inputdataframe <- inputdataframe %>% 
       mutate(puffin = puffin)
     } else {
       inputdataframe <- inputdataframe %>% 
         mutate(puffin = str_extract(other, "\\d*puff|\\d*.puff|\\d*atpu|\\d*.atpu|\\d*puffis|\\d*puffins|\\d*.puffins|\\d*.ATPU|\\d*.ALPU|\\d*.puffin|\\d*..ATPU")) %>% 
         mutate(puffin = as.double(str_extract(puffin, "\\d*")))
-  }
+    }
     
     if ("dcco" %in% colnames(inputdataframe)) {
       inputdataframe <- inputdataframe %>% 

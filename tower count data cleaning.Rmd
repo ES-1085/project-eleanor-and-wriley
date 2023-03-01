@@ -34,6 +34,8 @@ coei_jus <-c("chix","eider chicks", "COEI ducklings", "Eider Chicks","COEI chix"
 coei_ads <- c("COEI","Eiders", "# eiders", "eider","eiders", "coei")
 others <- c("Other","notes","comments","others", "Others", "comment","Comments")
 dates <- c("Date")
+puffins <- c("ATPU","puffs","puffins","atpu")
+corms <- c("DCCO","cormorants")
 
 cleancolumns <- function(inputdataframe) {
   for (i in 1:length(colnames(inputdataframe))){
@@ -58,7 +60,44 @@ cleancolumns <- function(inputdataframe) {
     } else if (colnames(inputdataframe)[i] %in% dates) {
       colnames(inputdataframe)[i] <- "date"
       print("dates")
+    } else if (colnames(inputdataframe)[i] %in% puffins) {
+      colnames(inputdataframe)[i] <- "puffin"
+      print("puffins")
+    } else if (colnames(inputdataframe)[i] %in% corms) {
+      colnames(inputdataframe)[i] <- "dcco"
+      print("corms")
+    } else if (colnames(inputdataframe)[i] %in% "COLO") {
+      colnames(inputdataframe)[i] <- "colo"
+      print("loon")
+    } else if (colnames(inputdataframe)[i] %in% "tern") {
+      colnames(inputdataframe)[i] <- "ternsp"
+      print("terns")
+    } else if (colnames(inputdataframe)[i] %in% "NOGA") {
+      colnames(inputdataframe)[i] <- "noga"
+      print("gannets")
+    } else if (colnames(inputdataframe)[i] %in% "BAEA") {
+      colnames(inputdataframe)[i] <- "baea"
+      print("eagles")
+    } else if (colnames(inputdataframe)[i] %in% "scoter") {
+      colnames(inputdataframe)[i] <- "scoter"
+      print("scoter")
+    } else if (colnames(inputdataframe)[i] %in% "seal") {
+      colnames(inputdataframe)[i] <- "seals"
+      print("seals")
+    } else if (colnames(inputdataframe)[i] %in% "RAZO") {
+      colnames(inputdataframe)[i] <- "razo"
+      print("razos")
+    } else if (colnames(inputdataframe)[i] %in% "LAGU") {
+      colnames(inputdataframe)[i] <- "lagu"
+      print("lagus")
+    } else if (colnames(inputdataframe)[i] %in% "AMCR") {
+      colnames(inputdataframe)[i] <- "corvid"
+      print("crows")
+    } else if (colnames(inputdataframe)[i] %in% "SPSA") {
+      colnames(inputdataframe)[i] <- "peepsp"
+      print("peeps")
     }
+      
   }
   return(inputdataframe)
 }
@@ -69,7 +108,210 @@ cleancolumns <- function(inputdataframe) {
 
 #there is a way to update this so that it leaves existing columns alone. In short, there should be a way to tell it to loop through the column names in a dataframe and not create a new column if the column already exists. Probably an if_else statement.
 splitcomments <- function(inputdataframe) {
-  r <- inputdataframe %>% 
+  #puffins
+    if ("puffin" %in% colnames(inputdataframe)) {
+        inputdataframe <- inputdataframe %>% 
+        mutate(puffin = puffin)
+  } else {
+        inputdataframe <- inputdataframe %>% 
+        mutate(puffin = str_extract(other, "\\d*puff|\\d*.puff|\\d*atpu|\\d*.atpu|\\d*puffis|\\d*puffins|\\d*.puffins|\\d*.ATPU|\\d*.ALPU|\\d*.puffin|\\d*..ATPU")) %>% 
+        mutate(puffin = as.double(str_extract(puffin, "\\d*")))
+        
+  } 
+  if ("dcco" %in% colnames(inputdataframe)) {
+    #cormorants
+        inputdataframe <- inputdataframe %>% 
+        mutate(dcco = dcco)
+  } else {
+         inputdataframe <- inputdataframe %>% 
+         mutate(dcco = str_extract(other, "\\d*corm|\\d*dcc|\\d*dcco|\\d*ddco|\\d*.DCCO|\\d*.DCC0|\\d*.commorants|\\d*.corm|\\d*.cormorants|d*..corm|\\d*.dcco")) %>% 
+         mutate(dcco = as.double(str_extract(dcco, "\\d*")))
+         
+  } 
+  if ("ternsp" %in% colnames(inputdataframe)) {
+    #terns
+        inputdataframe <- inputdataframe %>% 
+        mutate(ternsp = ternsp)
+  } else {
+         inputdataframe <- inputdataframe %>% 
+         mutate(ternsp = str_extract(other, "\\d*cote|\\d*.terns|\\d*.COTE|\\d*.ARTE|\\d*.Terns|\\d*.Tern|\\d*.arte|\\d*.common tern|\\d*.common term")) %>% 
+         mutate(ternsp = as.double(str_extract(ternsp, "\\d*")))
+         
+  } 
+  if ("razo" %in% colnames(inputdataframe)) {
+    #razorbills
+        inputdataframe <- inputdataframe %>% 
+        mutate(razo = razo)
+  } else {
+         inputdataframe <- inputdataframe %>% 
+         mutate(razo = str_extract(other, "\\d*razo|\\d*razor|\\d*.RAZO|\\d*.razorbills|\\d*.bills|\\d*.bill|\\d*.RAZ0|\\d*.RABI|\\d*.razo|\\d*razo")) %>% 
+         mutate(razo = as.double(str_extract(razo, "\\d*")))
+         
+  } 
+  if ("lagu" %in% colnames(inputdataframe)) {
+    #laughing gulls
+        inputdataframe <- inputdataframe %>% 
+        mutate(lagu = lagu)
+  } else {
+         inputdataframe <- inputdataframe %>% 
+         mutate(lagu = str_extract(other, "\\d*lagu|\\d*.laughing|\\d*.LAGU|\\d*lagus|\\d*.laughing gull|\\d*.lagu|\\d*LAGU|\\d*.laughing gulls")) %>% 
+         mutate(lagu = as.double(str_extract(lagu, "\\d*")))
+         
+  } 
+  if ("comu" %in% colnames(inputdataframe)) {
+    #murres
+        inputdataframe <- inputdataframe %>% 
+        mutate(comu = comu)
+  } else {
+         inputdataframe <- inputdataframe %>% 
+         mutate(comu = str_extract(other, "\\d*murre|\\d*.COMU|\\d*.common murre|\\d*.murre|\\d*.comu|\\d*.common murres|\\d*COMU")) %>% 
+         mutate(comu = as.double(str_extract(comu, "\\d*")))
+         
+  } 
+  if ("baea" %in% colnames(inputdataframe)) {
+    #bald eagle
+        inputdataframe <- inputdataframe %>% 
+        mutate(baea = baea)
+  } else {
+         inputdataframe <- inputdataframe %>% 
+         mutate(baea = str_extract(other, "\\d*.imm|\\d*.BAEA|\\d*.eagle|\\d*.juv")) %>% 
+         mutate(baea = as.double(str_extract(baea, "\\d*")))
+         
+  } 
+  if ("noga" %in% colnames(inputdataframe)) {
+    #gannet
+        inputdataframe <- inputdataframe %>% 
+        mutate(noga = noga)
+  } else {
+         inputdataframe <- inputdataframe %>% 
+         mutate(noga = str_extract(other, "\\d*.gannets|\\d*.NOGA|\\d*.gannet")) %>% 
+         mutate(noga = as.double(str_extract(noga, "\\d*")))
+         
+  } 
+  if ("corvid" %in% colnames(inputdataframe)) {
+    #corvid
+        inputdataframe <- inputdataframe %>% 
+        mutate(corvid = corvid)
+  } else {
+         inputdataframe <- inputdataframe %>% 
+         mutate(corvid = str_extract(other, "\\d*.crow|\\d*.Corvid|\\d*.AMCR|\\d*.Corvids|\\d*.crows|\\d*crow|\\d*.CORA")) %>% 
+         mutate(corvid = as.double(str_extract(corvid, "\\d*")))
+         
+  } 
+  if ("peepsp" %in% colnames(inputdataframe)) {
+    #sandpipers
+        inputdataframe <- inputdataframe %>% 
+        mutate(peepsp = peepsp)
+  } else {
+         inputdataframe <- inputdataframe %>% 
+         mutate(peepsp = str_extract(other, "\\d*.SPSA|\\d*.WHIM|\\d*..SPSA|\\d*.spotted sandpiper|\\d*.least sandpiper|\\d*.pipers|\\d*.common sandpipers|\\d*.piper|\\d*.red knots|\\d*.wimbrel|\\d*.spotted sandpipers|\\d*.sandpiper|\\d*.sandpipers|\\d*.RUTU|\\d*.SESA|d*.SBDO|\\d*.REPH|\\d*.LESA")) %>% 
+         mutate(peepsp = as.double(str_extract(peepsp, "\\d*")))
+         
+  } 
+  if ("seals" %in% colnames(inputdataframe)) {
+    #seals
+        inputdataframe <- inputdataframe %>% 
+        mutate(seals = seals)
+  } else {
+         inputdataframe <- inputdataframe %>% 
+         mutate(seals = str_extract(other, "\\d*.Seal|\\d*.Seals|\\d*.Harbor|\\d*.Gray|\\d*.seals|\\d*.grey|\\d*.seal|\\d*.harbor|\\d*.gray|\\*.Grey|\\d*.Grey Seal|\\d*.Grey Seals|\\d*.harbor seal|\\d*.gray seal")) %>% 
+         mutate(seals = as.double(str_extract(seals, "\\d*")))
+         
+  } 
+  if ("colo" %in% colnames(inputdataframe)) {
+    #loon
+        inputdataframe <- inputdataframe %>% 
+        mutate(colo = colo)
+  } else {
+         inputdataframe <- inputdataframe %>% 
+         mutate(colo = str_extract(other, "\\d*.COLO|\\d*.loon|\\d*.loons")) %>% 
+         mutate(colo = as.double(str_extract(colo, "\\d*")))
+         
+  } 
+  if ("cago" %in% colnames(inputdataframe)) {
+    #geese
+        inputdataframe <- inputdataframe %>% 
+        mutate(cago = cago)
+  } else {
+         inputdataframe <- inputdataframe %>% 
+         mutate(cago = str_extract(other, "\\d*.CAGO|\\d*.goose|\\d*.canada goose|\\d*.canada geese")) %>% 
+         mutate(cago = as.double(str_extract(cago, "\\d*")))
+         
+  } 
+  if ("porpoise" %in% colnames(inputdataframe)) {
+    #porpoise
+        inputdataframe <- inputdataframe %>% 
+        mutate(porpoise = porpoise)
+  } else {
+         inputdataframe <- inputdataframe %>% 
+         mutate(porpoise = str_extract(other, "\\d*.Harbor porpoise|\\d*.porpoise|\\d*.Porpoises|\\d*.porpoises")) %>% 
+         mutate(porpoise = as.double(str_extract(porpoise, "\\d*")))
+         
+  } 
+  if ("raptor" %in% colnames(inputdataframe)) {
+    #raptor
+        inputdataframe <- inputdataframe %>% 
+        mutate(raptor = raptor)
+  } else {
+         inputdataframe <- inputdataframe %>% 
+         mutate(raptor = str_extract(other, "\\d*.tv|\\d*.peregrine|\\d*.PEFA|\\d*.MERL")) %>% 
+         mutate(raptor = as.double(str_extract(raptor, "\\d*")))
+         
+  } 
+  if ("shearwater" %in% colnames(inputdataframe)) {
+    #shearwater
+        inputdataframe <- inputdataframe %>% 
+        mutate(shearwater = shearwater)
+  } else {
+         inputdataframe <- inputdataframe %>% 
+         mutate(shearwater = str_extract(other, "\\d*.shearwater|\\d*.GRSH|\\d*.GRSHE")) %>% 
+         mutate(shearwater = as.double(str_extract(shearwater, "\\d*")))
+         
+  } 
+  if ("gbhe" %in% colnames(inputdataframe)) {
+    #herons
+        inputdataframe <- inputdataframe %>% 
+        mutate(gbhe = gbhe)
+  } else {
+         inputdataframe <- inputdataframe %>% 
+         mutate(gbhe = str_extract(other, "\\d*.heron|\\d*.GBHE|\\d*.great blue heron")) %>% 
+         mutate(gbhe = as.double(str_extract(gbhe, "\\d*")))
+         
+  } 
+  if ("scoter" %in% colnames(inputdataframe)) {
+    #scoter
+        inputdataframe <- inputdataframe %>% 
+        mutate(scoter = scoter)
+  } else {
+         inputdataframe <- inputdataframe %>% 
+         mutate(scoter = str_extract(other, "\\d*.scoter|\\d*.Scoter|\\d*.BLSC|\\d*.surf scoter|\\d*.SUSC")) %>% 
+         mutate(scoter = as.double(str_extract(scoter, "\\d*")))
+         
+  } 
+  if ("wisp" %in% colnames(inputdataframe)) {
+    #Wilson's Storm-Petrel
+        inputdataframe <- inputdataframe %>% 
+        mutate(wisp = wisp)
+  } else {
+         inputdataframe <- inputdataframe %>% 
+         mutate(wisp = str_extract(other, "\\d*.WISP")) %>% 
+         mutate(wisp = as.double(str_extract(wisp, "\\d*")))
+         
+  } 
+  if ("lbbg" %in% colnames(inputdataframe)) {
+    #LBBG
+        inputdataframe <- inputdataframe %>% 
+        mutate(lbbg = lbbg)
+  } else {
+         inputdataframe <- inputdataframe %>% 
+         mutate(lbbg = str_extract(other, "\\d*.LBBG")) %>% 
+         mutate(lbbg = as.double(str_extract(lbbg, "\\d*")))
+  }
+ return(inputdataframe)
+}
+     
+```      
+    
     #puffins
   mutate(puffin = str_extract(other, "\\d*puff|\\d*.puff|\\d*atpu|\\d*.atpu|\\d*puffis|\\d*puffins|\\d*.puffins|\\d*.ATPU|\\d*.ALPU|\\d*.puffin|\\d*..ATPU")) %>% 
   mutate(puffin = as.double(str_extract(puffin, "\\d*"))) %>%
@@ -101,7 +343,7 @@ splitcomments <- function(inputdataframe) {
   mutate(peepsp = str_extract(other, "\\d*.SPSA|\\d*.WHIM|\\d*..SPSA|\\d*.spotted sandpiper|\\d*.least sandpiper|\\d*.pipers|\\d*.common sandpipers|\\d*.piper|\\d*.red knots|\\d*.wimbrel|\\d*.spotted sandpipers|\\d*.sandpiper|\\d*.sandpipers|\\d*.RUTU|\\d*.SESA|d*.SBDO|\\d*.REPH|\\d*.LESA")) %>% 
   mutate(peepsp = as.double(str_extract(peepsp, "\\d*"))) %>% 
     #seals
-  mutate(seals = str_extract(other, "\\d*.Seal|\\d*.Seals|\\d*.Harbor|\\d*.Gray|\\d*.seals|\\d*.grey|\\d*.seal|\\d*.harbor|\\d*.gray|\\*.Grey|\\d*.Grey Seal|\\d*.Grey Seals|\\d*.harbor seal|\\d*.gray seal")) %>% 
+  mutate(seals = str_extract(other, "\\d*.Seal|\\d*.Seals|\\d*.Harbor Seal|\\d*.Gray|\\d*.seals|\\d*.grey|\\d*.seal|\\d*.harbor|\\d*.gray|\\*.Grey|\\d*.Grey Seal|\\d*.Grey Seals|\\d*.harbor seal|\\d*.gray seal")) %>% 
   mutate(seals = as.double(str_extract(seals, "\\d*"))) %>% 
     #Loons
   mutate(colo = str_extract(other, "\\d*.COLO|\\d*.loon|\\d*.loons")) %>% 
@@ -110,7 +352,7 @@ splitcomments <- function(inputdataframe) {
   mutate(cago = str_extract(other, "\\d*.CAGO|\\d*.goose|\\d*.canada goose|\\d*.canada geese")) %>% 
   mutate(cago = as.double(str_extract(cago, "\\d*"))) %>% 
     #porpoise
-  mutate(porpoise = str_extract(other, "\\d*.Harbor|\\d*.porpoise|\\d*.Porpoises|\\d*.porpoises")) %>% 
+  mutate(porpoise = str_extract(other, "\\d*.Harbor porpoise|\\d*.porpoise|\\d*.Porpoises|\\d*.porpoises")) %>% 
   mutate(porpoise = as.double(str_extract(porpoise, "\\d*"))) %>% 
     #raptors
   mutate(raptor = str_extract(other, "\\d*.tv|\\d*.peregrine|\\d*.PEFA|\\d*.MERL")) %>% 
@@ -130,11 +372,11 @@ splitcomments <- function(inputdataframe) {
     #LBBG
   mutate(lbbg = str_extract(other, "\\d*.LBBG")) %>%  
   mutate(lbbg = as.double(str_extract(wisp, "\\d*"))) 
-  return(r)
+  return(inputdataframe)
 }
 
 
-```
+
 
 
 ```{r select columns and pivot}
@@ -287,9 +529,7 @@ tower_count_2011 <- tower_count_2011 %>%
                            monthch %in% "August" ~ "8",
                            TRUE ~ ""
                            )) %>% 
-  mutate(ATPU = paste(ATPU, "ATPU")) %>% 
-  mutate(Others = paste(Others, ATPU, sep = ",")) %>% #good way to fix puffin columns
-  select(-ATPU, -Comments)
+  select(-Comments)
 
 tower_count_2011 <- cleancolumns(tower_count_2011)
 tower_count_2011 <- splitcomments(tower_count_2011)
@@ -300,13 +540,8 @@ tower_2011_clean$year = 2011
 
 
 ```{r 2012}
-#this isn't working, may have to be done by hand. Unfortunately the splitcomments function overwrites the contents of the pre-existing columns. The best thing to do may be to somehow pivot those columns so they appear as comments in a different column, then paste them together. 
-
-#this is an extremely inelegant solution to this problem but it does seem to work. It is probably possible to write a loop to do it. 
-tower_count_2012 <- read_excel("data/tower_count/tower_count_2012.xls", skip = 2) %>% 
-  mutate(ATPU = paste(ATPU, "atpu"),RAZO = paste(RAZO, "razo"), DCCO = paste(DCCO, "dcco"),AMCR = paste(AMCR, "crow"),CORA = paste(CORA, "corvid"), COLO = paste(COLO, "COLO"), NOGA = paste(NOGA, "gannet"),BAEA = paste(BAEA, "eagle"),LAGU = paste(LAGU,"lagu"),COTE = paste(COTE, "tern"), SPSA = paste(SPSA, "piper")) %>% 
-  mutate(Comments = paste(Comments, ATPU, RAZO, DCCO, AMCR, CORA, COLO, NOGA, BAEA, LAGU, COTE, sep = "," ))
-#This is very unlikely to be adding the corvids together properly, but that should only be a problem if there are crows and ravens observed on the same day. Not sure if worth fixing, though would be interesting to try. 
+ 
+tower_count_2012 <- read_excel("data/tower_count/tower_count_2012.xls", skip = 2) 
 
 tower_count_2012 <- cleancolumns(tower_count_2012)
 tower_count_2012 <- splitcomments(tower_count_2012)
@@ -316,13 +551,10 @@ tower_2012_clean$year = 2012
 
 ```{r 2013}
 
-#same problem as above
-tower_count_2013 <- read_excel("data/tower_count/tower_count_2013.xls")%>% 
-  mutate(ATPU = paste(ATPU, "atpu"),RAZO = paste(RAZO, "razo"), DCCO = paste(DCCO, "dcco"), COLO = paste(COLO, "COLO"), NOGA = paste(NOGA, "gannet"),BAEA = paste(BAEA, "eagle"),LAGU = paste(LAGU,"lagu"),tern = paste(tern, "tern"), scoter = paste(scoter, "scoter"), seal = paste(seal, "seal")) %>% 
-  mutate(other = paste(other, ATPU, RAZO, DCCO, COLO, NOGA, BAEA, LAGU, tern, scoter, seal, sep = "," ))
+
+ tower_count_2013 <- read_excel("data/tower_count/tower_count_2013.xls") 
 
 tower_count_2013 <- cleancolumns(tower_count_2013)
-#worth checking if puffins are carrying over correctly
 tower_count_2013 <- splitcomments(tower_count_2013)
 tower_2013_clean <- selectcolumns(tower_count_2013)
 tower_2013_clean$year = 2013
