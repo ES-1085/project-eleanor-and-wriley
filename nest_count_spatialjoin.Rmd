@@ -1,0 +1,97 @@
+---
+title: "nest_count_spatial_join.Rmd"
+author: "Wriley and Eleanor"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(readxl)
+library(viridis)
+library(hrbrthemes)
+library(sf)
+library(leaflet)
+library(gganimate)
+library(ggimage)
+library(gifski)
+library(transformr)
+library(forcats)
+```
+
+```{r}
+outline <- read_sf("data/outlinecolored")
+
+gullshape2021 <- st_transform(gullshape2021, "+init=epsg:4326")
+outline <- st_transform(outline, "+init=epsg:4326")
+
+leaflet(data = gullshape2021) %>% 
+  addProviderTiles(providers$Esri.WorldImagery) %>% 
+    setView(lng = -68, 
+          lat = 44, 
+          zoom = 8) %>%
+  addPolygons(data = outline) %>% 
+  addCircleMarkers()
+
+```
+
+
+```{r join-shapefile-nestcount}
+##2022
+gullshape2022 <- read_sf("data/gullshapefiles/Gulls2022")
+gullshape2022 <- st_transform(gullshape2022, "+init=epsg:4326") %>%
+  select(Comment, geometry) %>%
+  rename(flag = "Comment") %>%
+  mutate(flag = as.integer(flag))
+
+nest_count_clean_2022 <- read.csv("data/nest_count_clean/nest_count_clean_2022.csv")
+
+gullshape2022 <- gullshape2022 %>%
+  left_join(nest_count_clean_2022, by = "flag") %>%
+  select(flag, geometry, clutch, year, species)
+
+##2021
+gullshape2021 <- read_sf("data/gullshapefiles/Gulls2021")
+nest_count_clean_2021 <- read.csv("data/nest_count_clean/nest_count_clean_2021.csv")
+gullshape2021 <- st_transform(gullshape2021, "+init=epsg:4326") %>%
+  select(Comment, geometry) %>%
+  rename(flag = "Comment") %>%
+  mutate(flag = as.integer(flag))
+
+gullshape2021 <- gullshape2021 %>%
+  left_join(nest_count_clean_2021, by = "flag") %>%
+  mutate(year = "2021") %>%
+  select(flag, geometry, clutch, year, species)
+
+#2020
+gullshape2020 <- read_sf("data/gullshapefiles/Gulls2020")
+nest_count_clean_2020 <- read.csv("data/nest_count_clean/nest_count_clean_2020.csv")
+gullshape2020 <- st_transform(gullshape2020, "+init=epsg:4326") %>%
+  select(Comment, geometry) %>%
+  rename(flag = "Comment") %>%
+  mutate(flag = as.integer(flag))
+
+gullshape2020 <- gullshape2020 %>%
+  left_join(nest_count_clean_2020, by = "flag") %>%
+  # mutate(year = "2020") %>%
+  select(flag, geometry, clutch, year, species)
+
+
+
+gullshapetest <- rbind(gullshape2022, gullshape2021)
+
+
+```
+
+```{r map-just-colony, eval = FALSE, echo = TRUE, fig.height=4, fig.width=4}
+ggplot(outline) +
+  # geom_sf(data = outline, fill = "lightblue")+
+  geom_sf(data = gullshapetest, color = "midnightblue", aes(group = year)) +
+  coord_sf(ylim = c(44.140385, 44.145726), xlim = c(-68.25038, -68.242629), expand = FALSE) + 
+  transition_states(states = year) +
+  #  # ease_aes('linear') +
+  theme_bw()
+
+```
+
