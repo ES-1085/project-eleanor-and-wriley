@@ -35,14 +35,14 @@ ui <- fluidPage(theme = shinytheme("superhero"),
   titlePanel("Tower Count Data"),
   sidebarLayout(
     sidebarPanel(
-        pickerInput("yearIn", "Year:", choices = yearlist, options = list(`actions-box` = TRUE),multiple = T, selected = c(2000:2022)),
-        selectInput("plottype","Plot Type", choices = c("barplot","boxplot","multi-year barplot","lines", "multi-year boxplots","counts within season", "lines faceted by species"), selected = "lines faceted by species"),
+        pickerInput("yearIn", "Year:", choices = yearlist, options = list(`actions-box` = TRUE),multiple = TRUE, selected = c(2000:2022)),
+        selectInput("plottype","Plot Type", choices = c("barplot","boxplot","multi-year barplot","lines", "multi-year boxplots","counts within season", "lines faceted by species", "boxplots faceted by species"), selected = "lines faceted by species"),
         selectInput("barstat","Statistic to Use (won't affect boxplots)", choices = c("median", "mean", "high count", "season total"), selected = "median"),
         checkboxGroupInput("speciesIn", "Species", choices = specieslist, selected  = c("herg","gbbg","coei_ad","blgu"))
     ),
     mainPanel(
       plotOutput("plot"),
-      textOutput("text")
+      textOutput("text"),
     )
    )
 )
@@ -53,7 +53,7 @@ ui <- fluidPage(theme = shinytheme("superhero"),
 
 server <- function(input, output) {
   output$text <- renderText({
-    if (input$plottype %in% c("counts within season","lines faceted by species")){
+    if (input$plottype %in% c("counts within season","lines faceted by species", "boxplots faceted by species")){
       print("NOTE: When this warning is shown, X and Y axes are not consistent between plots.")
     }
   })
@@ -184,6 +184,19 @@ server <- function(input, output) {
         facet_wrap(~species, scales = "free")+
         labs(title = paste(input$barstat, "counts by species and year"), subtitle = "Great Duck Tower Data", caption = "error bars represent standard error")+
         scale_color_viridis_d()+
+        theme_bw()
+    } else if (input$plottype == "boxplots faceted by species") {
+      tower %>% 
+        group_by(species, year) %>% 
+        filter(year %in% input$yearIn) %>% 
+        filter(species %in% input$speciesIn) %>% 
+        mutate(year = as.factor(year)) %>% 
+        ggplot(aes(x = year, y = count, fill = species, color = species))+
+        geom_boxplot(color = "black")+
+        labs(title= "Species Counts by Year", subtitle = "Great Duck Tower Data")+
+        scale_fill_viridis_d(alpha = 0.8)+
+        scale_color_viridis_d()+
+        facet_wrap(~species, scales = "free") +
         theme_bw()
     }
 })
