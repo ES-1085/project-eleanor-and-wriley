@@ -311,6 +311,7 @@ plot1 <- towerclean %>%
   xlab("Year")
 
 ```
+
 ```{r}
 plot1
 plot2 <- plot1 + theme(legend.title = element_text(size = 8), 
@@ -381,5 +382,15 @@ summary(lm2)
 ggplot(hergs, aes(x = year, y = med))+
   geom_point()+
   geom_smooth(method = lm)
+```
+
+
+```{r}
+tower %>% 
+  filter(species == "herg") %>% 
+  group_by(year) %>% 
+  summarize(mean = mean(count)) %>% 
+  ggplot(aes(x = year, y = mean))+
+  geom_line()
 ```
 

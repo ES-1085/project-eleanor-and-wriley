@@ -166,7 +166,8 @@ server <- function(input, output) {
         group_by(species, year) %>% 
         filter(year %in% input$yearIn) %>% 
         filter(species %in% input$speciesIn) %>% 
-        summarize(se = se(count),stat = if (input$barstat == "median") {
+        summarize(se = se(count), stat =
+          if (input$barstat == "median") {
           median(count)
         } else if (input$barstat == "high count") {
           max(count)
