@@ -43,53 +43,213 @@ gullshape2022 <- read_sf("data/gullshapefiles/Gulls2022")
 gullshape2022 <- st_transform(gullshape2022, "+init=epsg:4326") %>%
   select(Comment, geometry) %>%
   rename(flag = "Comment") %>%
-  mutate(flag = as.integer(flag))
+  mutate(flag = as.integer(flag)) %>%
+  mutate(year = 2022)
 
 nest_count_clean_2022 <- read.csv("data/nest_count_clean/nest_count_clean_2022.csv")
 
 gullshape2022 <- gullshape2022 %>%
   left_join(nest_count_clean_2022, by = "flag") %>%
-  select(flag, geometry, clutch, year, species)
+  select(flag, geometry, clutch, year, species) %>%
+  filter(!is.na(flag))
 
 ##2021
 gullshape2021 <- read_sf("data/gullshapefiles/Gulls2021")
-nest_count_clean_2021 <- read.csv("data/nest_count_clean/nest_count_clean_2021.csv")
 gullshape2021 <- st_transform(gullshape2021, "+init=epsg:4326") %>%
   select(Comment, geometry) %>%
   rename(flag = "Comment") %>%
-  mutate(flag = as.integer(flag))
+  mutate(flag = as.integer(flag)) %>%
+  mutate(year = 2021)
+
+nest_count_clean_2021 <- read.csv("data/nest_count_clean/nest_count_clean_2021.csv")
 
 gullshape2021 <- gullshape2021 %>%
   left_join(nest_count_clean_2021, by = "flag") %>%
-  mutate(year = "2021") %>%
-  select(flag, geometry, clutch, year, species)
+  select(flag, geometry, clutch, year, species) %>%
+  filter(!is.na(flag))
 
 #2020
 gullshape2020 <- read_sf("data/gullshapefiles/Gulls2020")
-nest_count_clean_2020 <- read.csv("data/nest_count_clean/nest_count_clean_2020.csv")
 gullshape2020 <- st_transform(gullshape2020, "+init=epsg:4326") %>%
   select(Comment, geometry) %>%
   rename(flag = "Comment") %>%
-  mutate(flag = as.integer(flag))
+  mutate(flag = as.integer(flag)) %>%
+  mutate(year = 2020)
+
+nest_count_clean_2020 <- read.csv("data/nest_count_clean/nest_count_clean_2020.csv")
 
 gullshape2020 <- gullshape2020 %>%
   left_join(nest_count_clean_2020, by = "flag") %>%
-  # mutate(year = "2020") %>%
-  select(flag, geometry, clutch, year, species)
+  select(flag, geometry, clutch, year, species) %>%
+  filter(!is.na(flag))
+
+##2019
+gullshape2019 <- read_sf("data/gullshapefiles/Gulls2019")
+gullshape2019 <- st_transform(gullshape2019, "+init=epsg:4326") %>%
+  select(Comment, geometry) %>%
+  rename(flag = "Comment") %>%
+  mutate(flag = as.integer(flag)) %>%
+  mutate(year = 2019)
+##2018
+gullshape2018 <- read_sf("data/gullshapefiles/gulls2018")
+gullshape2018 <- st_transform(gullshape2018, "+init=epsg:4326") %>%
+  select(Comment, geometry) %>%
+  rename(flag = "Comment") %>%
+  mutate(flag = as.integer(flag)) %>%
+  mutate(year = 2018)
+##2017
+gullshape2017 <- read_sf("data/gullshapefiles/gulls2017")
+gullshape2017 <- st_transform(gullshape2017, "+init=epsg:4326") %>%
+  select(Comment, geometry) %>%
+  rename(flag = "Comment") %>%
+  mutate(flag = as.integer(flag)) %>%
+  mutate(year = 2017)
+##2016
+gullshape2016 <- read_sf("data/gullshapefiles/gulls2016")
+gullshape2016 <- st_transform(gullshape2016, "+init=epsg:4326") %>%
+  select(Comment, geometry) %>%
+  rename(flag = "Comment") %>%
+  mutate(flag = as.integer(flag)) %>%
+  mutate(year = 2016)
+##2015
+gullshape2015 <- read_sf("data/gullshapefiles/gulls2015")
+gullshape2015 <- st_transform(gullshape2015, "+init=epsg:4326") %>%
+  select(COMMENT, geometry) %>%
+  rename(flag = "COMMENT") %>%
+  mutate(flag = as.integer(flag)) %>%
+  mutate(year = 2015)
+##2014
+gullshape2014 <- read_sf("data/gullshapefiles/gulls2014")
+gullshape2014 <- st_transform(gullshape2014, "+init=epsg:4326") %>%
+  select(COMMENT, geometry) %>%
+  rename(flag = "COMMENT") %>%
+  mutate(flag = as.integer(flag)) %>%
+  mutate(year = 2014)
+##2013
+gullshape2013 <- read_sf("data/gullshapefiles/gulls2013")
+gullshape2013 <- st_transform(gullshape2013, "+init=epsg:4326") %>%
+  select(Comment, geometry) %>%
+  rename(flag = "Comment") %>%
+  mutate(flag = as.integer(flag)) %>%
+  mutate(year = 2013)
+##2012
+gullshape2012 <- read_sf("data/gullshapefiles/gulls2012")
+gullshape2012 <- st_transform(gullshape2012, "+init=epsg:4326") %>%
+  select(Comment, geometry) %>%
+  rename(flag = "Comment") %>%
+  mutate(flag = as.integer(flag)) %>%
+  mutate(year = 2012)
+##2011
+gullshape2011 <- read_sf("data/gullshapefiles/gulls2011")
+gullshape2011 <- st_transform(gullshape2011, "+init=epsg:4326") %>%
+  select(COMMENT, geometry) %>%
+  rename(flag = "COMMENT") %>%
+  mutate(flag = as.integer(flag)) %>%
+  mutate(year = 2011)
+##2010
+gullshape2010 <- read_sf("data/gullshapefiles/gulls2010")
+gullshape2010 <- st_transform(gullshape2010, "+init=epsg:4326") %>%
+  select(COMMENT, geometry) %>%
+  rename(flag = "COMMENT") %>%
+  mutate(flag = as.integer(flag)) %>%
+  mutate(year = 2010)
+##2009
+gullshape2009 <- read_sf("data/gullshapefiles/gulls2009")
+gullshape2009 <- st_transform(gullshape2009, "+init=epsg:4326") %>%
+  select(COMMENT, geometry) %>%
+  rename(flag = "COMMENT") %>%
+  mutate(flag = as.integer(flag)) %>%
+  mutate(year = 2009)
+##2008
+gullshape2008 <- read_sf("data/gullshapefiles/gulls2008")
+gullshape2008 <- st_transform(gullshape2008, "+init=epsg:4326") %>%
+  select(COMMENT, geometry) %>%
+  rename(flag = "COMMENT") %>%
+  mutate(flag = as.integer(flag)) %>%
+  mutate(year = 2008)
+##2007
+gullshape2007 <- read_sf("data/gullshapefiles/gulls2007")
+gullshape2007 <- st_transform(gullshape2007, "+init=epsg:4326") %>%
+  select(COMMENT, geometry) %>%
+  rename(flag = "COMMENT") %>%
+  mutate(flag = as.integer(flag)) %>%
+  mutate(year = 2007)
+##2006
+gullshape2006 <- read_sf("data/gullshapefiles/gulls2006")
+gullshape2006 <- st_transform(gullshape2006, "+init=epsg:4326") %>%
+  select(COMMENT, geometry) %>%
+  rename(flag = "COMMENT") %>%
+  mutate(flag = as.integer(flag)) %>%
+  mutate(year = 2006)
+##2005
+gullshape2005 <- read_sf("data/gullshapefiles/gulls2005")
+gullshape2005 <- st_transform(gullshape2005, "+init=epsg:4326") %>%
+  select(COMMENT, geometry) %>%
+  rename(flag = "COMMENT") %>%
+  mutate(flag = as.integer(flag)) %>%
+  mutate(year = 2005)
+##2004
+gullshape2004 <- read_sf("data/gullshapefiles/gulls2004")
+gullshape2004 <- st_transform(gullshape2004, "+init=epsg:4326") %>%
+  select(ID, geometry) %>%
+  rename(flag = "ID") %>%
+  mutate(flag = as.integer(flag)) %>%
+  mutate(year = 2004)
+##2003
+gullshape2003 <- read_sf("data/gullshapefiles/gulls2003")
+gullshape2003 <- st_transform(gullshape2003, "+init=epsg:4326") %>%
+  select(Comment, geometry) %>%
+  rename(flag = "Comment") %>%
+  mutate(flag = as.integer(flag)) %>%
+  mutate(year = 2003)
+##2002
+gullshape2002 <- read_sf("data/gullshapefiles/gulls2002")
+gullshape2002 <- st_transform(gullshape2002, "+init=epsg:4326") %>%
+  select(COMMENT, geometry) %>%
+  rename(flag = "COMMENT") %>%
+  mutate(flag = as.integer(flag)) %>%
+  mutate(year = 2002)
+##2001
+gullshape2001 <- read_sf("data/gullshapefiles/gulls2001")
+gullshape2001 <- st_transform(gullshape2001, "+init=epsg:4326") %>%
+  select(COMMENT, geometry) %>%
+  rename(flag = "COMMENT") %>%
+  mutate(flag = as.integer(flag)) %>%
+  mutate(year = 2001)
+##2000
+gullshape2000 <- read_sf("data/gullshapefiles/gulls2000")
+gullshape2000 <- st_transform(gullshape2000, "+init=epsg:4326") %>%
+  select(COMMENT, geometry) %>%
+  rename(flag = "COMMENT") %>%
+  mutate(flag = as.integer(flag)) %>%
+  mutate(year = 2000)
+##1999
+gullshape1999 <- read_sf("data/gullshapefiles/gulls_1999")
+gullshape1999 <- st_transform(gullshape1999, "+init=epsg:4326") %>%
+  select(COMMENT, geometry) %>%
+  rename(flag = "COMMENT") %>%
+  mutate(flag = as.integer(flag)) %>%
+  mutate(year = 1999)
 
 
 
-gullshapetest <- rbind(gullshape2022, gullshape2021)
+
+gullshapetest <- rbind(gullshape2022, gullshape2021, gullshape2020, gullshape2019, gullshape2018, gullshape2017, gullshape2016, gullshape2015, gullshape2014, gullshape2013, gullshape2012, gullshape2011, gullshape2010, gullshape2009, gullshape2008, gullshape2007, gullshape2006, gullshape2005, gullshape2004, gullshape2003, gullshape2002, gullshape2001, gullshape2000, gullshape1999)
 
 
 ```
 
-```{r map-just-colony, eval = FALSE, echo = TRUE, fig.height=4, fig.width=4}
-ggplot(outline) +
-  # geom_sf(data = outline, fill = "lightblue")+
+```{r map-just-colony, eval = FALSE, echo = TRUE, fig.height=6, fig.width=6}
+ggplot(gullshapetest) +
+  geom_sf(data = outline, fill = "lightblue")+
   geom_sf(data = gullshapetest, color = "midnightblue", aes(group = year)) +
   coord_sf(ylim = c(44.140385, 44.145726), xlim = c(-68.25038, -68.242629), expand = FALSE) + 
-  transition_states(states = year) +
+  transition_states(states = year, 
+                    transition_length = 5,
+                    state_length = 5) +
+  labs(
+    title = "Distribution of Nesting Gulls", 
+    subtitle = 'Year: {closest_state}') +
   #  # ease_aes('linear') +
   theme_bw()
 
