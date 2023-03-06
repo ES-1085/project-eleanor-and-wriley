@@ -18,6 +18,7 @@ library(ggimage)
 library(gifski)
 library(transformr)
 library(forcats)
+library(visdat)
 ```
 
 ## R Markdown
@@ -109,6 +110,11 @@ tower %>%
        y = 'species')
 ```
 
+```{r visualize-missing-data}
+visdat::vis_miss(tower)
+visdat::vis_miss(nest_count_clean_2022)
+
+```
 
 
 ##Colony Distribution Animation
@@ -189,8 +195,6 @@ towerclean %>%
   scale_fill_viridis_d()+
   labs(main = "Species High Counts")
   
-=======
->>>>>>> e96468c442542fdaeb10f72079d7dad291863d85
 
 ```{r loading tracking data}
 
