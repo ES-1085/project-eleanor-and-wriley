@@ -1,8 +1,8 @@
 ---
-title: "Presentation title"
-subtitle: "Presentation subtitle (if any)"
-author: "Team name <br> Names of team members"
-institute: "Bates College"
+title: "Exploring Long-Term Datasets from Great Duck Island"
+subtitle: ""
+author: "Wriley and Eleanor"
+institute: "College of the Atlantic"
 date: "`r Sys.Date()`"
 output:
   xaringan::moon_reader:
@@ -18,7 +18,6 @@ output:
 ```{r load-packages, include = FALSE}
 # Add any additional packages you need to this chunk
 library(tidyverse)
-library(tidymodels)
 library(palmerpenguins)
 library(knitr)
 library(xaringanthemer)
@@ -33,9 +32,9 @@ knitr::opts_chunk$set(fig.retina = 3, dpi = 300, fig.width = 6, fig.asp = 0.618,
 # Load your data here
 ```
 
-```{r}
+```{r, include = FALSE}
 style_xaringan(
-  title_slide_background_image = "img/confetti.jpg"
+  title_slide_background_image = "img/gdi_tower.JPG"
 )
 ```
 
@@ -102,9 +101,9 @@ or text in two columns $^*$
 
 ```{r boring-regression}
 # a boring regression
-model <- lm(dist ~ speed, data = cars)
-tidy(model)
-glance(model)
+# model <- lm(dist ~ speed, data = cars)
+# tidy(model)
+# glance(model)
 ```
 
 ---
@@ -201,3 +200,8 @@ Limitations:
 `xaringanthemer` provides some solutions for this that: https://pkg.garrickadenbuie.com/xaringanthemer.
 
 - And if you want more bells and whistles, there is also `xaringanExtra`: https://pkg.garrickadenbuie.com/xaringanExtra.
+
+---
+#Tower Count Shiny App:
+
+https://udppk1-eleanor-gnam.shinyapps.io/towerDRAFT/
