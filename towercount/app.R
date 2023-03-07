@@ -17,9 +17,37 @@ tower <- read_csv("Data/towerclean.csv",
                                 col_types = cols(date = col_date(format = "%Y-%m-%d")))
 #Format year column
 tower$year <- year(as.Date(as.character(tower$year), format = "%Y"))
+
+tower <- tower %>%
+  mutate(label = case_when(species == "herg" ~ "Herring Gulls",
+                         species == "gbbg" ~ "Great Black-backed Gull",
+                         species == "blgu" ~ "Black Guillemot",
+                         species == "coei_ad" ~ "Common Eider (Adults)",
+                         species == "coei_ju" ~ "Common Eider (Chicks)",
+                         species == "comu" ~ "Common Murre",
+                         species == "razo" ~ "Razorbill",
+                         species == "noga" ~ "Northern Gannet",
+                         species == "puffin" ~ "Atlantic Puffin",
+                         species == "peepsp" ~ "Peep sp.",
+                         species == "ternsp" ~ "Tern sp.",
+                         species == "baea" ~ "Bald Eagle",
+                         species == "colo" ~ "Common Loon",
+                         species == "lagu" ~ "Laughing Gull",
+                         species == "cago" ~ "Canada Goose",
+                         species == "shearwater" ~ "Shearwater sp.",
+                         species == "wisp" ~ "Wilson's Storm-petrel",
+                         species == "raptor" ~ "Raptor sp.",
+                         species == "gbhe" ~ "Heron sp.",
+                         species == "dcco" ~ "Double-Crested Cormorant",
+                         species == "lbbg" ~ "Lesser Black-backed Gull",
+                         species == "scoter" ~ "Scoter sp.",
+                         TRUE ~ as.character(species)))
+
 #make lists of years and species
 yearlist <- as.list(unique(tower$year))
 specieslist <- as.list(unique(tower$species))
+labellist <- as.list(unique(tower$label))
+
 
 tower$date[tower$date == "2008-05-28"] <- "2018-05-28"
 
@@ -37,8 +65,8 @@ ui <- fluidPage(theme = shinytheme("superhero"),
     sidebarPanel(
         pickerInput("yearIn", "Year:", choices = yearlist, options = list(`actions-box` = TRUE),multiple = TRUE, selected = c(2000:2022)),
         selectInput("plottype","Plot Type", choices = c("barplot","boxplot","multi-year barplot","lines", "multi-year boxplots","counts within season", "lines faceted by species", "boxplots faceted by species"), selected = "lines faceted by species"),
-        selectInput("barstat","Statistic to Use (won't affect boxplots)", choices = c("median", "mean", "high count", "season total"), selected = "median"),
-        checkboxGroupInput("speciesIn", "Species", choices = specieslist, selected  = c("herg","gbbg","coei_ad","blgu"))
+        selectInput("barstat","Statistic to Use (won't affect boxplots)", choices = c("Median", "Mean", "High Count", "Season Total"), selected = "Median"),
+        checkboxGroupInput("speciesIn", "Species", choiceValues = specieslist, selected  = c("herg","gbbg","coei_ad","blgu"), choiceNames = labellist)
     ),
     mainPanel(
       plotOutput("plot"),
@@ -63,19 +91,19 @@ server <- function(input, output) {
         filter(year %in% input$yearIn) %>% 
         filter(species %in% input$speciesIn) %>% 
         group_by(species, year) %>% 
-        summarize(se = se(count), stat = if (input$barstat == "median") {
+        summarize(se = se(count), stat = if (input$barstat == "Median") {
          median(count)
-        } else if (input$barstat == "high count") {
+        } else if (input$barstat == "High Count") {
          max(count)
-        } else if (input$barstat == "mean") {
+        } else if (input$barstat == "Mean") {
          mean(count)
-        } else if (input$barstat == "season total") {
+        } else if (input$barstat == "Season Total") {
          sum(count)
         }) %>%
         ggplot(aes(x = species, y = stat, fill = species))+
         geom_col()+
         geom_errorbar(aes(x = species, ymin = (stat - se), ymax = (stat + se)), alpha = 
-                        (if(input$barstat %in% c("median", "mean")){0.8} else {0}), size = 0.9, width = 0.3)+
+                        (if(input$barstat %in% c("Median", "Mean")){0.8} else {0}), size = 0.9, width = 0.3)+
         facet_wrap(~year)+
         labs(title = paste(input$barstat, "counts by species and year"), subtitle = "Great Duck Tower Data", caption = "Error bars represent standard error")+
         scale_fill_viridis_d()+
@@ -97,19 +125,19 @@ server <- function(input, output) {
         group_by(species, year) %>% 
         filter(year %in% input$yearIn) %>% 
         filter(species %in% input$speciesIn) %>% 
-        summarize(se = se(count), stat = if (input$barstat == "median") {
+        summarize(se = se(count), stat = if (input$barstat == "Median") {
           median(count)
-        } else if (input$barstat == "high count") {
+        } else if (input$barstat == "High Count") {
           max(count)
-        } else if (input$barstat == "mean") {
+        } else if (input$barstat == "Mean") {
           mean(count)
-        } else if (input$barstat == "season total") {
+        } else if (input$barstat == "Season Total") {
           sum(count)
         }) %>% 
         ggplot(aes(x = year, y = stat, fill = species))+
         geom_col(position = position_dodge(preserve = "single"), width = 0.75)+
         geom_errorbar(aes(x = year, ymin = (stat - se), ymax = (stat + se), group = species), alpha = 
-                        (if(input$barstat %in% c("median", "mean")){0.8
+                        (if(input$barstat %in% c("Median", "Mean")){0.8
                         } else {0}),
                         size = 0.9, width = 0.3, position = position_dodge(width = 0.75, preserve = "single"))+
         labs(title= paste(input$barstat, "counts by species and year"), subtitle = "Great Duck Tower Data", caption = "error bars represent standard error")+
@@ -120,22 +148,22 @@ server <- function(input, output) {
         group_by(species, year) %>% 
         filter(year %in% input$yearIn) %>% 
         filter(species %in% input$speciesIn) %>% 
-        summarize(se = se(count),stat = if (input$barstat == "median") {
+        summarize(se = se(count),stat = if (input$barstat == "Median") {
           median(count)
-        } else if (input$barstat == "high count") {
+        } else if (input$barstat == "High Count") {
           max(count)
-        } else if (input$barstat == "mean") {
+        } else if (input$barstat == "Mean") {
           mean(count)
-        } else if (input$barstat == "season total") {
+        } else if (input$barstat == "Season Total") {
           sum(count)
         }) %>% 
         ggplot()+
         geom_point(aes(x = year, y = stat, color = species), size = 2)+
         geom_errorbar(aes(x = year, ymin = (stat - se), ymax = (stat + se)), alpha = 
-                        (if(input$barstat %in% c("median", "mean")){0.8}
+                        (if(input$barstat %in% c("Median", "Mean")){0.8}
                          else {0}), size = 0.5, width = 0.005)+
         geom_line(aes(x = year, y = stat, color = species), linewidth = 1.3 )+
-        labs(title = paste(input$barstat, "counts by species and year"), subtitle = "Great Duck Tower Data", caption = "error bars represent standard error")+
+        labs(title = paste(input$barstat, "counts by species and year"), subtitle = "Great Duck Tower Data", caption = "Error Bars Represent Standard Error")+
         scale_color_viridis_d()+
         theme_bw()
     } else if (input$plottype == "multi-year boxplots") {
@@ -167,19 +195,19 @@ server <- function(input, output) {
         filter(year %in% input$yearIn) %>% 
         filter(species %in% input$speciesIn) %>% 
         summarize(se = se(count), stat =
-          if (input$barstat == "median") {
+          if (input$barstat == "Median") {
           median(count)
-        } else if (input$barstat == "high count") {
+        } else if (input$barstat == "High Count") {
           max(count)
-        } else if (input$barstat == "mean") {
+        } else if (input$barstat == "Mean") {
           mean(count)
-        } else if (input$barstat == "season total") {
+        } else if (input$barstat == "Season Total") {
           sum(count)
         }) %>% 
         ggplot()+
         geom_point(aes(x = year, y = stat, color = species), size = 2)+
         geom_errorbar(aes(x = year, ymin = (stat - se), ymax = (stat + se)), alpha = 
-                        (if(input$barstat %in% c("median", "mean")){0.8}
+                        (if(input$barstat %in% c("Median", "Mean")){0.8}
                          else {0}), size = 0.5, width = 0.005)+
         geom_line(aes(x = year, y = stat, color = species), linewidth = 1.3 )+
         facet_wrap(~species, scales = "free")+
