@@ -18,26 +18,16 @@ library(ggimage)
 library(gifski)
 library(transformr)
 library(forcats)
+library(raster)
 ```
 
-```{r}
-outline <- read_sf("data/outlinecolored")
-
-gullshape2021 <- st_transform(gullshape2021, "+init=epsg:4326")
+```{r read-island-outline}
+outline <- read_sf("data/outlinecolored") 
 outline <- st_transform(outline, "+init=epsg:4326")
-
-leaflet(data = gullshape2021) %>% 
-  addProviderTiles(providers$Esri.WorldImagery) %>% 
-    setView(lng = -68, 
-          lat = 44, 
-          zoom = 8) %>%
-  addPolygons(data = outline) %>% 
-  addCircleMarkers()
-
 ```
 
 
-```{r join-shapefile-nestcount}
+```{r combine-shapefiles-without-nestcount}
 ##2022
 gullshape2022 <- read_sf("data/gullshapefiles/Gulls2022")
 gullshape2022 <- st_transform(gullshape2022, "+init=epsg:4326") %>%
@@ -46,12 +36,12 @@ gullshape2022 <- st_transform(gullshape2022, "+init=epsg:4326") %>%
   mutate(flag = as.integer(flag)) %>%
   mutate(year = 2022)
 
-nest_count_clean_2022 <- read.csv("data/nest_count_clean/nest_count_clean_2022.csv")
-
-gullshape2022 <- gullshape2022 %>%
-  left_join(nest_count_clean_2022, by = "flag") %>%
-  select(flag, geometry, clutch, year, species) %>%
-  filter(!is.na(flag))
+# nest_count_clean_2022 <- read.csv("data/nest_count_clean/nest_count_clean_2022.csv")
+# 
+# gullshape2022 <- gullshape2022 %>%
+#   left_join(nest_count_clean_2022, by = "flag") %>%
+#   select(flag, geometry, clutch, year, species) %>%
+#   filter(!is.na(flag))
 
 ##2021
 gullshape2021 <- read_sf("data/gullshapefiles/Gulls2021")
@@ -61,12 +51,12 @@ gullshape2021 <- st_transform(gullshape2021, "+init=epsg:4326") %>%
   mutate(flag = as.integer(flag)) %>%
   mutate(year = 2021)
 
-nest_count_clean_2021 <- read.csv("data/nest_count_clean/nest_count_clean_2021.csv")
-
-gullshape2021 <- gullshape2021 %>%
-  left_join(nest_count_clean_2021, by = "flag") %>%
-  select(flag, geometry, clutch, year, species) %>%
-  filter(!is.na(flag))
+# nest_count_clean_2021 <- read.csv("data/nest_count_clean/nest_count_clean_2021.csv")
+# 
+# gullshape2021 <- gullshape2021 %>%
+#   left_join(nest_count_clean_2021, by = "flag") %>%
+#   select(flag, geometry, clutch, year, species) %>%
+#   filter(!is.na(flag))
 
 #2020
 gullshape2020 <- read_sf("data/gullshapefiles/Gulls2020")
@@ -76,12 +66,12 @@ gullshape2020 <- st_transform(gullshape2020, "+init=epsg:4326") %>%
   mutate(flag = as.integer(flag)) %>%
   mutate(year = 2020)
 
-nest_count_clean_2020 <- read.csv("data/nest_count_clean/nest_count_clean_2020.csv")
-
-gullshape2020 <- gullshape2020 %>%
-  left_join(nest_count_clean_2020, by = "flag") %>%
-  select(flag, geometry, clutch, year, species) %>%
-  filter(!is.na(flag))
+# nest_count_clean_2020 <- read.csv("data/nest_count_clean/nest_count_clean_2020.csv")
+# 
+# gullshape2020 <- gullshape2020 %>%
+#   left_join(nest_count_clean_2020, by = "flag") %>%
+#   select(flag, geometry, clutch, year, species) %>%
+#   filter(!is.na(flag))
 
 ##2019
 gullshape2019 <- read_sf("data/gullshapefiles/Gulls2019")
@@ -240,18 +230,33 @@ gullshapetest <- rbind(gullshape2022, gullshape2021, gullshape2020, gullshape201
 ```
 
 ```{r map-just-colony, eval = FALSE, echo = TRUE, fig.height=6, fig.width=6}
-ggplot(gullshapetest) +
+animation.points.only <- ggplot(gullshapetest) +
   geom_sf(data = outline, fill = "lightblue")+
   geom_sf(data = gullshapetest, color = "midnightblue", aes(group = year)) +
   coord_sf(ylim = c(44.140385, 44.145726), xlim = c(-68.25038, -68.242629), expand = FALSE) + 
-  transition_states(states = year, 
-                    # transition_length = 1,
-                    state_length = 250) +
+  transition_states(states = year ,
+                    transition_length = 4,
+                    state_length = 4
+                    ) +
   labs(
     title = "Distribution of Nesting Gulls", 
     subtitle = 'Year: {closest_state}') +
   #  # ease_aes('linear') +
   theme_bw()
+
+```
+
+```{r}
+animate(animation.points.only, nframes = 48, duration = 40)
+```
+
+
+```{r density-test}
+
+gullshape2022.dt <- gullshape2022
+
+gullshape2022.dt$area <- sf::st_area(gullshape2022.dt$geometry)
+    gullshape2022$density <- gullshape2022.dt$sales / gullshape2022.dt$area
 
 ```
 
