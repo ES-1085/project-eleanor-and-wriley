@@ -9,8 +9,27 @@ date: "`r Sys.Date()`"
 
 ##This will be used to create figures used for our presentation. Alt text should be included here as well as in the Google Slides. 
 
-```{r load-packages, include = FALSE}
-
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
+library(readxl)
+library(viridis)
+library(hrbrthemes)
+library(sf)
+library(leaflet)
+library(gganimate)
+library(ggimage)
+library(gifski)
+library(transformr)
+library(forcats)
+library(visdat)
+```
+
+##Tower Count Data Visualizations
+
+For additional exploration of tower count data, see Shiny App: https://udppk1-eleanor-gnam.shinyapps.io/towerDRAFT/\
+
+```{r}
 
 ```
+
