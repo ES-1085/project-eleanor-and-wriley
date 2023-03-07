@@ -245,8 +245,8 @@ ggplot(gullshapetest) +
   geom_sf(data = gullshapetest, color = "midnightblue", aes(group = year)) +
   coord_sf(ylim = c(44.140385, 44.145726), xlim = c(-68.25038, -68.242629), expand = FALSE) + 
   transition_states(states = year, 
-                    transition_length = 5,
-                    state_length = 5) +
+                    # transition_length = 1,
+                    state_length = 250) +
   labs(
     title = "Distribution of Nesting Gulls", 
     subtitle = 'Year: {closest_state}') +
