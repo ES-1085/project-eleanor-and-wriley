@@ -676,9 +676,7 @@ tower_count_2001 &lt;- cleancolumns(tower_count_2001)</code></pre>
 ## [1] &quot;other&quot;</code></pre>
 <pre class="r"><code>tower_count_2001 &lt;- splitcomments(tower_count_2001)
 tower_2001_clean &lt;- selectcolumns(tower_count_2001)</code></pre>
-<pre><code>## Warning in mask$eval_all_mutate(quo): NAs introduced by coercion
-
-## Warning in mask$eval_all_mutate(quo): NAs introduced by coercion</code></pre>
+<pre><code>## Warning in mask$eval_all_mutate(quo): NAs introduced by coercion</code></pre>
 <pre class="r"><code>tower_2001_clean$year = 2001</code></pre>
 <pre class="r"><code>tower_count_2002 &lt;- read_excel(&quot;data/tower_count/tower_count_2002.xlsx&quot;, skip = 2)
 
@@ -761,13 +759,8 @@ tower_count_2008 &lt;- cleancolumns(tower_count_2008)</code></pre>
 ## [1] &quot;coei_ads&quot;
 ## [1] &quot;coei_jus&quot;</code></pre>
 <pre class="r"><code>tower_count_2008 &lt;- splitcomments(tower_count_2008)
-tower_2008_clean &lt;- selectcolumns(tower_count_2008)</code></pre>
-<pre><code>## Warning in mask$eval_all_mutate(quo): NAs introduced by coercion
-
-## Warning in mask$eval_all_mutate(quo): NAs introduced by coercion
-
-## Warning in mask$eval_all_mutate(quo): NAs introduced by coercion</code></pre>
-<pre class="r"><code>tower_2008_clean$year = 2008</code></pre>
+tower_2008_clean &lt;- selectcolumns(tower_count_2008)
+tower_2008_clean$year = 2008</code></pre>
 <pre class="r"><code>tower_count_2009 &lt;- read_excel(&quot;data/tower_count/tower_count_2009.xlsx&quot;, skip = 2)
 
 tower_count_2009 &lt;- cleancolumns(tower_count_2009)</code></pre>
@@ -964,7 +957,7 @@ tower_2022_clean$year = 2022</code></pre>
 towertowrite &lt;- tower %&gt;% 
   mutate(count = ifelse(is.na(count), 0, count))
            
-write.csv(towertowrite, &quot;data/towerclean.csv&quot;)</code></pre>
+#write.csv(towertowrite, &quot;data/towerclean.csv&quot;)</code></pre>
 
 
 

@@ -593,7 +593,7 @@ tower <- rbind(tower_2000_clean,tower_2001_clean,tower_2002_clean,tower_2003_cle
 towertowrite <- tower %>% 
   mutate(count = ifelse(is.na(count), 0, count))
            
-write.csv(towertowrite, "data/towerclean.csv")
+#write.csv(towertowrite, "data/towerclean.csv")
 ```
 
 
