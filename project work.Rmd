@@ -110,13 +110,6 @@ tower %>%
        y = 'species')
 ```
 
-```{r visualize-missing-data}
-visdat::vis_miss(tower)
-visdat::vis_miss(nest_count_clean_2022)
-
-```
-
-
 ##Colony Distribution Animation
 
 ```{r practice leaflet}

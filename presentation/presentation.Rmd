@@ -32,7 +32,6 @@ library(visdat)
 population_distribution_gulls <- read_xlsx(str_c("data/gull_pop_distribution_2022.xlsx")) 
 population_distribution_gulls$West[3]=193 
 
-
 head(population_distribution_gulls)
 
 population_distribution_gulls$West[3]=193
@@ -107,8 +106,6 @@ population_distribution_gulls %>%
   theme_bw()
 
 ```
-
-
 
 
 ```{r echo = FALSE, south-end-animation}
