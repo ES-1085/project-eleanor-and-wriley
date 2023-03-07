@@ -37,6 +37,10 @@ dates <- c("Date")
 puffins <- c("ATPU","puffs","puffins","atpu")
 corms <- c("DCCO","cormorants")
 
+
+#This function overwrites a variety of potential column names and replaces them with a standard name. It is not order dependent and can be used on dataframes with any number of columns and any variety of column names. It will leave columns that are not specified untouched. It can be appended as needed. 
+
+#One possible issue may arise if a dataframe has two columns that need to be combined into one. For example, a dataframe that has both a AMCR and a CORA column cannot be processed by this function--one column will be overwritten. If that is the case, I recommend adding those columns together before doing anything to process that dataframe.  
 cleancolumns <- function(inputdataframe) {
   for (i in 1:length(colnames(inputdataframe))){
       if (colnames(inputdataframe)[i] %in% hergs) {
@@ -90,7 +94,7 @@ cleancolumns <- function(inputdataframe) {
     } else if (colnames(inputdataframe)[i] %in% "LAGU") {
       colnames(inputdataframe)[i] <- "lagu"
       print("lagus")
-    } else if (colnames(inputdataframe)[i] %in% "AMCR") {
+    } else if (colnames(inputdataframe)[i] %in% c("AMCR", "CORA","crow","corvid")) {
       colnames(inputdataframe)[i] <- "corvid"
       print("crows")
     } else if (colnames(inputdataframe)[i] %in% "SPSA") {
@@ -106,7 +110,7 @@ cleancolumns <- function(inputdataframe) {
 
 ```{r comment split function}
 
-#there is a way to update this so that it leaves existing columns alone. In short, there should be a way to tell it to loop through the column names in a dataframe and not create a new column if the column already exists. Probably an if_else statement.
+
 splitcomments <- function(inputdataframe) {
   #puffins
     if ("puffin" %in% colnames(inputdataframe)) {
