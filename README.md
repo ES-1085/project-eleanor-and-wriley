@@ -8,6 +8,8 @@ by Eleanor and Wriley
 
 ##Methods for Collection/Data Source
 
+##Navigating the Project Folder
+
 ##Major Findings
 
 ##Takeaways
