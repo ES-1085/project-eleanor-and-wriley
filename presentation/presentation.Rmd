@@ -25,11 +25,202 @@ library(forcats)
 library(visdat)
 ```
 
+##Changes in the Gull Colony Distribution Over Time
+
+```{r dodged-barplot-whole-island, echo = FALSE}
+
+population_distribution_gulls <- read_xlsx(str_c("data/gull_pop_distribution_2022.xlsx")) 
+population_distribution_gulls$West[3]=193 
+
+
+head(population_distribution_gulls)
+
+population_distribution_gulls$West[3]=193
+
+population_distribution_gulls %>%
+  rename(little_point = `Little Point (near Boathouse)`) %>%
+  mutate(West = as.numeric(`West`)) %>%
+  mutate(south_end = East + West + Extension) %>%
+  mutate(north_end = Point + Cabin + Hell) %>%
+  select(YEAR, south_end, north_end, Borofsky, little_point) %>%
+  pivot_longer( cols = south_end:little_point,
+               names_to = "location",
+               values_to = "total") %>%
+  ggplot(aes(y = total, x = YEAR, fill = location)) +
+  geom_col(position = "dodge") +
+   scale_fill_viridis(discrete = T) +
+  theme_bw()
+
+```
+
+
+```{r  echo = FALSE, dodged-barplot-south-end}
+population_distribution_gulls %>%
+  rename(little_point = `Little Point (near Boathouse)`) %>%
+  mutate(West = as.numeric(`West`)) %>%
+  select(YEAR, East, West, Extension) %>%
+  pivot_longer( cols = East:Extension,
+               names_to = "location",
+               values_to = "total") %>%
+  ggplot(aes(y = total, x = YEAR, fill = location)) +
+  geom_col(position = "dodge") +
+   scale_fill_viridis(discrete = T) +
+  labs(title = "Distribution of Nests within the South End Colony") +
+  theme_bw()
+```
+
+```{r echo = FALSE, filled-barplot-whole-island}
+population_distribution_gulls %>%
+  rename(little_point = `Little Point (near Boathouse)`) %>%
+  mutate(West = as.numeric(`West`)) %>%
+  mutate(south_end = East + West + Extension) %>%
+  mutate(north_end = Point + Cabin + Hell) %>%
+  filter(!is.na(south_end)) %>% 
+  select(YEAR, south_end, north_end, Borofsky, little_point) %>%
+  pivot_longer( cols = south_end:little_point,
+               names_to = "location",
+               values_to = "total") %>%
+  ggplot(aes(y = total, x = YEAR, fill = location)) +
+  geom_col(position = "fill") +
+   scale_fill_viridis(discrete = T) +
+  theme_bw()
+```
+
+```{r echo = FALSE, stacked-barplot-whole-island}
+
+population_distribution_gulls %>%
+  rename(little_point = `Little Point (near Boathouse)`) %>%
+  mutate(West = as.numeric(`West`)) %>%
+  mutate(south_end = East + West + Extension) %>%
+  mutate(north_end = Point + Cabin + Hell) %>%
+  filter(!is.na(south_end)) %>% 
+  select(YEAR, south_end, north_end, Borofsky, little_point) %>% 
+  pivot_longer( cols = south_end:Borofsky,
+               names_to = "location",
+               values_to = "total") %>%
+  mutate(sub_colony = case_when(location == "Borofsky" ~ "Northeast Colony",
+                                location == "north_end" ~ "Northwest Colony",
+                                location == "south_end" ~ "South End Colony")) %>% 
+  ggplot(aes(y = total, x = YEAR, fill = sub_colony)) +
+  geom_col() +
+   scale_fill_viridis(discrete = T, direction = 1) +
+  theme_bw()
+
+```
+
+
+
+
+```{r echo = FALSE, south-end-animation}
+
+```
+
+
+
 ##Tower Count Data Visualizations
 
 For additional exploration of tower count data, see Shiny App: https://udppk1-eleanor-gnam.shinyapps.io/towerDRAFT/\
 
-```{r }
+```{r echo = FALSE, main-four-species}
+tower <- read_csv("data/towerclean.csv")
+
+se <- function(x) sd(x)/sqrt(length(x))
+
+tower %>%
+  filter(species == c("herg","gbbg","blgu","coei_ad")) %>% 
+  mutate(label = case_when(species == "herg" ~ "Herring Gull",
+                          species == "gbbg" ~ "Great Black-backed Gull",
+                          species == "blgu" ~ "Black Guillemot",
+                          species == "coei_ad" ~ "Common Eider",
+                          TRUE ~ as.character(species))) %>%
+  group_by(species, label, year) %>% 
+  mutate(med = median(count), se = se(count)) %>% 
+  ggplot()+
+  geom_point(aes(x = year, y = med, color = label), size = 1.8)+
+  geom_errorbar(aes(x = year, ymin = (med - se), ymax = (med + se)), alpha = 1, size = 0.5, width = 0.003)+
+  geom_line(aes(x = year, y = med, color = label), linewidth = 1.3)+
+  scale_color_viridis_d(direction = -1) +
+  theme_bw()+
+  facet_wrap(~label, scales = "free", ncol = 2)+
+  labs(title = "Median Counts of Species Breeding on Great Duck Island by Year", subtitle = "Error Bars Represent Standard Error", color = "")+
+  ylab("Median Daily Count")+
+  xlab("Year")+
+  theme(legend.position = "bottom")
+
+
+
+```
+```{r echo = FALSE, atpu-razo-noga}
+tower %>% 
+  filter(species == "puffin") %>% 
+  mutate(label = "Atlantic Puffin") %>% 
+  group_by(year, label) %>% 
+  summarize(mean = mean(count), se = se(count)) %>% 
+  ggplot(aes(x = year, y = mean, fill = label)) +
+  geom_col()+
+  geom_errorbar(aes(x = year, ymin = (mean - se), ymax = (mean + se)), alpha = 1, size = 0.8, width = 0.4)+
+  labs(title = "Mean Daily Count of Atlantic Puffin by Year", subtitle = "Error bars represent standard error", fill = "")+
+  scale_fill_viridis_d(option = "plasma")+
+  xlab("Year") +
+  ylab("Mean Daily Count")+
+  theme_bw()
+
+tower %>% 
+  filter(species == "noga") %>% 
+  mutate(label = "Northern Gannet") %>% 
+  group_by(year, label) %>% 
+  summarize(mean = mean(count), se = se(count)) %>% 
+  ggplot(aes(x = year, y = mean, fill = label)) +
+  geom_col()+
+  geom_errorbar(aes(x = year, ymin = (mean - se), ymax = (mean + se)), alpha = 1, size = 0.8, width = 0.4)+
+  labs(title = "Mean Daily Count of Northern Gannet by Year", subtitle = "Error bars represent standard error", fill = "")+
+  scale_fill_manual(values = "#1CCFD6")+
+  xlab("Year") +
+  ylab("Mean Daily Count")+
+  theme_bw()
+
+tower %>% 
+  filter(species == "razo") %>% 
+  mutate(label = "Razorbill") %>% 
+  group_by(year, label) %>% 
+  summarize(mean = mean(count), se = se(count)) %>% 
+  ggplot(aes(x = year, y = mean, fill = label)) +
+  geom_col()+
+  geom_errorbar(aes(x = year, ymin = (mean - se), ymax = (mean + se)), alpha = 1, size = 0.8, width = 0.4)+
+  labs(title = "Mean Daily Count of Razorbill by Year", subtitle = "Error bars represent standard error", fill = "")+
+  scale_fill_manual(values = "#AF2892")+
+  xlab("Year") +
+  ylab("Mean Daily Count")+
+  theme_bw()
+
+
+```
+
+```{r echo = FALSE, gull-counts-vs-nest-numbers}
+
+#still working on this one
+
+pop_dist_clean <- population_distribution_gulls %>%
+  rename(little_point = `Little Point (near Boathouse)`) %>%
+  mutate(West = as.numeric(`West`)) %>%
+  mutate(south_end = East + West + Extension) %>%
+  mutate(north_end = Point + Cabin + Hell) %>%
+  mutate(year = as.character(YEAR)) %>% 
+  filter(!is.na(south_end)) %>% 
+  select(year, south_end, north_end, Borofsky, little_point) %>%
+  pivot_longer( cols = south_end:little_point,
+               names_to = "location",
+               values_to = "total")
+
+
+tower %>%
+  mutate(year = as.character(year)) %>% 
+  filter(species == "herg") %>% 
+  group_by(year) %>% 
+  mutate(year = as.character(year)) %>% 
+  ggplot()+
+  geom_col(data = pop_dist_clean, aes(x = year, y = total), fill = "burlywood3")+
+  geom_boxplot(aes(x = year, y = count), fill = "turquoise2")
 
 ```
 
