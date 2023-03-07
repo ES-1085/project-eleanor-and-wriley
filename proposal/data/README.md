@@ -1,4 +1,4 @@
-# data
+# Data Dictionary for datafiles used in proposal
 
 Place data file(s) in this folder.
 
