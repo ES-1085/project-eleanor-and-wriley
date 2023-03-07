@@ -1,8 +1,20 @@
-Project title
+Exploring Long-Term Datasets from Great Duck Island
 ================
-by Team name
+by Eleanor and Wriley
 
 ## Summary
+
+##Research Questions
+
+##Methods for Collection/Data Source
+
+##Major Findings
+
+##Takeaways
+
+##Looking to the Future
+
+
 
 Write-up of your project and findings go here. Think of this as the text
 of your presentation. The length should be roughly 5 minutes when read
