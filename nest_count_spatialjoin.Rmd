@@ -19,7 +19,6 @@ library(ggimage)
 library(gifski)
 library(transformr)
 library(forcats)
-library(raster)
 ```
 
 ```{r read-island-outline}
