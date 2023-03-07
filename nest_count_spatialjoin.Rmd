@@ -19,7 +19,6 @@ library(ggimage)
 library(gifski)
 library(transformr)
 library(forcats)
-library(raster)
 ```
 
 ```{r read-island-outline}
@@ -259,5 +258,14 @@ gullshape2022.dt <- gullshape2022
 gullshape2022.dt$area <- sf::st_area(gullshape2022.dt$geometry)
     gullshape2022$density <- gullshape2022.dt$sales / gullshape2022.dt$area
 
+```
+
+```{r combine-files-with-nestcounts}
+nest_count_clean_2022 <- read.csv("data/nest_count_clean/nest_count_clean_2022.csv")
+
+gullshape2022.joined <- gullshape2022 %>%
+  left_join(nest_count_clean_2022, by = "flag") %>%
+  select(flag, geometry, clutch, year.x, species) %>%
+  filter(!is.na(flag))
 ```
 
