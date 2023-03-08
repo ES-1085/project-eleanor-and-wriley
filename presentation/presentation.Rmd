@@ -25,6 +25,8 @@ library(forcats)
 library(visdat)
 ```
 
+##Can we bring in those chick-check graphics by habitat? They're fun...
+
 ##Changes in the Gull Colony Distribution Over Time
 
 ```{r dodged-barplot-whole-island, echo = FALSE}
