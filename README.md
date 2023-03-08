@@ -4,7 +4,7 @@ by Eleanor and Wriley
 
 ## Summary
 
-##Research Questions
+COA students have been collecting data from Great Duck Island since 2000. 
 
 ##Methods for Collection/Data Source
 
