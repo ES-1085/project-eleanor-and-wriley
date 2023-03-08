@@ -256,16 +256,25 @@ animate(animation.points.only, nframes = 48, duration = 40)
 gullshape2022.dt <- gullshape2022
 
 gullshape2022.dt$area <- sf::st_area(gullshape2022.dt$geometry)
-    gullshape2022$density <- gullshape2022.dt$sales / gullshape2022.dt$area
+    gullshape2022.dt$density <- gullshape2022.dt$geometry / gullshape2022.dt$area
 
 ```
 
-```{r combine-files-with-nestcounts}
+```{r combine-files-with-nestcounts, fig.height=6, fig.width=6}
 nest_count_clean_2022 <- read.csv("data/nest_count_clean/nest_count_clean_2022.csv")
 
 gullshape2022.joined <- gullshape2022 %>%
   left_join(nest_count_clean_2022, by = "flag") %>%
   select(flag, geometry, clutch, year.x, species) %>%
   filter(!is.na(flag))
+
+gullshape2022.joined %>%
+  mutate(clutch = as.character(clutch)) %>%
+ggplot() +
+  geom_sf(data = outline, fill = "lightblue")+
+  geom_sf(aes(color = species, shape = clutch)) +
+  coord_sf(ylim = c(44.140385, 44.145726), xlim = c(-68.25038, -68.242629), expand = FALSE) + 
+  theme_bw()
+  
 ```
 
