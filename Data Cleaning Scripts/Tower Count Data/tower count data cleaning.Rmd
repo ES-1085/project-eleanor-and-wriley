@@ -109,7 +109,7 @@ cleancolumns <- function(inputdataframe) {
 ```
 
 ```{r comment split function}
-
+##This function uses regex to extract numbers of birds from the "comment" column. There is one if/else pair for every species that should be extracted, and each species has a string of possible expressions used to refer to it. 
 
 splitcomments <- function(inputdataframe) {
   #puffins
@@ -318,6 +318,9 @@ splitcomments <- function(inputdataframe) {
     
 
 ```{r select columns and pivot}
+
+#This function selects the columns organized by the functions above, then pivots them to create a long dataframe where species is a single column. 
+
 selectcolumns <- function(inputdataframe) {
   r <- inputdataframe %>% 
     mutate(notes = other) %>% 
@@ -592,6 +595,7 @@ tower_2022_clean$year = 2022
 
 
 ```{r}
+#This binds all the years together. Can be updated to add new years. 
 tower <- rbind(tower_2000_clean,tower_2001_clean,tower_2002_clean,tower_2003_clean,tower_2005_clean,tower_2006_clean,tower_2007_clean,tower_2008_clean,tower_2009_clean,tower_2010_clean,tower_2011_clean,tower_2012_clean,tower_2013_clean,tower_2014_clean,tower_2015_clean, tower_2016_clean,tower_2017_clean,tower_2018_clean,tower_2019_clean, tower_2020_clean, tower_2021_clean, tower_2022_clean)
 
 towertowrite <- tower %>% 
