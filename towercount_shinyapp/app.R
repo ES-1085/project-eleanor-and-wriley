@@ -61,7 +61,8 @@ se <- function(x) sd(x)/sqrt(length(x))
 #########################################################
 
 ui <- fluidPage(theme = shinytheme("flatly"),
-  titlePanel("Tower Count Data"),
+                navbarPage("Tower Count Data"),
+  tabsetPanel(tabPanel("Tower Count Data",
   sidebarLayout(
     sidebarPanel(
         pickerInput("yearIn", "Year:", choices = yearlist, options = list(`actions-box` = TRUE),multiple = TRUE, selected = c(2000:2022)),
@@ -75,6 +76,21 @@ ui <- fluidPage(theme = shinytheme("flatly"),
       DTOutput("summary")
     )
    )
+  ),
+  tabPanel("Data Table",
+           sidebarLayout(
+             sidebarPanel(
+               downloadButton("downloaddata","Download"),
+               pickerInput("yearIn2", "Year:", choices = yearlist, options = list(`actions-box` = TRUE),multiple = TRUE, selected = c(2000:2022)),
+               checkboxGroupInput("speciesIn2", "Species", choiceValues = specieslist, selected  = c("herg","gbbg","coei_ad","blgu"), choiceNames = labellist)
+             ),
+             mainPanel(
+               DTOutput("full"),
+               DTOutput("summary2")
+             )
+           )
+        )
+  )
 )
 
 #########################################################
@@ -82,6 +98,24 @@ ui <- fluidPage(theme = shinytheme("flatly"),
 #########################################################
 
 server <- function(input, output) {
+  output$full <- renderDT({
+    tower %>% 
+      filter(species %in% input$speciesIn2) %>% 
+      filter(year %in% input$yearIn2)
+  })
+  
+  output$downloaddata <- downloadHandler(
+    filename = function() {
+      "file.csv"
+    },
+    content = function(file) {
+      write.csv((tower %>% 
+                   filter(species %in% input$speciesIn) %>% 
+                   filter(year %in% input$yearIn)), file, row.names = FALSE)
+    }
+  )
+  
+  
   output$summary <- renderDT({
     tower %>% 
       filter(species %in% input$speciesIn) %>% 
@@ -93,9 +127,13 @@ server <- function(input, output) {
         max(count)
       } else if (input$barstat == "Mean") {
         mean(count)
-      } else if (input$barstat == "Season Total") {
+      } else if(input$barstat == "Season Total") {
         sum(count)
-  }) %>% 
+      }, `Standard Error`  = if(input$barstat %in% c("Mean","Median")) {
+        se(count)
+      } else {
+        NA
+      }) %>% 
       rename(`Input Statistic` = stat)
   })
   
