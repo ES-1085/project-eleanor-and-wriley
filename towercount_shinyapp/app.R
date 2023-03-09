@@ -11,6 +11,7 @@ library(tidyverse)
 library(lubridate)
 library(shinythemes)
 library(shinyWidgets)
+library(DT)
 
 #Import Data
 tower <- read_csv("Data/towerclean.csv", 
@@ -59,7 +60,7 @@ se <- function(x) sd(x)/sqrt(length(x))
 ###################### U I ##############################
 #########################################################
 
-ui <- fluidPage(theme = shinytheme("superhero"),
+ui <- fluidPage(theme = shinytheme("flatly"),
   titlePanel("Tower Count Data"),
   sidebarLayout(
     sidebarPanel(
@@ -71,6 +72,7 @@ ui <- fluidPage(theme = shinytheme("superhero"),
     mainPanel(
       plotOutput("plot"),
       textOutput("text"),
+      DTOutput("summary")
     )
    )
 )
@@ -80,6 +82,23 @@ ui <- fluidPage(theme = shinytheme("superhero"),
 #########################################################
 
 server <- function(input, output) {
+  output$summary <- renderDT({
+    tower %>% 
+      filter(species %in% input$speciesIn) %>% 
+      filter(year %in% input$yearIn) %>% 
+      group_by(species, year) %>% 
+      summarize(stat = if (input$barstat == "Median") {
+        median(count)
+      } else if (input$barstat == "High Count") {
+        max(count)
+      } else if (input$barstat == "Mean") {
+        mean(count)
+      } else if (input$barstat == "Season Total") {
+        sum(count)
+  }) %>% 
+      rename(`Input Statistic` = stat)
+  })
+  
   output$text <- renderText({
     if (input$plottype %in% c("counts within season","lines faceted by species", "boxplots faceted by species")){
       print("NOTE: When this warning is shown, X and Y axes are not consistent between plots.")
@@ -107,7 +126,10 @@ server <- function(input, output) {
         facet_wrap(~year)+
         labs(title = paste(input$barstat, "counts by species and year"), subtitle = "Great Duck Tower Data", caption = "Error bars represent standard error")+
         scale_fill_viridis_d()+
-        theme_bw()
+        theme_bw() +
+        theme(strip.background = element_rect(fill = "#9CCAA8"), 
+               strip.text = element_text(size = 15), 
+               title = element_text(size = 15))
      } else if (input$plottype == "boxplot") {
         tower %>% 
         group_by(species, year) %>% 
@@ -118,7 +140,10 @@ server <- function(input, output) {
         facet_wrap(~year)+
         labs(title= "Counts by species and year", subtitle = "Great Duck Tower Data")+
         scale_fill_viridis_d()+
-        theme_bw()
+        theme_bw()+
+        theme(strip.background = element_rect(fill = "#9CCAA8"), 
+               strip.text = element_text(size = 15), 
+               title = element_text(size = 15))
     } else if (input$plottype == "multi-year barplot") {
         tower %>% 
         mutate(year = as.character(year)) %>% 
@@ -142,7 +167,10 @@ server <- function(input, output) {
                         size = 0.9, width = 0.3, position = position_dodge(width = 0.75, preserve = "single"))+
         labs(title= paste(input$barstat, "counts by species and year"), subtitle = "Great Duck Tower Data", caption = "error bars represent standard error")+
         scale_fill_viridis_d()+
-        theme_bw()
+        theme_bw()+
+        theme(strip.background = element_rect(fill = "#9CCAA8"), 
+              strip.text = element_text(size = 15), 
+              title = element_text(size = 15))
     } else if (input$plottype == "lines") {
         tower %>% 
         group_by(species, year) %>% 
@@ -165,7 +193,10 @@ server <- function(input, output) {
         geom_line(aes(x = year, y = stat, color = species), linewidth = 1.3 )+
         labs(title = paste(input$barstat, "counts by species and year"), subtitle = "Great Duck Tower Data", caption = "Error Bars Represent Standard Error")+
         scale_color_viridis_d()+
-        theme_bw()
+        theme_bw()+
+        theme(strip.background = element_rect(fill = "#9CCAA8"), 
+              strip.text = element_text(size = 15), 
+              title = element_text(size = 15))
     } else if (input$plottype == "multi-year boxplots") {
       tower %>% 
         group_by(species, year) %>% 
@@ -177,7 +208,10 @@ server <- function(input, output) {
         labs(title= "Species Counts by Year", subtitle = "Great Duck Tower Data")+
         scale_fill_viridis_d(alpha = 0.8)+
         scale_color_viridis_d()+
-        theme_bw()
+        theme_bw()+
+        theme(strip.background = element_rect(fill = "#9CCAA8"), 
+              strip.text = element_text(size = 15), 
+              title = element_text(size = 15))
     } else if (input$plottype == "counts within season") {
       tower %>% 
         filter(year %in% input$yearIn) %>% 
@@ -188,7 +222,10 @@ server <- function(input, output) {
         labs(title= "Counts throughout season", subtitle = "Great Duck Tower Data")+
         scale_fill_viridis_d() +
         facet_wrap(~year, scales = "free")+
-        theme_bw()
+        theme_bw()+
+        theme(strip.background = element_rect(fill = "#9CCAA8"), 
+              strip.text = element_text(size = 15), 
+              title = element_text(size = 15))
     } else if (input$plottype == "lines faceted by species") {
       tower %>% 
         group_by(species, year) %>% 
@@ -213,7 +250,10 @@ server <- function(input, output) {
         facet_wrap(~species, scales = "free")+
         labs(title = paste(input$barstat, "counts by species and year"), subtitle = "Great Duck Tower Data", caption = "error bars represent standard error")+
         scale_color_viridis_d()+
-        theme_bw()
+        theme_bw()+
+        theme(strip.background = element_rect(fill = "#9CCAA8"), 
+              strip.text = element_text(size = 15), 
+              title = element_text(size = 15))
     } else if (input$plottype == "boxplots faceted by species") {
       tower %>% 
         group_by(species, year) %>% 
@@ -226,7 +266,10 @@ server <- function(input, output) {
         scale_fill_viridis_d(alpha = 0.8)+
         scale_color_viridis_d()+
         facet_wrap(~species, scales = "free") +
-        theme_bw()
+        theme_bw() +
+        theme(strip.background = element_rect(fill = "#9CCAA8"), 
+              strip.text = element_text(size = 15), 
+              title = element_text(size = 15))
     }
 })
  
