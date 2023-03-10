@@ -82,11 +82,11 @@ ui <- fluidPage(theme = shinytheme("flatly"),
              sidebarPanel(
                downloadButton("downloaddata","Download"),
                pickerInput("yearIn2", "Year:", choices = yearlist, options = list(`actions-box` = TRUE),multiple = TRUE, selected = c(2000:2022)),
-               checkboxGroupInput("speciesIn2", "Species", choiceValues = specieslist, selected  = c("herg","gbbg","coei_ad","blgu"), choiceNames = labellist)
+               selectizeInput("speciesIn2", "Species", choices = specieslist, selected  = c("herg","gbbg","coei_ad","blgu"), multiple = TRUE),
+               #checkboxInput("zeroes","Filter Zeroes?", value = FALSE)
              ),
              mainPanel(
                DTOutput("full"),
-               DTOutput("summary2")
              )
            )
         )
@@ -101,25 +101,24 @@ server <- function(input, output) {
   output$full <- renderDT({
     tower %>% 
       filter(species %in% input$speciesIn2) %>% 
-      filter(year %in% input$yearIn2)
-  })
+      filter(year %in% input$yearIn2) 
+      })
   
   output$downloaddata <- downloadHandler(
     filename = function() {
-      "file.csv"
+      "shinyappdownload.csv"
     },
     content = function(file) {
       write.csv((tower %>% 
                    filter(species %in% input$speciesIn) %>% 
-                   filter(year %in% input$yearIn)), file, row.names = FALSE)
-    }
-  )
+                   filter(year %in% input$yearIn)
+                   ), file, row.names = FALSE)
+    })
   
   
   output$summary <- renderDT({
     tower %>% 
-      filter(species %in% input$speciesIn) %>% 
-      filter(year %in% input$yearIn) %>% 
+      filter(species %in% input$speciesIn, year %in% input$yearIn) %>% 
       group_by(species, year) %>% 
       summarize(stat = if (input$barstat == "Median") {
         median(count)
@@ -132,7 +131,7 @@ server <- function(input, output) {
       }, `Standard Error`  = if(input$barstat %in% c("Mean","Median")) {
         se(count)
       } else {
-        NA
+        `Standard Error` = NA
       }) %>% 
       rename(`Input Statistic` = stat)
   })
