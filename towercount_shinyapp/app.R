@@ -68,8 +68,8 @@ ui <- fluidPage(theme = shinytheme("flatly"),
         pickerInput("yearIn", "Year:", choices = yearlist, options = list(`actions-box` = TRUE),multiple = TRUE, selected = c(2000:2022)),
         selectInput("plottype","Plot Type", choices = c("barplot","boxplot","multi-year barplot","lines", "multi-year boxplots","counts within season", "lines faceted by species", "boxplots faceted by species"), selected = "lines faceted by species"),
         selectInput("barstat","Statistic to Use (won't affect boxplots)", choices = c("Median", "Mean", "High Count", "Season Total"), selected = "Median"),
-        checkboxGroupInput("speciesIn", "Species", choiceValues = specieslist, selected  = c("herg","gbbg","coei_ad","blgu"), choiceNames = labellist)
-    ),
+        fluidRow(prettyCheckboxGroup("speciesIn", "Species", shape = "curve", animation = "jelly", choiceValues = specieslist, selected  = c("herg","gbbg","coei_ad","blgu"), choiceNames = labellist)
+    )),
     mainPanel(
       plotOutput("plot"),
       textOutput("text"),
@@ -86,7 +86,7 @@ ui <- fluidPage(theme = shinytheme("flatly"),
                checkboxInput("zeroes","Filter Zeroes?", value = FALSE)
              ),
              mainPanel(
-               DTOutput("full"),
+               DTOutput("full")
              )
            )
         )
@@ -98,6 +98,7 @@ ui <- fluidPage(theme = shinytheme("flatly"),
 #########################################################
 
 server <- function(input, output) {
+
   output$full <- renderDT({
     tower %>% 
       filter(species %in% input$speciesIn2) %>% 
@@ -129,6 +130,11 @@ server <- function(input, output) {
   
   
   output$summary <- renderDT({
+    if (input$plottype == "counts within season"){
+      tower %>%
+        filter(species %in% input$speciesIn, year %in% input$yearIn) %>% 
+        select(date, year, species, count, notes)
+    } else {
     tower %>% 
       filter(species %in% input$speciesIn, year %in% input$yearIn) %>% 
       group_by(species, year) %>% 
@@ -146,6 +152,7 @@ server <- function(input, output) {
         `Standard Error` = NA
       }) %>% 
       rename(`Input Statistic` = stat)
+    }
   })
   
   output$text <- renderText({
