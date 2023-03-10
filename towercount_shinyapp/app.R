@@ -66,7 +66,7 @@ ui <- fluidPage(theme = shinytheme("flatly"),
   sidebarLayout(
     sidebarPanel(
         pickerInput("yearIn", "Year:", choices = yearlist, options = list(`actions-box` = TRUE),multiple = TRUE, selected = c(2000:2022)),
-        selectInput("plottype","Plot Type", choices = c("barplot","boxplot","multi-year barplot","lines", "multi-year boxplots","counts within season", "lines faceted by species", "boxplots faceted by species"), selected = "lines faceted by species"),
+        selectInput("plottype","Plot Type", choices = c("barplot","boxplot","multi-year barplot","lines", "multi-year boxplots","counts within season", "lines faceted by species", "boxplots faceted by species", "counts by day of year"), selected = "lines faceted by species"),
         selectInput("barstat","Statistic to Use (won't affect boxplots)", choices = c("Median", "Mean", "High Count", "Season Total"), selected = "Median"),
         fluidRow(prettyCheckboxGroup("speciesIn", "Species", shape = "curve", animation = "jelly", choiceValues = specieslist, selected  = c("herg","gbbg","coei_ad","blgu"), choiceNames = labellist)
     )),
@@ -134,6 +134,12 @@ server <- function(input, output) {
       tower %>%
         filter(species %in% input$speciesIn, year %in% input$yearIn) %>% 
         select(date, year, species, count, notes)
+    } else if (input$plottype == "counts by day of year") {
+      tower %>% 
+        filter(species %in% input$speciesIn, year %in% input$yearIn) %>% 
+        mutate(yearday = yday(date)) %>% 
+        group_by(species, yearday) %>% 
+        summarize(`Median Count Across Years` = median(count), `Standard Error` = se(count))
     } else {
     tower %>% 
       filter(species %in% input$speciesIn, year %in% input$yearIn) %>% 
@@ -156,7 +162,7 @@ server <- function(input, output) {
   })
   
   output$text <- renderText({
-    if (input$plottype %in% c("counts within season","lines faceted by species", "boxplots faceted by species")){
+    if (input$plottype %in% c("counts within season","lines faceted by species", "boxplots faceted by species", "counts by day of year")){
       print("NOTE: When this warning is shown, X and Y axes are not consistent between plots.")
     }
   })
@@ -321,6 +327,23 @@ server <- function(input, output) {
         labs(title= "Species Counts by Year", subtitle = "Great Duck Tower Data")+
         scale_fill_viridis_d(alpha = 0.8)+
         scale_color_viridis_d()+
+        facet_wrap(~species, scales = "free") +
+        theme_bw() +
+        theme(strip.background = element_rect(fill = "#9CCAA8"), 
+              strip.text = element_text(size = 15), 
+              title = element_text(size = 15))
+    } else if (input$plottype == "counts by day of year") {
+      tower %>% 
+        filter(species %in% input$speciesIn) %>% 
+        filter(year %in% input$yearIn) %>% 
+        mutate(yearday = yday(date)) %>% 
+        group_by(species, yearday) %>% 
+        summarize(se = se(count), median = median(count)) %>% 
+        ggplot(aes(x = yearday, y = median, fill = species))+
+        geom_col()+
+        geom_errorbar(aes(x = yearday, ymin = (median - se), ymax = (median + se)), width = 0.5, size = 0.5, alpha = 0.8) + 
+        labs(title = "Median Count by Day of Year", subtitle = "Summarized Across Seasons")+
+        scale_fill_viridis_d()+
         facet_wrap(~species, scales = "free") +
         theme_bw() +
         theme(strip.background = element_rect(fill = "#9CCAA8"), 
