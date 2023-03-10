@@ -61,8 +61,8 @@ se <- function(x) sd(x)/sqrt(length(x))
 #########################################################
 
 ui <- fluidPage(theme = shinytheme("flatly"),
-                navbarPage("Tower Count Data"),
-  tabsetPanel(tabPanel("Tower Count Data",
+                navbarPage(title = "Great Duck Island Tower Count"),
+  tabsetPanel(tabPanel("Tower Count Data Visualization",
   sidebarLayout(
     sidebarPanel(
         pickerInput("yearIn", "Year:", choices = yearlist, options = list(`actions-box` = TRUE),multiple = TRUE, selected = c(2000:2022)),
@@ -77,13 +77,13 @@ ui <- fluidPage(theme = shinytheme("flatly"),
     )
    )
   ),
-  tabPanel("Data Table",
+  tabPanel("Data Table/Download Data",
            sidebarLayout(
              sidebarPanel(
                downloadButton("downloaddata","Download"),
                pickerInput("yearIn2", "Year:", choices = yearlist, options = list(`actions-box` = TRUE),multiple = TRUE, selected = c(2000:2022)),
                selectizeInput("speciesIn2", "Species", choices = specieslist, selected  = c("herg","gbbg","coei_ad","blgu"), multiple = TRUE),
-               #checkboxInput("zeroes","Filter Zeroes?", value = FALSE)
+               checkboxInput("zeroes","Filter Zeroes?", value = FALSE)
              ),
              mainPanel(
                DTOutput("full"),
@@ -101,7 +101,13 @@ server <- function(input, output) {
   output$full <- renderDT({
     tower %>% 
       filter(species %in% input$speciesIn2) %>% 
-      filter(year %in% input$yearIn2) 
+      filter(year %in% input$yearIn2) %>% 
+      filter(if (input$zeroes == TRUE){
+        count > 0
+            } else {
+              count >= 0 
+            }) %>% 
+      select(date, year, species, count, notes)
       })
   
   output$downloaddata <- downloadHandler(
@@ -110,8 +116,14 @@ server <- function(input, output) {
     },
     content = function(file) {
       write.csv((tower %>% 
-                   filter(species %in% input$speciesIn) %>% 
-                   filter(year %in% input$yearIn)
+                   filter(species %in% input$speciesIn2) %>% 
+                   filter(year %in% input$yearIn2) %>% 
+                   filter(if (input$zeroes == TRUE) {
+                     count > 0
+                          } else {
+                            count >= 0
+                          }) %>% 
+                   select(date, year, species, count, notes)
                    ), file, row.names = FALSE)
     })
   
