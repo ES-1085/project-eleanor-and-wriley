@@ -139,7 +139,7 @@ server <- function(input, output) {
         filter(species %in% input$speciesIn, year %in% input$yearIn) %>% 
         mutate(yearday = yday(date)) %>% 
         group_by(species, yearday) %>% 
-        summarize(`Median Count Across Years` = median(count), `Standard Error` = se(count))
+        summarize(`Median Count Across Years` = median(count), `Standard Error` = se(count)) 
     } else {
     tower %>% 
       filter(species %in% input$speciesIn, year %in% input$yearIn) %>% 
