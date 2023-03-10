@@ -149,6 +149,8 @@ tower %>%
 
 
 ```
+
+
 ```{r echo = FALSE, atpu-razo-noga}
 tower %>% 
   filter(species == "puffin") %>% 
@@ -212,14 +214,21 @@ pop_dist_clean <- population_distribution_gulls %>%
                values_to = "total")
 
 
+southend1 <- pop_dist_clean %>% 
+  filter(location == "south_end")
+
+
 tower %>%
   mutate(year = as.character(year)) %>% 
   filter(species == "herg") %>% 
   group_by(year) %>% 
+  summarize(median = median(count), se = se(count)) %>% 
   mutate(year = as.character(year)) %>% 
   ggplot()+
-  geom_col(data = pop_dist_clean, aes(x = year, y = total), fill = "burlywood3")+
-  geom_boxplot(aes(x = year, y = count), fill = "turquoise2")
+  geom_col(data = southend1, aes(x = year, y = total), fill = "burlywood3")+
+  geom_point(aes(x = year, y = median), color = "turquoise2") +
+  geom_line(aes(x = year, y = median), color = "turquoise2")+ 
+  geom_errorbar(aes(x = year, ymin = (median - se), ymax = (median + se)))
 
 ```
 
