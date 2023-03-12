@@ -206,7 +206,7 @@ pop_dist_clean <- population_distribution_gulls %>%
   mutate(West = as.numeric(`West`)) %>%
   mutate(south_end = East + West + Extension) %>%
   mutate(north_end = Point + Cabin + Hell) %>%
-  mutate(year = year(YEAR)) %>% 
+  mutate(year = YEAR) %>% 
   filter(!is.na(south_end)) %>% 
   select(year, south_end, north_end, Borofsky, little_point) %>%
   pivot_longer( cols = south_end:little_point,
@@ -215,21 +215,23 @@ pop_dist_clean <- population_distribution_gulls %>%
 
 
 southend1 <- pop_dist_clean %>% 
-  filter(location == "south_end")
+  filter(location == "south_end") %>% 
+  mutate(year = as.numeric(year))
 
 
 gullmeds <- tower %>%
-  mutate(year = as.factor(year)) %>% 
+  mutate(year = as.numeric(year)) %>% 
   filter(species == "herg") %>% 
   group_by(year, species) %>% 
   summarize(median = median(count), se = se(count)) 
 
 
-  ggplot() +
+ggplot() +
   geom_col(data = southend1, aes(x = year, y = total), fill = "burlywood3")+
-  geom_point(data = gullmeds, aes(x = year, y = median), color = "turquoise4") +
-  geom_line(data = gullmeds, aes(x = year, y = median)) +
-  geom_errorbar(data= gullmeds, aes(x = year, ymin = (median - se), ymax = (median + se)), width = 1.0, size = 1.2, color = "turquoise4")
+  geom_point(data = gullmeds, aes(x = year, y = median), color = "turquoise4", size = 2) +
+  geom_line(data = gullmeds, aes(x = year, y = median), linewidth = 1.3, color = "turquoise4") +
+  geom_errorbar(data= gullmeds, aes(x = year, ymin = (median - se), ymax = (median + se)), width = 0.5, size = 0.7)+
+  scale_y_continuous(name = "Total Nests on the South End", sec.axis = sec_axis(~., name = "Median Gulls Observed During Tower Count"))
 
   
   
