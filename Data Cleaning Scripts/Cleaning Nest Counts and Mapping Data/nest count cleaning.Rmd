@@ -182,6 +182,7 @@ nest_count_2015 <- nest_count_2015 %>%
 
 
 ```
+
 ```{r clean-2014}
 nest_count_2014 <- read_excel("data/nest_count/nest_count_2014.xlsx", na = "NA")
 
@@ -230,6 +231,7 @@ nest_count_2013 <- nest_count_2013 %>%
                           "herg"))))))))))))) %>%
   select(flag, clutch, year, species)
 ```
+
 ```{r clean-2012}
 nest_count_2012 <- read_excel("data/nest_count/nest_count_2012.xlsx", na = "NA")
 
@@ -255,6 +257,7 @@ nest_count_2012 <- nest_count_2012 %>%
                           "herg")))))))))))))) %>%
   select(flag, clutch, year, location, species)
 ```
+
 ```{r clean-2011}
 nest_count_2011 <- read_excel("data/nest_count/nest_count_2011.xls", na = "NA")
 
