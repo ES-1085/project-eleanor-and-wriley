@@ -134,12 +134,23 @@ server <- function(input, output) {
       tower %>%
         filter(species %in% input$speciesIn, year %in% input$yearIn) %>% 
         select(date, year, species, count, notes)
+      
     } else if (input$plottype == "counts by day of year") {
-      tower %>% 
-        filter(species %in% input$speciesIn, year %in% input$yearIn) %>% 
-        mutate(yearday = yday(date)) %>% 
-        group_by(species, yearday) %>% 
-        summarize(`Median Count Across Years` = median(count), `Standard Error` = se(count)) 
+        if (input$barstat == "Median"){
+          tower %>% 
+            filter(species %in% input$speciesIn, year %in% input$yearIn) %>% 
+            mutate(yearday = yday(date)) %>% 
+            group_by(species, yearday) %>%
+            summarize(median = median(count), `standard error` = se(count), `years with a count for this day` = length(count))
+        } else if (input$barstat == "Mean") {
+          tower %>% 
+            filter(species %in% input$speciesIn, year %in% input$yearIn) %>% 
+            mutate(yearday = yday(date)) %>% 
+            group_by(species, yearday) %>%
+            summarize(`mean` = mean(count), `standard error` = se(count), `years with a count for this day` = length(count))
+          }
+
+
     } else {
     tower %>% 
       filter(species %in% input$speciesIn, year %in% input$yearIn) %>% 
@@ -162,8 +173,17 @@ server <- function(input, output) {
   })
   
   output$text <- renderText({
-    if (input$plottype %in% c("counts within season","lines faceted by species", "boxplots faceted by species", "counts by day of year")){
+    if (input$plottype %in% c("counts within season","lines faceted by species", "boxplots faceted by species")){
       print("NOTE: When this warning is shown, X and Y axes are not consistent between plots.")
+    } else if (input$plottype == "counts by day of year"){
+        if (input$barstat %in% c("Median", "Mean")) {
+         print("NOTE: X and Y axes are not consistent between plots. Because the lengths of field seasons are not consistent, and because tower counts are often missed due to weather, 
+            the sample size of each year-day is different depending on how many years 
+            had tower counts on that day.")
+        } else if (input$barstat %in% c("High Count", "Season Total")) {
+          print("NOTE: This plot type only works with Median and Mean as input statistics.")
+      }
+
     }
   })
   output$plot <- renderPlot({
@@ -333,26 +353,45 @@ server <- function(input, output) {
               strip.text = element_text(size = 15), 
               title = element_text(size = 15))
     } else if (input$plottype == "counts by day of year") {
-      tower %>% 
-        filter(species %in% input$speciesIn) %>% 
-        filter(year %in% input$yearIn) %>% 
-        mutate(yearday = yday(date)) %>% 
-        group_by(species, yearday) %>% 
-        summarize(se = se(count), median = median(count)) %>% 
-        ggplot(aes(x = yearday, y = median, fill = species))+
-        geom_col()+
-        geom_errorbar(aes(x = yearday, ymin = (median - se), ymax = (median + se)), width = 0.5, size = 0.5, alpha = 0.8) + 
-        labs(title = "Median Count by Day of Year", subtitle = "Summarized Across Seasons")+
-        scale_fill_viridis_d()+
-        facet_wrap(~species, scales = "free") +
-        theme_bw() +
-        theme(strip.background = element_rect(fill = "#9CCAA8"), 
-              strip.text = element_text(size = 15), 
-              title = element_text(size = 15))
+        if (input$barstat == "Mean") {
+          tower %>% 
+            filter(species %in% input$speciesIn) %>% 
+            filter(year %in% input$yearIn) %>% 
+            mutate(yearday = yday(date)) %>% 
+            group_by(species, yearday) %>%
+            summarize(se = se(count), mean = mean(count)) %>% 
+            ggplot() +
+            geom_col(aes(x = yearday, y = mean, fill = species), size = 2)+
+            geom_errorbar(aes(x = yearday, ymin = (mean - se), ymax = (mean + se)), size = 0.5, width = 0.008, alpha = 0.8) +
+            labs(title = paste(input$barstat, "counts by day of year grouped across seasons"), subtitle = "Great Duck Tower Data", caption = "error bars represent standard error")+
+            scale_fill_viridis_d()+
+            facet_wrap(~species, scales = "free") +
+            theme_bw() +
+            theme(strip.background = element_rect(fill = "#9CCAA8"), 
+                  strip.text = element_text(size = 15), 
+                  title = element_text(size = 15))
+        } else if (input$barstat == "Median"){
+          tower %>% 
+            filter(species %in% input$speciesIn) %>% 
+            filter(year %in% input$yearIn) %>% 
+            mutate(yearday = yday(date)) %>% 
+            group_by(species, yearday) %>%
+            summarize(se = se(count), median = median(count)) %>% 
+            ggplot() +
+            geom_col(aes(x = yearday, y = median, fill = species), size = 2)+
+            geom_errorbar(aes(x = yearday, ymin = (median - se), ymax = (median + se)), size = 0.5, width = 0.008, alpha = 0.8) +
+            labs(title = paste(input$barstat, "counts by day of year grouped across seasons"), subtitle = "Great Duck Tower Data", caption = "error bars represent standard error")+
+            scale_fill_viridis_d()+
+            facet_wrap(~species, scales = "free") +
+            theme_bw() +
+            theme(strip.background = element_rect(fill = "#9CCAA8"), 
+                  strip.text = element_text(size = 15), 
+                  title = element_text(size = 15))
+        }
     }
-})
- 
-}
+}) #this one closes the renderPlot input
+
+} #this one closes the server
 
 # Run the application 
 shinyApp(ui = ui, server = server)

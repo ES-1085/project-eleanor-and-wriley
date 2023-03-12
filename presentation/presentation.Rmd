@@ -104,7 +104,7 @@ population_distribution_gulls %>%
                                 location == "south_end" ~ "South End Colony")) %>% 
   ggplot(aes(y = total, x = YEAR, fill = sub_colony)) +
   geom_col() +
-   scale_fill_viridis(discrete = T, direction = 1) +
+   scale_fill_viridis(discrete = T, direction = -1) +
   theme_bw()
 
 ```
@@ -120,7 +120,7 @@ population_distribution_gulls %>%
 
 For additional exploration of tower count data, see Shiny App: https://udppk1-eleanor-gnam.shinyapps.io/towerDRAFT/\
 
-```{r echo = FALSE, main-four-species}
+```{r echo = FALSE, main-four-species, fig.alt = "Four line charts showing trends in four breeding species on Great Duck Island between 2000 and 2022. Year is graphed on the x axis, and the median daily count of each species is graphed on the y axis. The median daily count for each year is represented by a point with error bars that show the standard error, and the points are connected by lines." }
 tower <- read_csv("data/towerclean.csv")
 
 se <- function(x) sd(x)/sqrt(length(x))
@@ -151,7 +151,7 @@ tower %>%
 ```
 
 
-```{r echo = FALSE, atpu-razo-noga}
+```{r echo = FALSE, atpu-razo-noga, fig.alt = "three barplots showing the mean daily count by year for four species: Atlantic Puffins, Northern Gannets, and Razorbills. Year is graphed to the x-axis, with mean daily count on the y axis. Each bar has an error bar denoting standard error for the counts within each year."  }
 tower %>% 
   filter(species == "puffin") %>% 
   mutate(label = "Atlantic Puffin") %>% 
@@ -206,7 +206,7 @@ pop_dist_clean <- population_distribution_gulls %>%
   mutate(West = as.numeric(`West`)) %>%
   mutate(south_end = East + West + Extension) %>%
   mutate(north_end = Point + Cabin + Hell) %>%
-  mutate(year = as.character(YEAR)) %>% 
+  mutate(year = year(YEAR)) %>% 
   filter(!is.na(south_end)) %>% 
   select(year, south_end, north_end, Borofsky, little_point) %>%
   pivot_longer( cols = south_end:little_point,
@@ -218,17 +218,20 @@ southend1 <- pop_dist_clean %>%
   filter(location == "south_end")
 
 
-tower %>%
-  mutate(year = as.character(year)) %>% 
+gullmeds <- tower %>%
+  mutate(year = as.factor(year)) %>% 
   filter(species == "herg") %>% 
-  group_by(year) %>% 
-  summarize(median = median(count), se = se(count)) %>% 
-  mutate(year = as.character(year)) %>% 
-  ggplot()+
-  geom_col(data = southend1, aes(x = year, y = total), fill = "burlywood3")+
-  geom_point(aes(x = year, y = median), color = "turquoise2") +
-  geom_line(aes(x = year, y = median), color = "turquoise2")+ 
-  geom_errorbar(aes(x = year, ymin = (median - se), ymax = (median + se)))
+  group_by(year, species) %>% 
+  summarize(median = median(count), se = se(count)) 
 
+
+  ggplot() +
+  geom_col(data = southend1, aes(x = year, y = total), fill = "burlywood3")+
+  geom_point(data = gullmeds, aes(x = year, y = median), color = "turquoise4") +
+  geom_line(data = gullmeds, aes(x = year, y = median)) +
+  geom_errorbar(data= gullmeds, aes(x = year, ymin = (median - se), ymax = (median + se)), width = 1.0, size = 1.2, color = "turquoise4")
+
+  
+  
 ```
 
