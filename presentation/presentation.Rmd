@@ -197,7 +197,7 @@ tower %>%
 
 ```
 
-```{r echo = FALSE, gull-counts-vs-nest-numbers}
+```{r echo = FALSE, gull-counts-vs-nest-numbers, fig.alt = "a line chart showing the change in median herring gull tower counts per year overlaid over a barplot showing the total number of herring gull nests in the south end colony per year. Median daily herring gull count is graphed on the left y axis, and the total number of nests in the south end colony is graphed on the right y axis. Year is graphed to the x axis. The vertexes on the line representing the median daily herring gull count for each year are given error bars that denote standard error.}
 
 #still working on this one
 
@@ -227,11 +227,15 @@ gullmeds <- tower %>%
 
 
 ggplot() +
-  geom_col(data = southend1, aes(x = year, y = total), fill = "burlywood3")+
-  geom_point(data = gullmeds, aes(x = year, y = median), color = "turquoise4", size = 2) +
-  geom_line(data = gullmeds, aes(x = year, y = median), linewidth = 1.3, color = "turquoise4") +
-  geom_errorbar(data= gullmeds, aes(x = year, ymin = (median - se), ymax = (median + se)), width = 0.5, size = 0.7)+
-  scale_y_continuous(name = "Total Nests on the South End", sec.axis = sec_axis(~., name = "Median Gulls Observed During Tower Count"))
+  geom_col(data = southend1, aes(x = year, y = total), fill = "firebrick", alpha = 0.8, color = "black") +
+  geom_point(data = gullmeds, aes(x = year, y = median), color = "steelblue3", size = 2,) +
+  geom_line(data = gullmeds, aes(x = year, y = median), linewidth = 1.3, color = "steelblue3") +
+  geom_errorbar(data= gullmeds, aes(x = year, ymin = (median - se), ymax = (median + se)), width = 0.5, size = 0.7) +
+  scale_y_continuous(name = "Total Nests on the South End", sec.axis = sec_axis(~., name = "Median Gulls Observed During Tower Count")) +
+  theme_bw() +
+  theme(axis.text.y.left = element_text(color = "firebrick"), axis.text.y.right = element_text(color = "steelblue4"), axis.title.y.left = element_text(color = "firebrick"), axis.title.y.right = element_text(color = "steelblue4")) +
+  labs(title = "Changes in median herring gull tower counts and total herring gull nests per year", subtitle = "South end colony only", caption = "error bars show standard error") +
+  xlab("year")
 
   
   
