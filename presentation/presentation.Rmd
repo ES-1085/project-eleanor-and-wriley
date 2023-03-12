@@ -25,11 +25,9 @@ library(forcats)
 library(visdat)
 ```
 
-##Can we bring in those chick-check graphics by habitat? They're fun...
-
 ##Changes in the Gull Colony Distribution Over Time
 
-```{r dodged-barplot-whole-island, echo = FALSE}
+```{r dodged-barplot-whole-island, echo = FALSE, fig.alt = "a dodged barplot showing changes in how gull nests are distributed among GDI's sub-colonies over time. The total number of nests is mapped on the y axis, and year is on the x axis. Each year has four columns, one for each sub-colony. Over time, the Borofsky colony and the Little Point colony have gone extinct. The north end colony has declined from a peak of around 440 nests in 2000 to a low of around 240 nests in 2022. The south end colony has increased from a low of 250 nests in 1999 to consistently above 750 nests since 2014." }
 
 population_distribution_gulls <- read_xlsx(str_c("data/gull_pop_distribution_2022.xlsx")) 
 population_distribution_gulls$West[3]=193 
