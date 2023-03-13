@@ -374,6 +374,7 @@ animate.save <- animate(animation.points.only, duration = 40, height = 1000, wid
 nest_density <- read_csv("data/density_habitat.csv") %>%
   select(point_id:habitat)
 ```
+
 ```{r}
 nest_density %>%
   filter(habitat %in% c("vegetation", "berm")) %>%
@@ -402,9 +403,9 @@ nest_density %>%
   group_by(year, habitat) %>%
   summarise(median = median(distance), se = se(distance)) %>%
   ggplot() +
-  geom_col(aes(x = year, y = median, fill = habitat), position = "dodge") +
+  geom_col(aes(x = year, y = median, fill = habitat), position = position_dodge(preserve = "single"), width = 0.75) +
   scale_fill_manual(values = c("#4259C3", "#9EC2FF")) +
-  geom_errorbar(aes(x = year, ymin = (median - se), ymax = (median + se)), size = 0.5, width = 0.5)
+  geom_errorbar(aes(x = year, ymin = (median - se), ymax = (median + se), group = habitat), size = 0.5, width = 0.5, position = position_dodge(preserve = "single", width = 0.75))
 
 ```
 
