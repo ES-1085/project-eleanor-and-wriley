@@ -235,11 +235,11 @@ animation.points.only <- ggplot(gullshapetest) +
   geom_sf(data = gullshapetest, color = "midnightblue", aes(group = year), size = .8) +
   coord_sf(ylim = c(44.140385, 44.145726), xlim = c(-68.25038, -68.242629), expand = FALSE) + 
   transition_states(year,
-                    transition_length = 1,
+                    transition_length = .1,
                     state_length = 20
                     ) +
-  enter_fade() +
-  exit_fade() +
+  # enter_fade() +
+  # exit_fade() +
   labs(
     title = "Distribution of Nesting Gulls", 
     subtitle = 'Year: {closest_state}') +
@@ -249,7 +249,7 @@ animation.points.only <- ggplot(gullshapetest) +
 ```
 
 ```{r}
-animate.save <- animate(animation.points.only, nframes = 40, duration = 30)
+animate.save <- animate(animation.points.only, duration = 30)
 
 anim_save(animate.save, filename = "gull1.gif")
 ```
