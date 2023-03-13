@@ -34,7 +34,7 @@ The `presentation` folder contains code and files used to build our presentation
 -`presentation.md` : a knit markdown version of our presentation figures
 
 
-The `towercount_shinyapp` folder contains necessary files for the Tower Count shiny app, which can be found here:  . It contains a data folder for the data file that the app draws upon, a dictionary for that datafolder, and a README with instructions on how to use and update the app. 
+The `towercount_shinyapp` folder contains necessary files for the Tower Count shiny app, which can be found here: https://udppk1-eleanor-gnam.shinyapps.io/towerDRAFT/. It contains a data folder for the data file that the app draws upon, a dictionary for that datafolder, and a README with instructions on how to use and update the app. 
 
 
 
@@ -49,7 +49,7 @@ The `towercount_shinyapp` folder contains necessary files for the Tower Count sh
 
 ## Presentation
 
-Our presentation can be found [here](presentation/presentation.html). You can update this link to a Google Slides link.
+Our presentation can be found [here] (https://docs.google.com/presentation/d/1xe4_pLJs9Um9beBfaBDH1iwyRoBHbitFbG_L7tSJyc4/edit#slide=id.g2176aac9a87_0_52)
 
 ## Data
 
