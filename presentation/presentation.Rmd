@@ -25,11 +25,9 @@ library(forcats)
 library(visdat)
 ```
 
-##Can we bring in those chick-check graphics by habitat? They're fun...
-
 ##Changes in the Gull Colony Distribution Over Time
 
-```{r dodged-barplot-whole-island, echo = FALSE}
+```{r dodged-barplot-whole-island, echo = FALSE, fig.alt = "a dodged barplot showing changes in how gull nests are distributed among GDI's sub-colonies over time. The total number of nests is mapped on the y axis, and year is on the x axis. Each year has four columns, one for each sub-colony. Over time, the Borofsky colony and the Little Point colony have gone extinct. The north end colony has declined from a peak of around 440 nests in 2000 to a low of around 240 nests in 2022. The south end colony has increased from a low of 250 nests in 1999 to consistently above 750 nests since 2014." }
 
 population_distribution_gulls <- read_xlsx(str_c("data/gull_pop_distribution_2022.xlsx")) 
 population_distribution_gulls$West[3]=193 
@@ -49,7 +47,8 @@ population_distribution_gulls %>%
                values_to = "total") %>%
   ggplot(aes(y = total, x = YEAR, fill = location)) +
   geom_col(position = "dodge") +
-   scale_fill_viridis(discrete = T) +
+  scale_fill_brewer(palette = "Dark2", direction = -1)
+   #scale_fill_viridis(discrete = T, direction = -1, ) +
   theme_bw()
 
 ```
@@ -104,7 +103,7 @@ population_distribution_gulls %>%
                                 location == "south_end" ~ "South End Colony")) %>% 
   ggplot(aes(y = total, x = YEAR, fill = sub_colony)) +
   geom_col() +
-   scale_fill_viridis(discrete = T, direction = 1) +
+   scale_fill_viridis(discrete = T, direction = -1) +
   theme_bw()
 
 ```
@@ -120,7 +119,7 @@ population_distribution_gulls %>%
 
 For additional exploration of tower count data, see Shiny App: https://udppk1-eleanor-gnam.shinyapps.io/towerDRAFT/\
 
-```{r echo = FALSE, main-four-species}
+```{r echo = FALSE, main-four-species, fig.alt = "Four line charts showing trends in four breeding species on Great Duck Island between 2000 and 2022. Year is graphed on the x axis, and the median daily count of each species is graphed on the y axis. The median daily count for each year is represented by a point with error bars that show the standard error, and the points are connected by lines." }
 tower <- read_csv("data/towerclean.csv")
 
 se <- function(x) sd(x)/sqrt(length(x))
@@ -151,7 +150,7 @@ tower %>%
 ```
 
 
-```{r echo = FALSE, atpu-razo-noga}
+```{r echo = FALSE, atpu-razo-noga, fig.alt = "three barplots showing the mean daily count by year for four species: Atlantic Puffins, Northern Gannets, and Razorbills. Year is graphed to the x-axis, with mean daily count on the y axis. Each bar has an error bar denoting standard error for the counts within each year."  }
 tower %>% 
   filter(species == "puffin") %>% 
   mutate(label = "Atlantic Puffin") %>% 
@@ -197,7 +196,7 @@ tower %>%
 
 ```
 
-```{r echo = FALSE, gull-counts-vs-nest-numbers}
+```{r echo = FALSE, gull-counts-vs-nest-numbers, fig.alt = "a line chart showing the change in median herring gull tower counts per year overlaid over a barplot showing the total number of herring gull nests in the south end colony per year. Median daily herring gull count is graphed on the left y axis, and the total number of nests in the south end colony is graphed on the right y axis. Year is graphed to the x axis. The vertexes on the line representing the median daily herring gull count for each year are given error bars that denote standard error.}
 
 #still working on this one
 
@@ -206,7 +205,7 @@ pop_dist_clean <- population_distribution_gulls %>%
   mutate(West = as.numeric(`West`)) %>%
   mutate(south_end = East + West + Extension) %>%
   mutate(north_end = Point + Cabin + Hell) %>%
-  mutate(year = as.character(YEAR)) %>% 
+  mutate(year = YEAR) %>% 
   filter(!is.na(south_end)) %>% 
   select(year, south_end, north_end, Borofsky, little_point) %>%
   pivot_longer( cols = south_end:little_point,
@@ -215,20 +214,29 @@ pop_dist_clean <- population_distribution_gulls %>%
 
 
 southend1 <- pop_dist_clean %>% 
-  filter(location == "south_end")
+  filter(location == "south_end") %>% 
+  mutate(year = as.numeric(year))
 
 
-tower %>%
-  mutate(year = as.character(year)) %>% 
+gullmeds <- tower %>%
+  mutate(year = as.numeric(year)) %>% 
   filter(species == "herg") %>% 
-  group_by(year) %>% 
-  summarize(median = median(count), se = se(count)) %>% 
-  mutate(year = as.character(year)) %>% 
-  ggplot()+
-  geom_col(data = southend1, aes(x = year, y = total), fill = "burlywood3")+
-  geom_point(aes(x = year, y = median), color = "turquoise2") +
-  geom_line(aes(x = year, y = median), color = "turquoise2")+ 
-  geom_errorbar(aes(x = year, ymin = (median - se), ymax = (median + se)))
+  group_by(year, species) %>% 
+  summarize(median = median(count), se = se(count)) 
 
+
+ggplot() +
+  geom_col(data = southend1, aes(x = year, y = total), fill = "firebrick", alpha = 0.8, color = "black") +
+  geom_point(data = gullmeds, aes(x = year, y = median), color = "steelblue3", size = 2,) +
+  geom_line(data = gullmeds, aes(x = year, y = median), linewidth = 1.3, color = "steelblue3") +
+  geom_errorbar(data= gullmeds, aes(x = year, ymin = (median - se), ymax = (median + se)), width = 0.5, size = 0.7) +
+  scale_y_continuous(name = "Total Nests on the South End", sec.axis = sec_axis(~., name = "Median Gulls Observed During Tower Count")) +
+  theme_bw() +
+  theme(axis.text.y.left = element_text(color = "firebrick"), axis.text.y.right = element_text(color = "steelblue4"), axis.title.y.left = element_text(color = "firebrick"), axis.title.y.right = element_text(color = "steelblue4")) +
+  labs(title = "Changes in median herring gull tower counts and total herring gull nests per year", subtitle = "South end colony only", caption = "error bars show standard error") +
+  xlab("year")
+
+  
+  
 ```
 
