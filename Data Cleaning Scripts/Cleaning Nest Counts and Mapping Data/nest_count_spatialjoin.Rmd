@@ -249,7 +249,7 @@ animation.points.only <- ggplot(gullshapetest) +
 ```
 
 ```{r}
-animate.save <- animate(animation.points.only, duration = 30)
+animate.save <- animate(animation.points.only, duration = 40)
 
 anim_save(animate.save, filename = "gull1.gif")
 ```

@@ -1,0 +1,275 @@
+---
+title: "gull density visualizations"
+author: "Wriley Hodge"
+date: "2023-03-13"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(dplyr)
+library(readxl)
+```
+
+```{r}
+density_1999 <- read_excel("data/gull_density/near_tables_gulls_1999_2022.xlsx", sheet = "neartable_gulls1999") %>%
+  mutate(year = "1999")
+
+density_2000 <- read_excel("data/gull_density/near_tables_gulls_1999_2022.xlsx", sheet = "neartable_gulls2000") %>%
+  mutate(year = "2000")
+
+density_2001 <- read_excel("data/gull_density/near_tables_gulls_1999_2022.xlsx", sheet = "neartable_gulls2001") %>%
+  mutate(year = "2001")
+
+density_2002 <- read_excel("data/gull_density/near_tables_gulls_1999_2022.xlsx", sheet = "neartable_gulls2002") %>%
+  mutate(year = "2002")
+
+density_2003 <- read_excel("data/gull_density/neartable_gulls2003.xlsx") %>%
+  mutate(year = "2003")
+
+density_2004 <- read_excel("data/gull_density/near_tables_gulls_1999_2022.xlsx", sheet = "neartable_gulls2004") %>%
+  mutate(year = "2004")
+
+density_2005 <- read_excel("data/gull_density/near_tables_gulls_1999_2022.xlsx", sheet = "neartable_gulls2005") %>%
+  mutate(year = "2005")
+
+density_2006 <- read_excel("data/gull_density/near_tables_gulls_1999_2022.xlsx", sheet = "neartable_gulls2006") %>%
+  mutate(year = "2006")
+
+density_2007 <- read_excel("data/gull_density/near_tables_gulls_1999_2022.xlsx", sheet = "neartable_gulls2007") %>%
+  mutate(year = "2007")
+
+density_2008 <- read_excel("data/gull_density/near_tables_gulls_1999_2022.xlsx", sheet = "neartable_gulls2008") %>%
+  mutate(year = "2008")
+
+density_2009 <- read_excel("data/gull_density/near_tables_gulls_1999_2022.xlsx", sheet = "neartable_gulls2009") %>%
+  mutate(year = "2009")
+
+density_2010 <- read_excel("data/gull_density/near_tables_gulls_1999_2022.xlsx", sheet = "neartable_gulls2010") %>%
+  mutate(year = "2010")
+
+density_2011 <- read_excel("data/gull_density/near_tables_gulls_1999_2022.xlsx", sheet = "neartable_gulls2011") %>%
+  mutate(year = "2011")
+
+density_2012 <- read_excel("data/gull_density/near_tables_gulls_1999_2022.xlsx", sheet = "neartable_gulls2012") %>%
+  mutate(year = "2012")
+
+density_2013 <- read_excel("data/gull_density/near_tables_gulls_1999_2022.xlsx", sheet = "neartable_gulls2013") %>%
+  mutate(year = "2013")
+
+density_2014 <- read_excel("data/gull_density/near_tables_gulls_1999_2022.xlsx", sheet = "neartable_gulls2014") %>%
+  mutate(year = "2014")
+
+density_2015 <- read_excel("data/gull_density/near_tables_gulls_1999_2022.xlsx", sheet = "neartable_gulls2015") %>%
+  mutate(year = "2015")
+
+density_2016 <- read_excel("data/gull_density/near_tables_gulls_1999_2022.xlsx", sheet = "neartable_gulls2016") %>%
+  mutate(year = "2016")
+
+density_2017 <- read_excel("data/gull_density/near_tables_gulls_1999_2022.xlsx", sheet = "neartable_gulls2017") %>%
+  mutate(year = "2017")
+
+density_2018 <- read_excel("data/gull_density/near_tables_gulls_1999_2022.xlsx", sheet = "neartable_gulls2018") %>%
+  mutate(year = "2018")
+
+density_2019 <- read_excel("data/gull_density/near_tables_gulls_1999_2022.xlsx", sheet = "neartable_gulls2019") %>%
+  mutate(year = "2019")
+
+density_2020 <- read_excel("data/gull_density/near_tables_gulls_1999_2022.xlsx", sheet = "neartable_gulls2020") %>%
+  mutate(year = "2020")
+
+density_2021 <- read_excel("data/gull_density/near_tables_gulls_1999_2022.xlsx", sheet = "neartable_gulls2021") %>%
+  mutate(year = "2021")
+
+density_2022 <- read_excel("data/gull_density/near_tables_gulls_1999_2022.xlsx", sheet = "neartable_gulls2022") %>%
+  mutate(year = "2022")
+
+
+all_density <- rbind(density_1999, 
+                     density_2000,
+                     density_2001,
+                     density_2002,
+                     density_2003,
+                     density_2004,
+                     density_2005,
+                     density_2006,
+                     density_2007,
+                     density_2008,
+                     density_2009,
+                     density_2010,
+                     density_2011,
+                     density_2012,
+                     density_2013,
+                     density_2014,
+                     density_2015,
+                     density_2016,
+                     density_2017,
+                     density_2018,
+                     density_2019,
+                     density_2020,
+                     density_2021,
+                     density_2022
+                     ) %>%
+  rename(
+    point_id = `IN_FID`,
+    near_point_id = `NEAR_FID`,
+    distance = `NEAR_DIST`,
+    distance_rank = `NEAR_RANK`
+  ) %>%
+  select(point_id, near_point_id, distance, distance_rank, year)
+
+```
+
+```{r}
+habitat_1999 <- read_excel("data/gull_density/gull_nest_hab_1999_2022.xlsx", sheet = "gulls1999_SpatialJoin_test") %>%
+  mutate(year = "1999") %>%
+  select(`OBJECTID`, `ID`, year)
+
+habitat_2000 <- read_excel("data/gull_density/gull_nest_hab_1999_2022.xlsx", sheet = "gulls2000_SpatialJoin") %>%
+  mutate(year = "2000") %>%
+  select(`OBJECTID`, `ID`, year)
+
+habitat_2001 <- read_excel("data/gull_density/gull_nest_hab_1999_2022.xlsx", sheet = "gulls2001_SpatialJoin") %>%
+  mutate(year = "2001") %>%
+  select(`OBJECTID`, `ID`, year)
+
+habitat_2002 <- read_excel("data/gull_density/gull_nest_hab_1999_2022.xlsx", sheet = "gulls2002_SpatialJoin") %>%
+  mutate(year = "2002") %>%
+  select(`OBJECTID`, `ID`, year)
+
+habitat_2003 <- read_excel("data/gull_density/gull_nest_hab_1999_2022.xlsx", sheet = "gulls2003_SpatialJoin") %>%
+  mutate(year = "2003") %>%
+  select(`OBJECTID`, `ID`, year)
+
+habitat_2004 <- read_excel("data/gull_density/gull_nest_hab_1999_2022.xlsx", sheet = "gulls2004_SpatialJoin") %>%
+  mutate(year = "2004") %>%
+  select(`OBJECTID`, `ID_1`, year) %>%
+  mutate(`ID` = `ID_1`) %>%
+  select(`OBJECTID`, `ID`, year) 
+
+habitat_2005 <- read_excel("data/gull_density/gull_nest_hab_1999_2022.xlsx", sheet = "gulls2005_SpatialJoin") %>%
+  mutate(year = "2005") %>%
+  select(`OBJECTID`, `ID`, year)
+
+habitat_2006 <- read_excel("data/gull_density/gull_nest_hab_1999_2022.xlsx", sheet = "gulls2006_SpatialJoin") %>%
+  mutate(year = "2006") %>%
+  select(`OBJECTID`, `ID`, year)
+
+habitat_2007 <- read_excel("data/gull_density/gull_nest_hab_1999_2022.xlsx", sheet = "gulls2007_SpatialJoin") %>%
+  mutate(year = "2007") %>%
+  select(`OBJECTID`, `ID`, year)
+
+habitat_2008 <- read_excel("data/gull_density/gull_nest_hab_1999_2022.xlsx", sheet = "gulls2008_SpatialJoin") %>%
+  mutate(year = "2008") %>%
+  select(`OBJECTID`, `ID`, year)
+
+habitat_2009 <- read_excel("data/gull_density/gull_nest_hab_1999_2022.xlsx", sheet = "gulls2009_SpatialJoin2") %>%
+  mutate(year = "2009") %>%
+  select(`OBJECTID`, `ID`, year)
+
+habitat_2010 <- read_excel("data/gull_density/gull_nest_hab_1999_2022.xlsx", sheet = "gulls2010_SpatialJoin") %>%
+  mutate(year = "2010") %>%
+  select(`OBJECTID`, `ID`, year)
+
+habitat_2011 <- read_excel("data/gull_density/gull_nest_hab_1999_2022.xlsx", sheet = "gulls2011_join") %>%
+  mutate(year = "2011") %>%
+  select(`OBJECTID`, `ID`, year)
+
+habitat_2012 <- read_excel("data/gull_density/gull_nest_hab_1999_2022.xlsx", sheet = "gulls2012_join") %>%
+  mutate(year = "2012") %>%
+  select(`OBJECTID`, `ID`, year)
+
+habitat_2013 <- read_excel("data/gull_density/gull_nest_hab_1999_2022.xlsx", sheet = "gulls2013_join") %>%
+  mutate(year = "2013") %>%
+  select(`OBJECTID`, `ID`, year)
+
+habitat_2014 <- read_excel("data/gull_density/gull_nest_hab_1999_2022.xlsx", sheet = "gulls2014_join") %>%
+  mutate(year = "2014") %>%
+  select(`OBJECTID`, `ID`, year)
+
+habitat_2015 <- read_excel("data/gull_density/gull_nest_hab_1999_2022.xlsx", sheet = "gulls2015_join") %>%
+  mutate(year = "2015") %>%
+  select(`OBJECTID`, `ID`, year)
+
+habitat_2016 <- read_excel("data/gull_density/gull_nest_hab_1999_2022.xlsx", sheet = "gulls2016_join") %>%
+  mutate(year = "2016") %>%
+  select(`OBJECTID`, `ID`, year)
+
+habitat_2017 <- read_excel("data/gull_density/gull_nest_hab_1999_2022.xlsx", sheet = "gulls2017_join") %>%
+  mutate(year = "2017") %>%
+  select(`OBJECTID`, `ID`, year)
+
+habitat_2018 <- read_excel("data/gull_density/gull_nest_hab_1999_2022.xlsx", sheet = "gulls2018_join") %>%
+  mutate(year = "2018") %>%
+  select(`OBJECTID`, `ID`, year)
+
+habitat_2019 <- read_excel("data/gull_density/gull_nest_hab_1999_2022.xlsx", sheet = "gulls2019_join") %>%
+  mutate(year = "2019") %>%
+  select(`OBJECTID`, `ID`, year)
+
+habitat_2020 <- read_excel("data/gull_density/gull_nest_hab_1999_2022.xlsx", sheet = "gulls2020_join") %>%
+  mutate(year = "2020") %>%
+  select(`OBJECTID`, `ID`, year)
+
+habitat_2021 <- read_excel("data/gull_density/gull_nest_hab_1999_2022.xlsx", sheet = "gulls2021_join") %>%
+  mutate(year = "2021") %>%
+  select(`OBJECTID`, `ID`, year)
+
+habitat_2022 <- read_excel("data/gull_density/gull_nest_hab_1999_2022.xlsx", sheet = "gulls2022_join") %>%
+  mutate(year = "2022") %>%
+  select(`OBJECTID`, `ID`, year)
+
+gull_habitat_nests <- rbind(
+  habitat_1999,
+  habitat_2000,
+  habitat_2001,
+  habitat_2002,
+  habitat_2003,
+  habitat_2004,
+  habitat_2005,
+  habitat_2006,
+  habitat_2007,
+  habitat_2008,
+  habitat_2009,
+  habitat_2010,
+  habitat_2011,
+  habitat_2012,
+  habitat_2013,
+  habitat_2014,
+  habitat_2015,
+  habitat_2016,
+  habitat_2017,
+  habitat_2018,
+  habitat_2019,
+  habitat_2020,
+  habitat_2021,
+  habitat_2022) %>%
+  rename(
+    point_id = `OBJECTID`,
+    habitat = `ID`)
+```
+
+```{r fig.height=3, fig.width=5}
+density_habitat <- inner_join(all_density, gull_habitat_nests, by = c("point_id", "year")) %>%
+  mutate(habitat = str_replace(habitat, "VEGETATED", "vegetation"),
+         habitat = str_replace(habitat, "BERM", "berm")) 
+
+density_habitat %>%
+group_by(point_id, year, habitat) %>%
+  summarise(new_distance = mean(distance)) %>%
+  # filter(habitat %in% c(vegetation, berm)) %>%
+  ggplot() +
+  geom_bar(aes(x = year, fill = habitat), position = "dodge")
+```
+
+
+```{r}
+density_habitat %>%
+  filter(distance_rank == 1) %>%
+  filter(distance <= 100) %>%
+  ggplot() +
+  geom_boxplot(aes(x = year, y = `distance`))
+```
+
+
