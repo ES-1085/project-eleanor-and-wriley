@@ -341,9 +341,10 @@ gullshapecombined <- rbind(gullshape2022, gullshape2021, gullshape2020, gullshap
 
 ```{r echo=FALSE, fig.height=5, fig.width=5, creating-animation}
 animation.points.only <- ggplot(gullshapecombined) +
-  geom_sf(data = outline, fill = "#DBE9F5")+
+  geom_sf(data = outline, aes(fill = ID)) +
   geom_sf(data = gullshapecombined, color = "#00264D", aes(group = year), size = 2) +
   coord_sf(ylim = c(44.140385, 44.145726), xlim = c(-68.25038, -68.242629), expand = FALSE) + 
+  scale_fill_manual(values = c("#DBE9F5", "#9EC2FF"))
   transition_states(year,
                     transition_length = .1,
                     state_length = 20

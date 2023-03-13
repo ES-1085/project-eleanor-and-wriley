@@ -232,6 +232,11 @@ animate.save <- animate(animation.points.only, duration = 40)
 
 anim_save(animate.save, filename = "gull1.gif")
 ```
+```{r}
+ggplot(outline) +
+  geom_sf(data = outline, aes(fill = ID))
+    
+```
 
 
 ```{r density-test}
