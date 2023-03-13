@@ -36,13 +36,6 @@ gullshape2022 <- st_transform(gullshape2022, "+init=epsg:4326") %>%
   mutate(flag = as.integer(flag)) %>%
   mutate(year = 2022)
 
-# nest_count_clean_2022 <- read.csv("data/nest_count_clean/nest_count_clean_2022.csv")
-# 
-# gullshape2022 <- gullshape2022 %>%
-#   left_join(nest_count_clean_2022, by = "flag") %>%
-#   select(flag, geometry, clutch, year, species) %>%
-#   filter(!is.na(flag))
-
 ##2021
 gullshape2021 <- read_sf("data/gullshapefiles/Gulls2021")
 gullshape2021 <- st_transform(gullshape2021, "+init=epsg:4326") %>%
@@ -51,13 +44,6 @@ gullshape2021 <- st_transform(gullshape2021, "+init=epsg:4326") %>%
   mutate(flag = as.integer(flag)) %>%
   mutate(year = 2021)
 
-# nest_count_clean_2021 <- read.csv("data/nest_count_clean/nest_count_clean_2021.csv")
-# 
-# gullshape2021 <- gullshape2021 %>%
-#   left_join(nest_count_clean_2021, by = "flag") %>%
-#   select(flag, geometry, clutch, year, species) %>%
-#   filter(!is.na(flag))
-
 #2020
 gullshape2020 <- read_sf("data/gullshapefiles/Gulls2020")
 gullshape2020 <- st_transform(gullshape2020, "+init=epsg:4326") %>%
@@ -65,13 +51,6 @@ gullshape2020 <- st_transform(gullshape2020, "+init=epsg:4326") %>%
   rename(flag = "Comment") %>%
   mutate(flag = as.integer(flag)) %>%
   mutate(year = 2020)
-
-# nest_count_clean_2020 <- read.csv("data/nest_count_clean/nest_count_clean_2020.csv")
-# 
-# gullshape2020 <- gullshape2020 %>%
-#   left_join(nest_count_clean_2020, by = "flag") %>%
-#   select(flag, geometry, clutch, year, species) %>%
-#   filter(!is.na(flag))
 
 ##2019
 gullshape2019 <- read_sf("data/gullshapefiles/Gulls2019")
@@ -224,15 +203,15 @@ gullshape1999 <- st_transform(gullshape1999, "+init=epsg:4326") %>%
 
 
 
-gullshapetest <- rbind(gullshape2022, gullshape2021, gullshape2020, gullshape2019, gullshape2018, gullshape2017, gullshape2016, gullshape2015, gullshape2014, gullshape2013, gullshape2012, gullshape2011, gullshape2010, gullshape2009, gullshape2008, gullshape2007, gullshape2006, gullshape2005, gullshape2004, gullshape2003, gullshape2002, gullshape2001, gullshape2000, gullshape1999)
+gullshapecombined <- rbind(gullshape2022, gullshape2021, gullshape2020, gullshape2019, gullshape2018, gullshape2017, gullshape2016, gullshape2015, gullshape2014, gullshape2013, gullshape2012, gullshape2011, gullshape2010, gullshape2009, gullshape2008, gullshape2007, gullshape2006, gullshape2005, gullshape2004, gullshape2003, gullshape2002, gullshape2001, gullshape2000, gullshape1999)
 
 
 ```
 
 ```{r map-just-colony, eval = FALSE, echo = TRUE, fig.height=6, fig.width=6}
-animation.points.only <- ggplot(gullshapetest) +
+animation.points.only <- ggplot(gullshapecombined) +
   geom_sf(data = outline, fill = "lightblue")+
-  geom_sf(data = gullshapetest, color = "midnightblue", aes(group = year), size = .8) +
+  geom_sf(data = gullshapecombined, color = "midnightblue", aes(group = year), size = .8) +
   coord_sf(ylim = c(44.140385, 44.145726), xlim = c(-68.25038, -68.242629), expand = FALSE) + 
   transition_states(year,
                     transition_length = .1,
@@ -379,5 +358,8 @@ all.nest.count %>%
   geom_col(aes(x = year, y = n, fill = clutch), position = "fill")
     
   
+```
+```{r}
+write_csv(all.nest.count, "data/all.nest.count.csv")
 ```
 

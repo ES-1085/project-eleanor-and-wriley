@@ -15,6 +15,8 @@ library(tidyverse)
 library(readxl)
 library(viridis)
 library(hrbrthemes)
+library(RColorBrewer)
+library(wesanderson)
 library(sf)
 library(leaflet)
 library(gganimate)
@@ -27,29 +29,74 @@ library(visdat)
 
 ##Changes in the Gull Colony Distribution Over Time
 
-```{r dodged-barplot-whole-island, echo = FALSE, fig.alt = "a dodged barplot showing changes in how gull nests are distributed among GDI's sub-colonies over time. The total number of nests is mapped on the y axis, and year is on the x axis. Each year has four columns, one for each sub-colony. Over time, the Borofsky colony and the Little Point colony have gone extinct. The north end colony has declined from a peak of around 440 nests in 2000 to a low of around 240 nests in 2022. The south end colony has increased from a low of 250 nests in 1999 to consistently above 750 nests since 2014." }
+```{r}
+all.nest.count <- read.csv("data/all.nest.count.csv")
+```
 
+```{r fig.height=2, fig.width=4, fig.alt = "a bar graph showing the total number of nests on Great Duck Island from 1999 - 2022. The y axis shows the total number of nests, while the x axis represents year. There is a major outlier in 2010, but this was due to faulty data collection and is unlikely to actually be representative of overall changes. We can see that the overall population   increased from 1999 to 2015 from about 600 nests in 1999 to 1200 in 2015 (though note that there were about 900 in 2000). The population has been slowly decreasing since 2015"}
+
+all.nest.count %>%
+  group_by(year, species) %>%
+  count(species) %>%
+  filter(species == "herg") %>%
+  ggplot() +
+  geom_col(aes(x = year, y = n), fill = "#9EC2FF") +
+  theme_bw() +
+    labs(y = "Total Number of Nesting Gulls", x = "Year")
+```
+
+```{r fig.height=2, fig.width=5}
+all.nest.count %>%
+  group_by(year, species) %>%
+  count(species) %>%
+  filter(species == "gbbg") %>%
+  ggplot() +
+  geom_col(aes(x = year, y = n), fill = "#9EC2FF") +
+  theme_bw() +
+    labs(y = "Total Number of Nesting Great Black-backed Gulls", x = "Year")
+```
+```{r fig.height=2, fig.width=5}
+all.nest.count %>%
+  group_by(year, species) %>%
+  count(species) %>%
+  filter(species == "coei") %>%
+  ggplot() +
+  geom_col(aes(x = year, y = n), fill = "#9EC2FF") +
+  theme_bw() +
+    labs(y = "Total Number of Nesting Common Eiders", x = "Year")
+```
+```{r cleaning-population-distribution}
 population_distribution_gulls <- read_xlsx(str_c("data/gull_pop_distribution_2022.xlsx")) 
 population_distribution_gulls$West[3]=193 
 
-head(population_distribution_gulls)
-
-population_distribution_gulls$West[3]=193
-
-population_distribution_gulls %>%
+population_distribution_gulls_cleaned <- population_distribution_gulls %>%
   rename(little_point = `Little Point (near Boathouse)`) %>%
   mutate(West = as.numeric(`West`)) %>%
   mutate(south_end = East + West + Extension) %>%
   mutate(north_end = Point + Cabin + Hell) %>%
   select(YEAR, south_end, north_end, Borofsky, little_point) %>%
-  pivot_longer( cols = south_end:little_point,
+  pivot_longer(cols = south_end:little_point,
                names_to = "location",
-               values_to = "total") %>%
+               values_to = "total")
+```
+
+
+```{r dodged-barplot-whole-island, echo = FALSE,  fig.height=3, fig.width=6, fig.alt = "a dodged barplot showing changes in how gull nests are distributed among GDI's sub-colonies over time. The total number of nests is mapped on the y axis, and year is on the x axis. Each year has four columns, one for each sub-colony. Over time, the Borofsky colony and the Little Point colony have gone extinct. The north end colony has declined from a peak of around 440 nests in 2000 to a low of around 240 nests in 2022. The south end colony has increased from a low of 250 nests in 1999 to consistently above 750 nests since 2014." }
+
+population_distribution_gulls_cleaned %>%
+  filter(location != "little_point") %>%
+  mutate(location = str_replace(location, "Borofsky", "Borofsky Colony"), 
+         location = str_replace(location,  "north_end", "North End Colony"),
+         location = str_replace(location,  "south_end", "South End Colony")
+         ) %>%
   ggplot(aes(y = total, x = YEAR, fill = location)) +
-  geom_col(position = "dodge") +
-  scale_fill_brewer(palette = "Dark2", direction = -1)
-   #scale_fill_viridis(discrete = T, direction = -1, ) +
-  theme_bw()
+  geom_col(position = "dodge", width = 1, color = "black") +
+   # scale_fill_manual(values = c("#00264D", "#4259C3", "#9EC2FF")) +
+  scale_fill_manual(values = c("#00264D", "#4259C3", "#9EC2FF")) +
+  theme_bw() +
+  labs(y = "Total Number of Nesting Gulls", 
+       x = "Year",
+       fill = "Location")
 
 ```
 
@@ -63,7 +110,7 @@ population_distribution_gulls %>%
                names_to = "location",
                values_to = "total") %>%
   ggplot(aes(y = total, x = YEAR, fill = location)) +
-  geom_col(position = "dodge") +
+  geom_col(position = "dodge", width = 1, color = "white") +
    scale_fill_viridis(discrete = T) +
   labs(title = "Distribution of Nests within the South End Colony") +
   theme_bw()
@@ -108,10 +155,258 @@ population_distribution_gulls %>%
 
 ```
 
+```{r read-in-shapefiles}
+#This code is from the nest count spatial join doc, except I couldn't figure out how to write an sf file so I'm bringing it here for the animation below... Apologies for all the extra code....
+outline <- read_sf("data/outlinecolored") 
+outline <- st_transform(outline, "+init=epsg:4326")
 
-```{r echo = FALSE, south-end-animation}
+gullshape2022 <- read_sf("data/gullshapefiles/Gulls2022")
+gullshape2022 <- st_transform(gullshape2022, "+init=epsg:4326") %>%
+  select(Comment, geometry) %>%
+  rename(flag = "Comment") %>%
+  mutate(flag = as.integer(flag)) %>%
+  mutate(year = 2022)
+
+##2021
+gullshape2021 <- read_sf("data/gullshapefiles/Gulls2021")
+gullshape2021 <- st_transform(gullshape2021, "+init=epsg:4326") %>%
+  select(Comment, geometry) %>%
+  rename(flag = "Comment") %>%
+  mutate(flag = as.integer(flag)) %>%
+  mutate(year = 2021)
+
+#2020
+gullshape2020 <- read_sf("data/gullshapefiles/Gulls2020")
+gullshape2020 <- st_transform(gullshape2020, "+init=epsg:4326") %>%
+  select(Comment, geometry) %>%
+  rename(flag = "Comment") %>%
+  mutate(flag = as.integer(flag)) %>%
+  mutate(year = 2020)
+
+##2019
+gullshape2019 <- read_sf("data/gullshapefiles/Gulls2019")
+gullshape2019 <- st_transform(gullshape2019, "+init=epsg:4326") %>%
+  select(Comment, geometry) %>%
+  rename(flag = "Comment") %>%
+  mutate(flag = as.integer(flag)) %>%
+  mutate(year = 2019)
+##2018
+gullshape2018 <- read_sf("data/gullshapefiles/gulls2018")
+gullshape2018 <- st_transform(gullshape2018, "+init=epsg:4326") %>%
+  select(Comment, geometry) %>%
+  rename(flag = "Comment") %>%
+  mutate(flag = as.integer(flag)) %>%
+  mutate(year = 2018)
+##2017
+gullshape2017 <- read_sf("data/gullshapefiles/gulls2017")
+gullshape2017 <- st_transform(gullshape2017, "+init=epsg:4326") %>%
+  select(Comment, geometry) %>%
+  rename(flag = "Comment") %>%
+  mutate(flag = as.integer(flag)) %>%
+  mutate(year = 2017)
+##2016
+gullshape2016 <- read_sf("data/gullshapefiles/gulls2016")
+gullshape2016 <- st_transform(gullshape2016, "+init=epsg:4326") %>%
+  select(Comment, geometry) %>%
+  rename(flag = "Comment") %>%
+  mutate(flag = as.integer(flag)) %>%
+  mutate(year = 2016)
+##2015
+gullshape2015 <- read_sf("data/gullshapefiles/gulls2015")
+gullshape2015 <- st_transform(gullshape2015, "+init=epsg:4326") %>%
+  select(COMMENT, geometry) %>%
+  rename(flag = "COMMENT") %>%
+  mutate(flag = as.integer(flag)) %>%
+  mutate(year = 2015)
+##2014
+gullshape2014 <- read_sf("data/gullshapefiles/gulls2014")
+gullshape2014 <- st_transform(gullshape2014, "+init=epsg:4326") %>%
+  select(COMMENT, geometry) %>%
+  rename(flag = "COMMENT") %>%
+  mutate(flag = as.integer(flag)) %>%
+  mutate(year = 2014)
+##2013
+gullshape2013 <- read_sf("data/gullshapefiles/gulls2013")
+gullshape2013 <- st_transform(gullshape2013, "+init=epsg:4326") %>%
+  select(Comment, geometry) %>%
+  rename(flag = "Comment") %>%
+  mutate(flag = as.integer(flag)) %>%
+  mutate(year = 2013)
+##2012
+gullshape2012 <- read_sf("data/gullshapefiles/gulls2012")
+gullshape2012 <- st_transform(gullshape2012, "+init=epsg:4326") %>%
+  select(Comment, geometry) %>%
+  rename(flag = "Comment") %>%
+  mutate(flag = as.integer(flag)) %>%
+  mutate(year = 2012)
+##2011
+gullshape2011 <- read_sf("data/gullshapefiles/gulls2011")
+gullshape2011 <- st_transform(gullshape2011, "+init=epsg:4326") %>%
+  select(COMMENT, geometry) %>%
+  rename(flag = "COMMENT") %>%
+  mutate(flag = as.integer(flag)) %>%
+  mutate(year = 2011)
+##2010
+gullshape2010 <- read_sf("data/gullshapefiles/gulls2010")
+gullshape2010 <- st_transform(gullshape2010, "+init=epsg:4326") %>%
+  select(COMMENT, geometry) %>%
+  rename(flag = "COMMENT") %>%
+  mutate(flag = as.integer(flag)) %>%
+  mutate(year = 2010)
+##2009
+gullshape2009 <- read_sf("data/gullshapefiles/gulls2009")
+gullshape2009 <- st_transform(gullshape2009, "+init=epsg:4326") %>%
+  select(COMMENT, geometry) %>%
+  rename(flag = "COMMENT") %>%
+  mutate(flag = as.integer(flag)) %>%
+  mutate(year = 2009)
+##2008
+gullshape2008 <- read_sf("data/gullshapefiles/gulls2008")
+gullshape2008 <- st_transform(gullshape2008, "+init=epsg:4326") %>%
+  select(COMMENT, geometry) %>%
+  rename(flag = "COMMENT") %>%
+  mutate(flag = as.integer(flag)) %>%
+  mutate(year = 2008)
+##2007
+gullshape2007 <- read_sf("data/gullshapefiles/gulls2007")
+gullshape2007 <- st_transform(gullshape2007, "+init=epsg:4326") %>%
+  select(COMMENT, geometry) %>%
+  rename(flag = "COMMENT") %>%
+  mutate(flag = as.integer(flag)) %>%
+  mutate(year = 2007)
+##2006
+gullshape2006 <- read_sf("data/gullshapefiles/gulls2006")
+gullshape2006 <- st_transform(gullshape2006, "+init=epsg:4326") %>%
+  select(COMMENT, geometry) %>%
+  rename(flag = "COMMENT") %>%
+  mutate(flag = as.integer(flag)) %>%
+  mutate(year = 2006)
+##2005
+gullshape2005 <- read_sf("data/gullshapefiles/gulls2005")
+gullshape2005 <- st_transform(gullshape2005, "+init=epsg:4326") %>%
+  select(COMMENT, geometry) %>%
+  rename(flag = "COMMENT") %>%
+  mutate(flag = as.integer(flag)) %>%
+  mutate(year = 2005)
+##2004
+gullshape2004 <- read_sf("data/gullshapefiles/gulls2004")
+gullshape2004 <- st_transform(gullshape2004, "+init=epsg:4326") %>%
+  select(ID, geometry) %>%
+  rename(flag = "ID") %>%
+  mutate(flag = as.integer(flag)) %>%
+  mutate(year = 2004)
+##2003
+gullshape2003 <- read_sf("data/gullshapefiles/gulls2003")
+gullshape2003 <- st_transform(gullshape2003, "+init=epsg:4326") %>%
+  select(Comment, geometry) %>%
+  rename(flag = "Comment") %>%
+  mutate(flag = as.integer(flag)) %>%
+  mutate(year = 2003)
+##2002
+gullshape2002 <- read_sf("data/gullshapefiles/gulls2002")
+gullshape2002 <- st_transform(gullshape2002, "+init=epsg:4326") %>%
+  select(COMMENT, geometry) %>%
+  rename(flag = "COMMENT") %>%
+  mutate(flag = as.integer(flag)) %>%
+  mutate(year = 2002)
+##2001
+gullshape2001 <- read_sf("data/gullshapefiles/gulls2001")
+gullshape2001 <- st_transform(gullshape2001, "+init=epsg:4326") %>%
+  select(COMMENT, geometry) %>%
+  rename(flag = "COMMENT") %>%
+  mutate(flag = as.integer(flag)) %>%
+  mutate(year = 2001)
+##2000
+gullshape2000 <- read_sf("data/gullshapefiles/gulls2000")
+gullshape2000 <- st_transform(gullshape2000, "+init=epsg:4326") %>%
+  select(COMMENT, geometry) %>%
+  rename(flag = "COMMENT") %>%
+  mutate(flag = as.integer(flag)) %>%
+  mutate(year = 2000)
+##1999
+gullshape1999 <- read_sf("data/gullshapefiles/gulls_1999")
+gullshape1999 <- st_transform(gullshape1999, "+init=epsg:4326") %>%
+  select(COMMENT, geometry) %>%
+  rename(flag = "COMMENT") %>%
+  mutate(flag = as.integer(flag)) %>%
+  mutate(year = 1999)
+
+
+
+
+gullshapecombined <- rbind(gullshape2022, gullshape2021, gullshape2020, gullshape2019, gullshape2018, gullshape2017, gullshape2016, gullshape2015, gullshape2014, gullshape2013, gullshape2012, gullshape2011, gullshape2010, gullshape2009, gullshape2008, gullshape2007, gullshape2006, gullshape2005, gullshape2004, gullshape2003, gullshape2002, gullshape2001, gullshape2000, gullshape1999)
+```
+
+##Colony Animation 
+
+```{r echo=FALSE, fig.height=5, fig.width=5, creating-animation}
+animation.points.only <- ggplot(gullshapecombined) +
+  geom_sf(data = outline, fill = "#DBE9F5")+
+  geom_sf(data = gullshapecombined, color = "#00264D", aes(group = year), size = 2) +
+  coord_sf(ylim = c(44.140385, 44.145726), xlim = c(-68.25038, -68.242629), expand = FALSE) + 
+  transition_states(year,
+                    transition_length = .1,
+                    state_length = 20
+                    ) +
+  # enter_fade() +
+  # exit_fade() +
+  labs(
+    title = "Distribution of Nesting Gulls", 
+    subtitle = 'Year: {closest_state}') +
+  theme_bw() +
+  theme(axis.text = element_text(size = 15),
+        title = element_text(size = 20),
+        plot.subtitle = element_text(size = 18))
 
 ```
+
+```{r rendering-and-saving-animation, fig.alt="This animated map shows the changing distribution and location of herring gull nests at the south end sub colony on Great Duck Island. The y axis shows longtitude and the x axis shows lattitude. Herring gull nests are represented by dark blue points, and the outline of Great Duck is shown in light blue. This animation shows that gulls have not colonized the island in an even distribution, but rather in a series of clusters"}
+
+animate.save <- animate(animation.points.only, duration = 40, height = 1000, width = 1000)
+
+# anim_save(animate.save, filename = "colony_animation.gif")
+```
+
+##Density Graphs
+
+```{r importing-data}
+nest_density <- read_csv("data/density_habitat.csv") %>%
+  select(point_id:habitat)
+```
+```{r}
+nest_density %>%
+  filter(habitat %in% c("vegetation", "berm")) %>%
+  ggplot() +
+  geom_bar(aes(x = year, fill = habitat)) +
+  scale_fill_manual(values = c( "#9EC2FF", "#4259C3")) +
+  theme_bw()
+```
+
+
+```{r}
+se <- function(x) sd(x)/sqrt(length(x))
+
+nest_density %>%
+  filter(distance_rank == 1) %>%
+  group_by(year) %>%
+  summarise(median = median(distance), se = se(distance)) %>%
+  ggplot() +
+  geom_col(aes(x = year, y = median, group = year), fill = "#9EC2FF") +
+  geom_errorbar(aes(x = year, ymin = (median - se), ymax = (median + se)), size = 0.5, width = 0.5)
+
+#### ELEANOR I CAN"T FIGURE THIS OUT. GRUMBLE!
+nest_density %>%
+  filter(distance_rank == 1) %>%
+  filter(habitat %in% c("berm", "vegetation")) %>%
+  group_by(year, habitat) %>%
+  summarise(median = median(distance), se = se(distance)) %>%
+  ggplot() +
+  geom_col(aes(x = year, y = median, fill = habitat), position = "dodge") +
+  scale_fill_manual(values = c("#4259C3", "#9EC2FF")) +
+  geom_errorbar(aes(x = year, ymin = (median - se), ymax = (median + se)), size = 0.5, width = 0.5)
+
+```
+
 
 
 

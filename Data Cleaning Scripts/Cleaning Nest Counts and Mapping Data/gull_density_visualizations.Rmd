@@ -268,8 +268,12 @@ group_by(point_id, year, habitat) %>%
 density_habitat %>%
   filter(distance_rank == 1) %>%
   filter(distance <= 100) %>%
+  filter(habitat == "berm") %>%
   ggplot() +
   geom_boxplot(aes(x = year, y = `distance`))
 ```
 
+```{r}
+write.csv(density_habitat, "data/density_habitat.csv")
+```
 
