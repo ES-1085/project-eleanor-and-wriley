@@ -47,7 +47,8 @@ population_distribution_gulls %>%
                values_to = "total") %>%
   ggplot(aes(y = total, x = YEAR, fill = location)) +
   geom_col(position = "dodge") +
-   scale_fill_viridis(discrete = T) +
+  scale_fill_brewer(palette = "Dark2", direction = -1)
+   #scale_fill_viridis(discrete = T, direction = -1, ) +
   theme_bw()
 
 ```
