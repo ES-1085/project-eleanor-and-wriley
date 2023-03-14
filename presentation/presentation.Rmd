@@ -47,7 +47,7 @@ all.nest.count %>%
          y = "Number of Nests", 
          x = "Year")
 
-ggsave("total_herg_nests.jpeg", device = "jpeg", dpi = 700)
+ggsave("total_herg_nests.jpeg", device = "jpeg", dpi = 2500)
 ```
 
 ```{r fig.height=2, fig.width=5, fig.alt="A bar graph showing changes in the number of great black backed gulls nesting on Great Duck. The y axis shows the total number of nests, while the x axis shows the year. Black backed gulls are difficult to accurately count, so we are unsure of exactly how accurate this data is, but it seems to show that gbbgs peaked in the early 2010s, and have been nesting at lower levels since."}
