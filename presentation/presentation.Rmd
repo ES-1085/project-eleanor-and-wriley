@@ -169,9 +169,8 @@ population_distribution_gulls %>%
   theme_bw()
 
 ```
-
-```{r read-in-shapefiles}
 #This code is from the nest count spatial join doc, except I couldn't figure out how to write an sf file so I'm bringing it here for the animation below... Apologies for all the extra code....
+```{r read-in-shapefiles}
 outline <- read_sf("data/outlinecolored") 
 outline <- st_transform(outline, "+init=epsg:4326")
 
