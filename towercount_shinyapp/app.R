@@ -44,6 +44,31 @@ tower <- tower %>%
                          species == "scoter" ~ "Scoter sp.",
                          TRUE ~ as.character(species)))
 
+tower <- tower %>%
+  mutate(col = case_when(species == "herg" ~ "#440154",
+                           species == "gbbg" ~ "#414487",
+                           species == "blgu" ~ "#22a884",
+                           species == "coei_ad" ~ "#7ad151",
+                           species == "coei_ju" ~ "#280b53",
+                           species == "comu" ~ "#65156e",
+                           species == "razo" ~ "#9f2a63",
+                           species == "noga" ~ "#d44842",
+                           species == "puffin" ~ "#f57d15",
+                           species == "peepsp" ~ "#fac228",
+                           species == "ternsp" ~ "#febb81",
+                           species == "baea" ~ "#00265b",
+                           species == "colo" ~ "#7e7d78",
+                           species == "lagu" ~ "#c2b36c",
+                           species == "cago" ~ "#eed753",
+                           species == "shearwater" ~ "#35466b",
+                           species == "wisp" ~ "#c2df23",
+                           species == "raptor" ~ "#6300a7",
+                           species == "gbhe" ~ "#e76f5a",
+                           species == "dcco" ~ "#120d31",
+                           species == "lbbg" ~ "#e65d2f",
+                           species == "scoter" ~ "#fcae12",
+                           TRUE ~ as.character(species)))
+
 #make lists of years and species
 yearlist <- as.list(unique(tower$year))
 specieslist <- as.list(unique(tower$species))
@@ -207,6 +232,7 @@ server <- function(input, output) {
                         (if(input$barstat %in% c("Median", "Mean")){0.8} else {0}), size = 0.9, width = 0.3)+
         facet_wrap(~year)+
         labs(title = paste(input$barstat, "counts by species and year"), subtitle = "Great Duck Tower Data", caption = "Error bars represent standard error")+
+        ylab(input$barstat)+
         scale_fill_viridis_d()+
         theme_bw() +
         theme(strip.background = element_rect(fill = "#9CCAA8"), 
@@ -246,10 +272,11 @@ server <- function(input, output) {
         geom_errorbar(aes(x = year, ymin = (stat - se), ymax = (stat + se), group = species), alpha = 
                         (if(input$barstat %in% c("Median", "Mean")){0.8
                         } else {0}),
-                        size = 0.9, width = 0.3, position = position_dodge(width = 0.75, preserve = "single"))+
+                        size = 0.9, width = 0.3, position = position_dodge(width = 0.75, preserve = "single")) +
         labs(title= paste(input$barstat, "counts by species and year"), subtitle = "Great Duck Tower Data", caption = "error bars represent standard error")+
-        scale_fill_viridis_d()+
-        theme_bw()+
+        scale_fill_viridis_d() +
+        ylab(input$barstat) +
+        theme_bw() +
         theme(strip.background = element_rect(fill = "#9CCAA8"), 
               strip.text = element_text(size = 15), 
               title = element_text(size = 15))
@@ -276,6 +303,7 @@ server <- function(input, output) {
         labs(title = paste(input$barstat, "counts by species and year"), subtitle = "Great Duck Tower Data", caption = "Error Bars Represent Standard Error")+
         scale_color_viridis_d()+
         theme_bw()+
+        ylab(input$barstat) +
         theme(strip.background = element_rect(fill = "#9CCAA8"), 
               strip.text = element_text(size = 15), 
               title = element_text(size = 15))
@@ -333,6 +361,7 @@ server <- function(input, output) {
         labs(title = paste(input$barstat, "counts by species and year"), subtitle = "Great Duck Tower Data", caption = "error bars represent standard error")+
         scale_color_viridis_d()+
         theme_bw()+
+        ylab(input$barstat) +
         theme(strip.background = element_rect(fill = "#9CCAA8"), 
               strip.text = element_text(size = 15), 
               title = element_text(size = 15))
@@ -349,6 +378,7 @@ server <- function(input, output) {
         scale_color_viridis_d()+
         facet_wrap(~species, scales = "free") +
         theme_bw() +
+        ylab(input$barstat) +
         theme(strip.background = element_rect(fill = "#9CCAA8"), 
               strip.text = element_text(size = 15), 
               title = element_text(size = 15))
@@ -367,6 +397,7 @@ server <- function(input, output) {
             scale_fill_viridis_d()+
             facet_wrap(~species, scales = "free") +
             theme_bw() +
+            ylab(input$barstat) +
             theme(strip.background = element_rect(fill = "#9CCAA8"), 
                   strip.text = element_text(size = 15), 
                   title = element_text(size = 15))
@@ -384,6 +415,7 @@ server <- function(input, output) {
             scale_fill_viridis_d()+
             facet_wrap(~species, scales = "free") +
             theme_bw() +
+            ylab(input$barstat) +
             theme(strip.background = element_rect(fill = "#9CCAA8"), 
                   strip.text = element_text(size = 15), 
                   title = element_text(size = 15))
