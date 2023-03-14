@@ -57,12 +57,16 @@ The `towercount_shinyapp` folder contains necessary files for the Tower Count sh
 
 ## Summary of Findings
 
-### Tower Count
+Tower Count:
 
 Colony Dynamics: Our graphs show that while overall, the total number of gulls nesting on Great Duck has slightly increased, the distribution between different subcolonies has shifted considerably, with the Borofksy colony on the north end disappearing and the south end colony becoming the largest. We can also see that the distribution of nests in the south end colony has remained relatively evenly split between nesting on the rocky shoreline and the interior vegetation. The mean distance to nearest neighbor has decreased over the last 20 years, as has the overall variance in distance to nearest neighbor. We can also see that gulls consitently nest in a higher density on the berm. This raises a series of questions about how and why gulls are choosing to nest where they nest, and what it is about different habitats that facilitates different densities.
 
 
 ## Looking to the Future
+
+On a broad level, we hope for future years of data collection to be added to this project so that we can continue to visualize this long term data as new data is collected. We have tried to write our code in a way that makes it easy to pipe new data into. We will also create a series of documents outlining the ideal format for data to be recorded.
+
+This project has raised a series of questions that we think merit future work. In terms of tower count, we believe it is worth it to pay closer attention to Black Guillemots and try to assess potential causes of change and decline on GDI. We look forward to seeing any changes to the trends in nesting puffins, and visiting razorbills. In terms of the population distribution of gulls, our work raises questions about why and how gulls are choosing where to nest. Our hope is for future research to address these questions.
 
 
 ## Presentation
@@ -71,7 +75,7 @@ Our presentation can be found [here] (https://docs.google.com/presentation/d/1xe
 
 ## Data
 
-Our data came from the generations of students who conducted research at the Alice Eno Research Station on Great Duck Island, under the supervisior of Professor John Anderson at College of the Atlantic.
+Our data came from the generations of students who conducted research at the Alice Eno Research Station on Great Duck Island, under the supervision of Professor John Anderson at College of the Atlantic. None of this data is currently published, and was all accessed from the data archive on the Island Computer (the central storage location of all things GDI related)
 
 Include a citation for your data here. See
 <http://libraryguides.vu.edu.au/c.php?g=386501&p=4347840> for guidance
