@@ -33,7 +33,7 @@ library(visdat)
 all.nest.count <- read.csv("data/all.nest.count.csv")
 ```
 
-```{r fig.height=2, fig.width=4, fig.alt = "a bar graph showing the total number of nests on Great Duck Island from 1999 - 2022. The y axis shows the total number of nests, while the x axis represents year. There is a major outlier in 2010, but this was due to faulty data collection and is unlikely to actually be representative of overall changes. We can see that the overall population   increased from 1999 to 2015 from about 600 nests in 1999 to 1200 in 2015 (though note that there were about 900 in 2000). The population has been slowly decreasing since 2015"}
+```{r fig.height=2.5, fig.width=5, fig.alt = "A bar graph showing the total number of nests on Great Duck Island from 1999 - 2022. The y axis shows the total number of nests, while the x axis represents year. There is a major outlier in 2010, but this was due to faulty data collection and is unlikely to actually be representative of overall changes. We can see that the overall population   increased from 1999 to 2015 from about 600 nests in 1999 to 1200 in 2015 (though note that there were about 900 in 2000). The population has been slowly decreasing since 2015"}
 
 all.nest.count %>%
   group_by(year, species) %>%
@@ -42,10 +42,15 @@ all.nest.count %>%
   ggplot() +
   geom_col(aes(x = year, y = n), fill = "#9EC2FF") +
   theme_bw() +
-    labs(y = "Total Number of Nesting Gulls", x = "Year")
+    labs(title = "Total Number of Herring Gulls Nesting on Great Duck",
+         subtitle = "From 1999 to 2022",
+         y = "Number of Nests", 
+         x = "Year")
+
+ggsave("total_herg_nests.jpeg", device = "jpeg", dpi = 700)
 ```
 
-```{r fig.height=2, fig.width=5}
+```{r fig.height=2, fig.width=5, fig.alt="A bar graph showing changes in the number of great black backed gulls nesting on Great Duck. The y axis shows the total number of nests, while the x axis shows the year. Black backed gulls are difficult to accurately count, so we are unsure of exactly how accurate this data is, but it seems to show that gbbgs peaked in the early 2010s, and have been nesting at lower levels since."}
 all.nest.count %>%
   group_by(year, species) %>%
   count(species) %>%
@@ -53,9 +58,13 @@ all.nest.count %>%
   ggplot() +
   geom_col(aes(x = year, y = n), fill = "#9EC2FF") +
   theme_bw() +
-    labs(y = "Total Number of Nesting Great Black-backed Gulls", x = "Year")
+    labs(title = "Changes in Nesting Great Black-backed Gulls from 1999 to 2022",
+         y = "Number of Nests", 
+         x = "Year")
+
+ggsave("total_gbbg_nests.jpeg", device = "jpeg", dpi = 700)
 ```
-```{r fig.height=2, fig.width=5}
+```{r fig.height=2, fig.width=5, fig.alt="A bar graph showing changes in the number of common eiders nesting on Great Duck. The y axis shows the total number of nests, while the x axis shows the year. Common eiders are very cryptic nesters and are difficult to accurately count, so we are unsure of exactly how accurate this data is, but it seems to show that the number of eiders have been steadily rising"}
 all.nest.count %>%
   group_by(year, species) %>%
   count(species) %>%
@@ -63,7 +72,11 @@ all.nest.count %>%
   ggplot() +
   geom_col(aes(x = year, y = n), fill = "#9EC2FF") +
   theme_bw() +
-    labs(y = "Total Number of Nesting Common Eiders", x = "Year")
+    labs(title = "Changes in Nesting Common Eiders from 1999 to 2022",
+         y = "Number of Nests", 
+         x = "Year")
+
+ggsave("total_coei_nests.jpeg", device = "jpeg", dpi = 700)
 ```
 ```{r cleaning-population-distribution}
 population_distribution_gulls <- read_xlsx(str_c("data/gull_pop_distribution_2022.xlsx")) 
@@ -98,6 +111,8 @@ population_distribution_gulls_cleaned %>%
        x = "Year",
        fill = "Location")
 
+ggsave("proportion_subcolonies.jpeg", device = "jpeg", dpi = 500)
+
 ```
 
 
@@ -111,7 +126,7 @@ population_distribution_gulls %>%
                values_to = "total") %>%
   ggplot(aes(y = total, x = YEAR, fill = location)) +
   geom_col(position = "dodge", width = 1, color = "white") +
-   scale_fill_viridis(discrete = T) +
+  scale_fill_manual(values = c("#9EC2FF", "#4259C3","#00264D")) +
   labs(title = "Distribution of Nests within the South End Colony") +
   theme_bw()
 ```
@@ -344,7 +359,7 @@ animation.points.only <- ggplot(gullshapecombined) +
   geom_sf(data = outline, aes(fill = ID)) +
   geom_sf(data = gullshapecombined, color = "#00264D", aes(group = year), size = 2) +
   coord_sf(ylim = c(44.140385, 44.145726), xlim = c(-68.25038, -68.242629), expand = FALSE) + 
-  scale_fill_manual(values = c("#DBE9F5", "#9EC2FF"))
+  scale_fill_manual(values = c("#DBE9F5", "#DBE9F5", "#BDD5E7")) +
   transition_states(year,
                     transition_length = .1,
                     state_length = 20
@@ -365,7 +380,7 @@ animation.points.only <- ggplot(gullshapecombined) +
 
 animate.save <- animate(animation.points.only, duration = 40, height = 1000, width = 1000)
 
-# anim_save(animate.save, filename = "colony_animation.gif")
+anim_save(animate.save, filename = "colony_animation.filled.gif")
 ```
 
 ##Density Graphs
@@ -375,37 +390,61 @@ nest_density <- read_csv("data/density_habitat.csv") %>%
   select(point_id:habitat)
 ```
 
-```{r}
+```{r fig.alt="Bar graph showing the number of herring gull nests in different habitats from 1999 to 2022. The x axis is representing the number of nests, while the y axis shows the year. The different habitats are represented by different colors. We can see that the proportion of gulls nesting on the rocky shoreline and in the vegetated meadow has stayed roughly the same over the last 24 years."}
 nest_density %>%
   filter(habitat %in% c("vegetation", "berm")) %>%
   ggplot() +
-  geom_bar(aes(x = year, fill = habitat)) +
+  geom_bar(aes(x = year, fill = habitat), position = "dodge") +
   scale_fill_manual(values = c( "#9EC2FF", "#4259C3")) +
-  theme_bw()
+  theme_bw() +
+  labs(title = "Number of Nesting Gulls at the South End",
+       subtitle = "Colored by Habitat",
+       y = "Number of Nests",
+       x = "Year",
+       fill = "Habitat")
+
+ggsave("proportion_nests_by_habitat.jpeg", device = "jpeg", dpi = 500)
 ```
 
 
-```{r}
+```{r fig.height=2.5, fig.width=4, fig.alt= "Bar graph showing changes in nesting density from 1999 to 2022 at the south end colony on Great Duck Island. Mean distance to nearest neighbor, measured in meters, is shown on the y axis while year is shown on the x axis. There seems to be a trend of mean distance decreasing through time, and the error is also decreasing through time"}
 se <- function(x) sd(x)/sqrt(length(x))
 
 nest_density %>%
   filter(distance_rank == 1) %>%
   group_by(year) %>%
-  summarise(median = median(distance), se = se(distance)) %>%
+  summarise(mean = mean(distance), se = se(distance)) %>%
   ggplot() +
-  geom_col(aes(x = year, y = median, group = year), fill = "#9EC2FF") +
-  geom_errorbar(aes(x = year, ymin = (median - se), ymax = (median + se)), size = 0.5, width = 0.5)
+  geom_col(aes(x = year, y = mean, group = year), fill = "#9EC2FF") +
+  geom_errorbar(aes(x = year, ymin = (mean - se), ymax = (mean + se)), size = 0.5, width = 0.5) +
+  labs(title = "Changes in Density of Nesting HERGs",
+       y = "Mean Distance to Nearest Neighbor (meters)",
+       x = "Year") +
+  theme_bw()
 
-#### ELEANOR I CAN"T FIGURE THIS OUT. GRUMBLE!
+ggsave("changes_in_density.jpeg", device = "jpeg", dpi = 500)
+```
+
+
+```{r fig.height=2, fig.width=4, fig.alt= "Same as previous graph, except that now habitat is differentiated by color. Bar graph showing changes in nesting density from 1999 to 2022 at the south end colony on Great Duck Island. Mean distance to nearest neighbor, represented in meters, is shown on the y axis while year is shown on the x axis. Error bars represent standard error. There seems to be a trend of mean distance decreasing through time, and the error is also decreasing through time"}
 nest_density %>%
   filter(distance_rank == 1) %>%
   filter(habitat %in% c("berm", "vegetation")) %>%
   group_by(year, habitat) %>%
-  summarise(median = median(distance), se = se(distance)) %>%
+  summarise(mean = mean(distance), se = se(distance)) %>%
   ggplot() +
-  geom_col(aes(x = year, y = median, fill = habitat), position = position_dodge(preserve = "single"), width = 0.75) +
+  geom_col(aes(x = year, y = mean, fill = habitat), position = position_dodge(preserve = "single"), width = 0.75) +
   scale_fill_manual(values = c("#4259C3", "#9EC2FF")) +
-  geom_errorbar(aes(x = year, ymin = (median - se), ymax = (median + se), group = habitat), size = 0.5, width = 0.5, position = position_dodge(preserve = "single", width = 0.75))
+  # scale_fill_manual(values = c("#459BB7", "#8ACCDC")) +
+  geom_errorbar(aes(x = year, ymin = (mean - se), ymax = (mean + se), group = habitat), size = 0.5, width = 0.5, position = position_dodge(preserve = "single", width = 0.75)) +
+  labs(title = "Changes in Density of Nesting HERGs",
+       subtitle = "By Habitat and Year",
+       y = "Mean Distance to Nearest Neighbor (meters)",
+       x = "Year",
+       fill = "Habitat") +
+  theme_bw()
+
+ggsave("changes_in_density_with_habitat.jpeg", device = "jpeg", dpi = 500)
 
 ```
 
