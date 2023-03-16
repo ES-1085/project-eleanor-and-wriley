@@ -53,7 +53,7 @@ Data on gull nest distributions across the island up until 2022.
 
 #gullshapefiles
 
-Shape files of the nesting distribution of gulls from 1999 to 2022. This is used to create the maps showing nest locations. Ideally there would just be one file, expect we couldn't figure out how to write an sf file. The code chunk labeled 'read-in-shapefiles' reads all of these in, them binds them into one data fram called `gullshapecombined`. In this combined file, there are three columns:
+Shape files of the nesting distribution of gulls from 1999 to 2022. This is used to create the maps showing nest locations. Ideally there would just be one file, expect we couldn't figure out how to write an sf file. The code chunk labeled 'read-in-shapefiles' reads all of these in, them binds them into one data frame called `gullshapecombined`. In this combined file, there are three columns:
 
 `year` : year of the nest
 `flag` : the unique flag of the nest

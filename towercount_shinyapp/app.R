@@ -19,6 +19,7 @@ tower <- read_csv("Data/towerclean.csv",
 #Format year column
 tower$year <- year(as.Date(as.character(tower$year), format = "%Y"))
 
+#Add common name labels
 tower <- tower %>%
   mutate(label = case_when(species == "herg" ~ "Herring Gulls",
                          species == "gbbg" ~ "Great Black-backed Gull",
@@ -44,6 +45,7 @@ tower <- tower %>%
                          species == "scoter" ~ "Scoter sp.",
                          TRUE ~ as.character(species)))
 
+#add species-fixed colors. Haven't done anything with this yet. 
 tower <- tower %>%
   mutate(col = case_when(species == "herg" ~ "#440154",
                            species == "gbbg" ~ "#414487",
@@ -74,7 +76,7 @@ yearlist <- as.list(unique(tower$year))
 specieslist <- as.list(unique(tower$species))
 labellist <- as.list(unique(tower$label))
 
-
+#fix one bafflingly incorrect date. 
 tower$date[tower$date == "2008-05-28"] <- "2018-05-28"
 
 #define standard error function
@@ -124,6 +126,7 @@ ui <- fluidPage(theme = shinytheme("flatly"),
 
 server <- function(input, output) {
 
+  #table for data download
   output$full <- renderDT({
     tower %>% 
       filter(species %in% input$speciesIn2) %>% 
@@ -135,7 +138,7 @@ server <- function(input, output) {
             }) %>% 
       select(date, year, species, count, notes)
       })
-  
+#download button--I want to figure out how to password protect this
   output$downloaddata <- downloadHandler(
     filename = function() {
       "shinyappdownload.csv"
@@ -153,7 +156,7 @@ server <- function(input, output) {
                    ), file, row.names = FALSE)
     })
   
-  
+  #data table
   output$summary <- renderDT({
     if (input$plottype == "counts within season"){
       tower %>%
@@ -197,6 +200,7 @@ server <- function(input, output) {
     }
   })
   
+  #warning texts
   output$text <- renderText({
     if (input$plottype %in% c("counts within season","lines faceted by species", "boxplots faceted by species")){
       print("NOTE: When this warning is shown, X and Y axes are not consistent between plots.")
@@ -211,6 +215,7 @@ server <- function(input, output) {
 
     }
   })
+  #main panel plot
   output$plot <- renderPlot({
      if (input$plottype == "barplot") {
         tower %>% 

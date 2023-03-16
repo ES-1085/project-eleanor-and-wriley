@@ -109,7 +109,7 @@ cleancolumns <- function(inputdataframe) {
 ```
 
 ```{r comment split function}
-##This function uses regex to extract numbers of birds from the "comment" column. There is one if/else pair for every species that should be extracted, and each species has a string of possible expressions used to refer to it. 
+##This function uses regex to extract numbers of birds from the "comment" column. There is one if/else pair for every species that should be extracted, and each species has a string of possible expressions used to refer to it. Those strings can be extended to account for new species nicknames, and additional if/else phrases can be added to add new species into the eventual clean datafile. 
 
 splitcomments <- function(inputdataframe) {
   #puffins
@@ -319,7 +319,7 @@ splitcomments <- function(inputdataframe) {
 
 ```{r select columns and pivot}
 
-#This function selects the columns organized by the functions above, then pivots them to create a long dataframe where species is a single column. 
+#This function selects the columns organized by the functions above, then pivots them to create a long dataframe where species is a single column. If new species are added to the splitcomments function, they must also be added to the list of columns athat are selected and pivoted in order to appear in the final dataframe. 
 
 selectcolumns <- function(inputdataframe) {
   r <- inputdataframe %>% 
@@ -379,6 +379,7 @@ tower_2002_clean$year = 2002
 ```{r 2003}
 tower_count_2003 <- read_excel("data/tower_count/tower_count_2003.xls")
 
+#where eider chicks and adults are recorded in the same column with dashes or parens or slashes to separate them, it is necessary to manually extract those numbers. 
 tower_count_2003 <- tower_count_2003 %>% 
   mutate(coei_ad = str_extract(Eider, "^(.+)/|^(.+)")) %>% 
   mutate(coei_ad = as.double(str_extract(coei_ad,"\\d*"))) %>%
@@ -535,7 +536,7 @@ tower_count_2017 <- read_excel("data/tower_count/tower_count_2017.xlsx") %>%
   mutate(coei_ad = str_extract(`COEI + chix`, "^(.+)[\\+]|\\d*")) %>% 
   mutate(coei_ad = as.double(str_extract(coei_ad,"\\d*"))) %>%
   mutate(coei_ju = str_extract(`COEI + chix`, "[\\+].*")) %>% 
-  mutate(coei_ju = as.double(str_extract(coei_ju, "\\d*$"))) %>% #I am a regex genuis now
+  mutate(coei_ju = as.double(str_extract(coei_ju, "\\d*$"))) %>% 
   select(-`COEI + chix`)
 
 tower_count_2017 <- cleancolumns(tower_count_2017)
@@ -593,6 +594,7 @@ tower_2022_clean <- selectcolumns(tower_count_2022)
 tower_2022_clean$year = 2022
 ```
 
+#add new code chunks as necessary for future years' data. 
 
 ```{r}
 #This binds all the years together. Can be updated to add new years. 
