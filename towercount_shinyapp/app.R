@@ -100,7 +100,8 @@ ui <- fluidPage(theme = shinytheme("flatly"),
     mainPanel(
       plotOutput("plot"),
       textOutput("text"),
-      DTOutput("summary")
+      DTOutput("summary"),
+      textOutput("contact")
     )
    )
   ),
@@ -427,6 +428,10 @@ server <- function(input, output) {
         }
     }
 }) #this one closes the renderPlot input
+  
+  output$contact <- renderText({
+    print("For more information about this app or the data it contains, contact Eleanor Gnam (egnam23@coa.edu) or Wriley Hodge (whodge24@coa.edu)")
+  })
 
 } #this one closes the server
 

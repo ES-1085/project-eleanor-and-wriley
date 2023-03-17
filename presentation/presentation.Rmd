@@ -3,11 +3,11 @@ title: "Exploring Long-Term Datasets from Great Duck Island"
 subtitle: ""
 author: "Wriley and Eleanor"
 institute: "College of the Atlantic"
-date: "`r Sys.Date()`"
+date: "17 March 2023"
 
 ---
 
-##This will be used to create figures used for our presentation. Alt text should be included here as well as in the Google Slides. 
+#This will be used to create figures used for our presentation. Alt text should be included here as well as in the Google Slides. 
 
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(echo = TRUE)
@@ -27,7 +27,7 @@ library(forcats)
 library(visdat)
 ```
 
-##Changes in the Gull Colony Distribution Over Time
+#Changes in the Gull Colony Distribution Over Time
 
 ```{r}
 all.nest.count <- read.csv("data/all.nest.count.csv")
@@ -64,6 +64,7 @@ all.nest.count %>%
 
 ggsave("total_gbbg_nests.jpeg", device = "jpeg", dpi = 700)
 ```
+
 ```{r fig.height=2, fig.width=5, fig.alt="A bar graph showing changes in the number of common eiders nesting on Great Duck. The y axis shows the total number of nests, while the x axis shows the year. Common eiders are very cryptic nesters and are difficult to accurately count, so we are unsure of exactly how accurate this data is, but it seems to show that the number of eiders have been steadily rising"}
 all.nest.count %>%
   group_by(year, species) %>%
@@ -169,7 +170,9 @@ population_distribution_gulls %>%
   theme_bw()
 
 ```
+
 #This code is from the nest count spatial join doc, except I couldn't figure out how to write an sf file so I'm bringing it here for the animation below... Apologies for all the extra code....
+
 ```{r read-in-shapefiles}
 outline <- read_sf("data/outlinecolored") 
 outline <- st_transform(outline, "+init=epsg:4326")
@@ -351,7 +354,7 @@ gullshape1999 <- st_transform(gullshape1999, "+init=epsg:4326") %>%
 gullshapecombined <- rbind(gullshape2022, gullshape2021, gullshape2020, gullshape2019, gullshape2018, gullshape2017, gullshape2016, gullshape2015, gullshape2014, gullshape2013, gullshape2012, gullshape2011, gullshape2010, gullshape2009, gullshape2008, gullshape2007, gullshape2006, gullshape2005, gullshape2004, gullshape2003, gullshape2002, gullshape2001, gullshape2000, gullshape1999)
 ```
 
-##Colony Animation 
+#Colony Animation 
 
 ```{r echo=FALSE, fig.height=5, fig.width=5, creating-animation}
 animation.points.only <- ggplot(gullshapecombined) +
@@ -382,7 +385,7 @@ animate.save <- animate(animation.points.only, duration = 40, height = 1000, wid
 anim_save(animate.save, filename = "colony_animation.filled.gif")
 ```
 
-##Density Graphs
+#Density Graphs
 
 ```{r importing-data}
 nest_density <- read_csv("data/density_habitat.csv") %>%
@@ -448,9 +451,7 @@ ggsave("changes_in_density_with_habitat.jpeg", device = "jpeg", dpi = 500)
 ```
 
 
-
-
-##Tower Count Data Visualizations
+#Tower Count Data Visualizations
 
 For additional exploration of tower count data, see Shiny App: https://udppk1-eleanor-gnam.shinyapps.io/towerDRAFT/\
 
@@ -531,7 +532,7 @@ tower %>%
 
 ```
 
-```{r echo = FALSE, gull-counts-vs-nest-numbers, fig.alt = "a line chart showing the change in median herring gull tower counts per year overlaid over a barplot showing the total number of herring gull nests in the south end colony per year. Median daily herring gull count is graphed on the left y axis, and the total number of nests in the south end colony is graphed on the right y axis. Year is graphed to the x axis. The vertexes on the line representing the median daily herring gull count for each year are given error bars that denote standard error.}
+```{r echo = FALSE, gull-counts-vs-nest-numbers, fig.alt = "a line chart showing the change in median herring gull tower counts per year overlaid over a barplot showing the total number of herring gull nests in the south end colony per year. Median daily herring gull count is graphed on the left y axis, and the total number of nests in the south end colony is graphed on the right y axis. Year is graphed to the x axis. The vertexes on the line representing the median daily herring gull count for each year are given error bars that denote standard error."}
 
 #still working on this one
 

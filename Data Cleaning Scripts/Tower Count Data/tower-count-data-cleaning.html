@@ -11,7 +11,7 @@
 
 <meta name="author" content="Eleanor and Wriley" />
 
-<meta name="date" content="2023-03-07" />
+<meta name="date" content="2023-03-16" />
 
 <title>tower count data cleaning</title>
 
@@ -352,7 +352,7 @@ display: none;
 
 <h1 class="title toc-ignore">tower count data cleaning</h1>
 <h4 class="author">Eleanor and Wriley</h4>
-<h4 class="date">2023-03-07</h4>
+<h4 class="date">16 March 2023</h4>
 
 </div>
 
@@ -368,6 +368,10 @@ dates &lt;- c(&quot;Date&quot;)
 puffins &lt;- c(&quot;ATPU&quot;,&quot;puffs&quot;,&quot;puffins&quot;,&quot;atpu&quot;)
 corms &lt;- c(&quot;DCCO&quot;,&quot;cormorants&quot;)
 
+
+#This function overwrites a variety of potential column names and replaces them with a standard name. It is not order dependent and can be used on dataframes with any number of columns and any variety of column names. It will leave columns that are not specified untouched. It can be appended as needed. 
+
+#One possible issue may arise if a dataframe has two columns that need to be combined into one. For example, a dataframe that has both a AMCR and a CORA column cannot be processed by this function--one column will be overwritten. If that is the case, I recommend adding those columns together before doing anything to process that dataframe.  
 cleancolumns &lt;- function(inputdataframe) {
   for (i in 1:length(colnames(inputdataframe))){
       if (colnames(inputdataframe)[i] %in% hergs) {
@@ -421,7 +425,7 @@ cleancolumns &lt;- function(inputdataframe) {
     } else if (colnames(inputdataframe)[i] %in% &quot;LAGU&quot;) {
       colnames(inputdataframe)[i] &lt;- &quot;lagu&quot;
       print(&quot;lagus&quot;)
-    } else if (colnames(inputdataframe)[i] %in% &quot;AMCR&quot;) {
+    } else if (colnames(inputdataframe)[i] %in% c(&quot;AMCR&quot;, &quot;CORA&quot;,&quot;crow&quot;,&quot;corvid&quot;)) {
       colnames(inputdataframe)[i] &lt;- &quot;corvid&quot;
       print(&quot;crows&quot;)
     } else if (colnames(inputdataframe)[i] %in% &quot;SPSA&quot;) {
@@ -432,7 +436,8 @@ cleancolumns &lt;- function(inputdataframe) {
   }
   return(inputdataframe)
 }</code></pre>
-<pre class="r"><code>#there is a way to update this so that it leaves existing columns alone. In short, there should be a way to tell it to loop through the column names in a dataframe and not create a new column if the column already exists. Probably an if_else statement.
+<pre class="r"><code>##This function uses regex to extract numbers of birds from the &quot;comment&quot; column. There is one if/else pair for every species that should be extracted, and each species has a string of possible expressions used to refer to it. Those strings can be extended to account for new species nicknames, and additional if/else phrases can be added to add new species into the eventual clean datafile. 
+
 splitcomments &lt;- function(inputdataframe) {
   #puffins
     if (&quot;puffin&quot; %in% colnames(inputdataframe)) {
@@ -635,7 +640,9 @@ splitcomments &lt;- function(inputdataframe) {
   }
  return(inputdataframe)
 }</code></pre>
-<pre class="r"><code>selectcolumns &lt;- function(inputdataframe) {
+<pre class="r"><code>#This function selects the columns organized by the functions above, then pivots them to create a long dataframe where species is a single column. If new species are added to the splitcomments function, they must also be added to the list of columns athat are selected and pivoted in order to appear in the final dataframe. 
+
+selectcolumns &lt;- function(inputdataframe) {
   r &lt;- inputdataframe %&gt;% 
     mutate(notes = other) %&gt;% 
     select(&quot;date&quot;,&quot;herg&quot;,&quot;gbbg&quot;,&quot;coei_ad&quot;,&quot;coei_ju&quot;,&quot;blgu&quot;,&quot;other&quot;,&quot;puffin&quot;,&quot;dcco&quot;,&quot;ternsp&quot;,&quot;razo&quot;,&quot;lagu&quot;,&quot;comu&quot;,&quot;baea&quot;,&quot;noga&quot;,&quot;corvid&quot;,&quot;peepsp&quot;,&quot;seals&quot;,&quot;colo&quot;,&quot;cago&quot;,&quot;porpoise&quot;,&quot;raptor&quot;,&quot;gbhe&quot;,&quot;scoter&quot;,&quot;shearwater&quot;,&quot;notes&quot;,&quot;wisp&quot;,&quot;lbbg&quot;) %&gt;% 
@@ -694,6 +701,7 @@ tower_2002_clean &lt;- tower_count_2002 %&gt;%
 <pre class="r"><code>tower_2002_clean$year = 2002</code></pre>
 <pre class="r"><code>tower_count_2003 &lt;- read_excel(&quot;data/tower_count/tower_count_2003.xls&quot;)
 
+#where eider chicks and adults are recorded in the same column with dashes or parens or slashes to separate them, it is necessary to manually extract those numbers. 
 tower_count_2003 &lt;- tower_count_2003 %&gt;% 
   mutate(coei_ad = str_extract(Eider, &quot;^(.+)/|^(.+)&quot;)) %&gt;% 
   mutate(coei_ad = as.double(str_extract(coei_ad,&quot;\\d*&quot;))) %&gt;%
@@ -891,7 +899,7 @@ tower_2016_clean$year = 2016</code></pre>
   mutate(coei_ad = str_extract(`COEI + chix`, &quot;^(.+)[\\+]|\\d*&quot;)) %&gt;% 
   mutate(coei_ad = as.double(str_extract(coei_ad,&quot;\\d*&quot;))) %&gt;%
   mutate(coei_ju = str_extract(`COEI + chix`, &quot;[\\+].*&quot;)) %&gt;% 
-  mutate(coei_ju = as.double(str_extract(coei_ju, &quot;\\d*$&quot;))) %&gt;% #I am a regex genuis now
+  mutate(coei_ju = as.double(str_extract(coei_ju, &quot;\\d*$&quot;))) %&gt;% 
   select(-`COEI + chix`)
 
 tower_count_2017 &lt;- cleancolumns(tower_count_2017)</code></pre>
@@ -952,11 +960,14 @@ tower_count_2022 &lt;- cleancolumns(tower_count_2022)
 tower_count_2022 &lt;- splitcomments(tower_count_2022)
 tower_2022_clean &lt;- selectcolumns(tower_count_2022)
 tower_2022_clean$year = 2022</code></pre>
-<pre class="r"><code>tower &lt;- rbind(tower_2000_clean,tower_2001_clean,tower_2002_clean,tower_2003_clean,tower_2005_clean,tower_2006_clean,tower_2007_clean,tower_2008_clean,tower_2009_clean,tower_2010_clean,tower_2011_clean,tower_2012_clean,tower_2013_clean,tower_2014_clean,tower_2015_clean, tower_2016_clean,tower_2017_clean,tower_2018_clean,tower_2019_clean, tower_2020_clean, tower_2021_clean, tower_2022_clean)
+<p>#add new code chunks as necessary for future years’ data.</p>
+<pre class="r"><code>#This binds all the years together. Can be updated to add new years. 
+tower &lt;- rbind(tower_2000_clean,tower_2001_clean,tower_2002_clean,tower_2003_clean,tower_2005_clean,tower_2006_clean,tower_2007_clean,tower_2008_clean,tower_2009_clean,tower_2010_clean,tower_2011_clean,tower_2012_clean,tower_2013_clean,tower_2014_clean,tower_2015_clean, tower_2016_clean,tower_2017_clean,tower_2018_clean,tower_2019_clean, tower_2020_clean, tower_2021_clean, tower_2022_clean)
 
 towertowrite &lt;- tower %&gt;% 
   mutate(count = ifelse(is.na(count), 0, count))
-           
+
+#Uncomment this line and specify a filepath to write a clean csv
 #write.csv(towertowrite, &quot;data/towerclean.csv&quot;)</code></pre>
 
 

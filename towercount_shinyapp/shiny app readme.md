@@ -1,5 +1,4 @@
 
-
 ##Data Dictionary
 
 ##towerclean
@@ -40,4 +39,4 @@
 
 To update the datafile used in the app, replace the csv file in the data file with a new csv file in the exact same format. If new species are added to be detected, they will automatically be added to the species list used to generate checkboxes, but they won't automatically be labeled with their common name, so that name must be added to the case_when string. 
 
-This app relies on unpublished and potentially sensitive data. Please be thoughtful before distributing this app.
+This app relies on unpublished and potentially sensitive data. Please be thoughtful before distributing this app. For more information, contact Eleanor Gnam (egnam23@coa.edu) or Wriley Hodge (whodge24@coa.edu).

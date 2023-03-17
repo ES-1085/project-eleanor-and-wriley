@@ -1,7 +1,7 @@
 ---
 title: "tower count data cleaning"
 author: "Eleanor and Wriley"
-date: "`r Sys.Date()`"
+date: "16 March 2023"
 output: html_document
 ---
 
@@ -602,7 +602,8 @@ tower <- rbind(tower_2000_clean,tower_2001_clean,tower_2002_clean,tower_2003_cle
 
 towertowrite <- tower %>% 
   mutate(count = ifelse(is.na(count), 0, count))
-           
+
+#Uncomment this line and specify a filepath to write a clean csv
 #write.csv(towertowrite, "data/towerclean.csv")
 ```
 

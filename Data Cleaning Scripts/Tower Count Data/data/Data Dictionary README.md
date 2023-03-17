@@ -6,7 +6,7 @@ The column headers and data organization varies based on year in these datafiles
 
 ##Cleaned Data File
 
-This file will write to whatever filepath is specified in the write_csv command. This should be a long, not wide, data frame with five columns:
+This file will write to whatever filepath is specified in the write_csv command. The default name is `towerclean.csv`. This should be a long, not wide, data frame with five columns:
 
 `date` : date of the observation
 `species` :species or grouped species that was observed

@@ -1,6 +1,8 @@
 Exploring Long-Term Datasets from Great Duck Island
 ================
-by Eleanor and Wriley
+by Eleanor Gnam and Wriley Hodge
+16 March 2023
+Prepared for Data Science 1: Visualization at College of the Atlantic
 
 ## Summary
 

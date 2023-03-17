@@ -1,7 +1,7 @@
 ---
 title: "nest_count_spatial_join.Rmd"
 author: "Wriley and Eleanor"
-date: "`r Sys.Date()`"
+date: "16 March 2023"
 output: html_document
 ---
 
@@ -228,9 +228,10 @@ animation.points.only <- ggplot(gullshapecombined) +
 ```
 
 ```{r}
-animate.save <- animate(animation.points.only, duration = 40)
+#animate.save <- animate(animation.points.only, duration = 40)
 
-anim_save(animate.save, filename = "gull1.gif")
+#Uncomment to write fresh animation gif
+#anim_save(animate.save, filename = "gull1.gif")
 ```
 ```{r}
 ggplot(outline) +
@@ -241,10 +242,10 @@ ggplot(outline) +
 
 ```{r density-test}
 
-gullshape2022.dt <- gullshape2022
-
-gullshape2022.dt$area <- sf::st_area(gullshape2022.dt$geometry)
-    gullshape2022.dt$density <- gullshape2022.dt$geometry / gullshape2022.dt$area
+# gullshape2022.dt <- gullshape2022
+# 
+# gullshape2022.dt$area <- sf::st_area(gullshape2022.dt$geometry)
+#     gullshape2022.dt$density <- gullshape2022.dt$geometry / gullshape2022.dt$area
 
 ```
 
@@ -364,7 +365,9 @@ all.nest.count %>%
     
   
 ```
+
 ```{r}
-write_csv(all.nest.count, "data/all.nest.count.csv")
+#uncomment to write fresh nest count csv
+#write_csv(all.nest.count, "data/all.nest.count.csv")
 ```
 
