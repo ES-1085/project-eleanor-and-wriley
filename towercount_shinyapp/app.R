@@ -93,7 +93,7 @@ ui <- fluidPage(theme = shinytheme("flatly"),
   sidebarLayout(
     sidebarPanel(
         pickerInput("yearIn", "Year:", choices = yearlist, options = list(`actions-box` = TRUE),multiple = TRUE, selected = c(2000:2022)),
-        selectInput("plottype","Plot Type", choices = c("barplot","boxplot","multi-year barplot","lines", "multi-year boxplots","counts within season", "lines faceted by species", "boxplots faceted by species", "counts by day of year"), selected = "lines faceted by species"),
+        selectInput("plottype","Plot Type", choices = c("barplot","boxplot","multi-year barplot","lines", "multi-year boxplots","counts within season", "lines faceted by species", "boxplots faceted by species", "counts by day of year", "scatterplot of counts"), selected = "lines faceted by species"),
         selectInput("barstat","Statistic to Use (won't affect boxplots)", choices = c("Median", "Mean", "High Count", "Season Total"), selected = "Median"),
         fluidRow(prettyCheckboxGroup("speciesIn", "Species", shape = "curve", animation = "jelly", choiceValues = specieslist, selected  = c("herg","gbbg","coei_ad","blgu"), choiceNames = labellist)
     )),
@@ -159,7 +159,7 @@ server <- function(input, output) {
   
   #data table
   output$summary <- renderDT({
-    if (input$plottype == "counts within season"){
+    if (input$plottype %in% c("counts within season", "scatterplot of counts")){
       tower %>%
         filter(species %in% input$speciesIn, year %in% input$yearIn) %>% 
         select(date, year, species, count, notes)
@@ -425,7 +425,22 @@ server <- function(input, output) {
             theme(strip.background = element_rect(fill = "#9CCAA8"), 
                   strip.text = element_text(size = 15), 
                   title = element_text(size = 15))
-        }
+        } 
+    } else if (input$plottype == "scatterplot of counts") {
+      tower %>% 
+        filter(year %in% input$yearIn) %>% 
+        filter(species %in% input$speciesIn) %>% 
+        mutate(year = as.factor(year)) %>% 
+        ggplot(aes(x = date, y = count, color = species))+
+        geom_jitter()+
+        geom_smooth()+
+        labs(title= "Counts throughout season", subtitle = "Great Duck Tower Data")+
+        scale_color_viridis_d() +
+        facet_wrap(~species, scales = "free")+
+        theme_bw()+
+        theme(strip.background = element_rect(fill = "#9CCAA8"), 
+              strip.text = element_text(size = 15), 
+              title = element_text(size = 15))
     }
 }) #this one closes the renderPlot input
   
