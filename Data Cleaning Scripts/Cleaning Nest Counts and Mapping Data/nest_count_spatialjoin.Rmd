@@ -344,6 +344,24 @@ all.nest.count <- rbind(nest_count_clean_2022,
 ```
 
 ```{r}
+nest_count_clean_2022 %>%
+  filter(species == "herg") %>%
+  count(clutch) %>%
+  filter(clutch%in%(0:5)) 
+
+nest_count_clean_2022 %>%
+  filter(species == "herg") %>%
+  filter(clutch%in%(1:8)) %>%
+  summarise(mean = mean(clutch))
+
+
+mean(nest)
+
+mean(nest_count_clean_2022$clutch)
+```
+
+
+```{r}
 all.nest.count %>%
   group_by(year, species) %>%
   count(species) %>%

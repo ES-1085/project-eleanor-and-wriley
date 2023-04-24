@@ -107,7 +107,8 @@ population_distribution_gulls_cleaned %>%
    # scale_fill_manual(values = c("#00264D", "#4259C3", "#9EC2FF")) +
   scale_fill_manual(values = c("#00264D", "#4259C3", "#9EC2FF")) +
   theme_bw() +
-  labs(y = "Total Number of Nesting Gulls", 
+  labs(title = "Changes in the Distribution of Nesting Herring Gulls on GDI",
+       y = "Total Number of Nesting Gulls", 
        x = "Year",
        fill = "Location")
 
@@ -392,12 +393,12 @@ nest_density <- read_csv("data/density_habitat.csv") %>%
 ```{r fig.alt="Bar graph showing the number of herring gull nests in different habitats from 1999 to 2022. The x axis is representing the number of nests, while the y axis shows the year. The different habitats are represented by different colors. We can see that the proportion of gulls nesting on the rocky shoreline and in the vegetated meadow has stayed roughly the same over the last 24 years."}
 nest_density %>%
   filter(habitat %in% c("vegetation", "berm")) %>%
+  filter(distance_rank == 1) %>%
   ggplot() +
-  geom_bar(aes(x = year, fill = habitat), position = "dodge") +
+  geom_bar(aes(x = year, fill = habitat), position = "dodge", color = "black") +
   scale_fill_manual(values = c( "#9EC2FF", "#4259C3")) +
   theme_bw() +
   labs(title = "Number of Nesting Gulls at the South End",
-       subtitle = "Colored by Habitat",
        y = "Number of Nests",
        x = "Year",
        fill = "Habitat")
@@ -432,8 +433,8 @@ nest_density %>%
   group_by(year, habitat) %>%
   summarise(mean = mean(distance), se = se(distance)) %>%
   ggplot() +
-  geom_col(aes(x = year, y = mean, fill = habitat), position = position_dodge(preserve = "single"), width = 0.75) +
-  scale_fill_manual(values = c("#4259C3", "#9EC2FF")) +
+  geom_col(aes(x = year, y = mean, fill = habitat), position = position_dodge(preserve = "single"), color = "black", width = 0.75) +
+  scale_fill_manual(values = c("#9EC2FF", "#4259C3")) +
   # scale_fill_manual(values = c("#459BB7", "#8ACCDC")) +
   geom_errorbar(aes(x = year, ymin = (mean - se), ymax = (mean + se), group = habitat), size = 0.5, width = 0.5, position = position_dodge(preserve = "single", width = 0.75)) +
   labs(title = "Changes in Density of Nesting HERGs",
