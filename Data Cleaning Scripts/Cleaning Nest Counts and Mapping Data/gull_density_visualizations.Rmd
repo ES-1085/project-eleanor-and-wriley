@@ -1,9 +1,11 @@
 ---
-title: "gull density visualizations"
+title: "Gull Density Visualizations"
 author: "Wriley Hodge"
 date: "2023-03-13"
 output: html_document
 ---
+
+#This is not a main project file. 
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)

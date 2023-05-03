@@ -9,11 +9,9 @@
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
-<meta name="author" content="Eleanor and Wriley" />
 
-<meta name="date" content="2023-03-16" />
 
-<title>tower count data cleaning</title>
+<title>Data-Dictionary-README</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -350,625 +348,59 @@ display: none;
 
 
 
-<h1 class="title toc-ignore">tower count data cleaning</h1>
-<h4 class="author">Eleanor and Wriley</h4>
-<h4 class="date">16 March 2023</h4>
 
 </div>
 
 
-<pre class="r"><code>#lists of possible columns names for our usual birds, add as new ones arise
-hergs &lt;- c(&quot;gulls&quot;,&quot;hegu&quot;,&quot;HERG&quot;,&quot;Gull&quot;,&quot;# gulls&quot;, &quot;HeGu&quot;,&quot;HerGull&quot;)
-gbbgs &lt;- c(&quot;bbgu&quot;,&quot;GBBG&quot;,&quot;BBGull&quot;)
-blgus &lt;- c(&quot;# squees&quot;, &quot;squees&quot;,&quot;BLGU&quot;,&quot;Guillem&quot;, &quot;BGUY&quot;, &quot;squee&quot;,&quot;SQUEE&quot;)
-coei_jus &lt;-c(&quot;chix&quot;,&quot;eider chicks&quot;, &quot;COEI ducklings&quot;, &quot;Eider Chicks&quot;,&quot;COEI chix&quot;,&quot;COEI  chix&quot;,&quot;EICHICK&quot;, &quot;coei chix&quot;)
-coei_ads &lt;- c(&quot;COEI&quot;,&quot;Eiders&quot;, &quot;# eiders&quot;, &quot;eider&quot;,&quot;eiders&quot;, &quot;coei&quot;)
-others &lt;- c(&quot;Other&quot;,&quot;notes&quot;,&quot;comments&quot;,&quot;others&quot;, &quot;Others&quot;, &quot;comment&quot;,&quot;Comments&quot;)
-dates &lt;- c(&quot;Date&quot;)
-puffins &lt;- c(&quot;ATPU&quot;,&quot;puffs&quot;,&quot;puffins&quot;,&quot;atpu&quot;)
-corms &lt;- c(&quot;DCCO&quot;,&quot;cormorants&quot;)
-
-
-#This function overwrites a variety of potential column names and replaces them with a standard name. It is not order dependent and can be used on dataframes with any number of columns and any variety of column names. It will leave columns that are not specified untouched. It can be appended as needed. 
-
-#One possible issue may arise if a dataframe has two columns that need to be combined into one. For example, a dataframe that has both a AMCR and a CORA column cannot be processed by this function--one column will be overwritten. If that is the case, I recommend adding those columns together before doing anything to process that dataframe.  
-cleancolumns &lt;- function(inputdataframe) {
-  for (i in 1:length(colnames(inputdataframe))){
-      if (colnames(inputdataframe)[i] %in% hergs) {
-        colnames(inputdataframe)[i] &lt;- &quot;herg&quot;
-        print(&quot;hergs&quot;)
-    } else if(colnames(inputdataframe)[i] %in% gbbgs) {
-        colnames(inputdataframe)[i] &lt;- &quot;gbbg&quot;
-        print(&quot;gbbgs&quot;)
-    } else if (colnames(inputdataframe)[i] %in% blgus) {
-      colnames(inputdataframe)[i] &lt;- &quot;blgu&quot;
-      print(&quot;blgus&quot;)
-    } else if (colnames(inputdataframe)[i] %in% coei_jus) {
-      colnames(inputdataframe)[i] &lt;- &quot;coei_ju&quot;
-      print(&quot;coei_jus&quot;)
-    } else if (colnames(inputdataframe)[i] %in% coei_ads) {
-      colnames(inputdataframe)[i] &lt;- &quot;coei_ad&quot;
-      print(&quot;coei_ads&quot;)
-    } else if (colnames(inputdataframe)[i] %in% others) {
-      colnames(inputdataframe)[i] &lt;- &quot;other&quot;
-      print(&quot;other&quot;)
-    } else if (colnames(inputdataframe)[i] %in% dates) {
-      colnames(inputdataframe)[i] &lt;- &quot;date&quot;
-      print(&quot;dates&quot;)
-    } else if (colnames(inputdataframe)[i] %in% puffins) {
-      colnames(inputdataframe)[i] &lt;- &quot;puffin&quot;
-      print(&quot;puffins&quot;)
-    } else if (colnames(inputdataframe)[i] %in% corms) {
-      colnames(inputdataframe)[i] &lt;- &quot;dcco&quot;
-      print(&quot;corms&quot;)
-    } else if (colnames(inputdataframe)[i] %in% &quot;COLO&quot;) {
-      colnames(inputdataframe)[i] &lt;- &quot;colo&quot;
-      print(&quot;loon&quot;)
-    } else if (colnames(inputdataframe)[i] %in% &quot;tern&quot;) {
-      colnames(inputdataframe)[i] &lt;- &quot;ternsp&quot;
-      print(&quot;terns&quot;)
-    } else if (colnames(inputdataframe)[i] %in% &quot;NOGA&quot;) {
-      colnames(inputdataframe)[i] &lt;- &quot;noga&quot;
-      print(&quot;gannets&quot;)
-    } else if (colnames(inputdataframe)[i] %in% &quot;BAEA&quot;) {
-      colnames(inputdataframe)[i] &lt;- &quot;baea&quot;
-      print(&quot;eagles&quot;)
-    } else if (colnames(inputdataframe)[i] %in% &quot;scoter&quot;) {
-      colnames(inputdataframe)[i] &lt;- &quot;scoter&quot;
-      print(&quot;scoter&quot;)
-    } else if (colnames(inputdataframe)[i] %in% &quot;seal&quot;) {
-      colnames(inputdataframe)[i] &lt;- &quot;seals&quot;
-      print(&quot;seals&quot;)
-    } else if (colnames(inputdataframe)[i] %in% &quot;RAZO&quot;) {
-      colnames(inputdataframe)[i] &lt;- &quot;razo&quot;
-      print(&quot;razos&quot;)
-    } else if (colnames(inputdataframe)[i] %in% &quot;LAGU&quot;) {
-      colnames(inputdataframe)[i] &lt;- &quot;lagu&quot;
-      print(&quot;lagus&quot;)
-    } else if (colnames(inputdataframe)[i] %in% c(&quot;AMCR&quot;, &quot;CORA&quot;,&quot;crow&quot;,&quot;corvid&quot;)) {
-      colnames(inputdataframe)[i] &lt;- &quot;corvid&quot;
-      print(&quot;crows&quot;)
-    } else if (colnames(inputdataframe)[i] %in% &quot;SPSA&quot;) {
-      colnames(inputdataframe)[i] &lt;- &quot;peepsp&quot;
-      print(&quot;peeps&quot;)
-    }
-      
-  }
-  return(inputdataframe)
-}</code></pre>
-<pre class="r"><code>##This function uses regex to extract numbers of birds from the &quot;comment&quot; column. There is one if/else pair for every species that should be extracted, and each species has a string of possible expressions used to refer to it. Those strings can be extended to account for new species nicknames, and additional if/else phrases can be added to add new species into the eventual clean datafile. 
-
-splitcomments &lt;- function(inputdataframe) {
-  #puffins
-    if (&quot;puffin&quot; %in% colnames(inputdataframe)) {
-        inputdataframe &lt;- inputdataframe %&gt;% 
-        mutate(puffin = puffin)
-  } else {
-        inputdataframe &lt;- inputdataframe %&gt;% 
-        mutate(puffin = str_extract(other, &quot;\\d*puff|\\d*.puff|\\d*atpu|\\d*.atpu|\\d*puffis|\\d*puffins|\\d*.puffins|\\d*.ATPU|\\d*.ALPU|\\d*.puffin|\\d*..ATPU&quot;)) %&gt;% 
-        mutate(puffin = as.double(str_extract(puffin, &quot;\\d*&quot;)))
-        
-  } 
-  if (&quot;dcco&quot; %in% colnames(inputdataframe)) {
-    #cormorants
-        inputdataframe &lt;- inputdataframe %&gt;% 
-        mutate(dcco = dcco)
-  } else {
-         inputdataframe &lt;- inputdataframe %&gt;% 
-         mutate(dcco = str_extract(other, &quot;\\d*corm|\\d*dcc|\\d*dcco|\\d*ddco|\\d*.DCCO|\\d*.DCC0|\\d*.commorants|\\d*.corm|\\d*.cormorants|d*..corm|\\d*.dcco&quot;)) %&gt;% 
-         mutate(dcco = as.double(str_extract(dcco, &quot;\\d*&quot;)))
-         
-  } 
-  if (&quot;ternsp&quot; %in% colnames(inputdataframe)) {
-    #terns
-        inputdataframe &lt;- inputdataframe %&gt;% 
-        mutate(ternsp = ternsp)
-  } else {
-         inputdataframe &lt;- inputdataframe %&gt;% 
-         mutate(ternsp = str_extract(other, &quot;\\d*cote|\\d*.terns|\\d*.COTE|\\d*.ARTE|\\d*.Terns|\\d*.Tern|\\d*.arte|\\d*.common tern|\\d*.common term&quot;)) %&gt;% 
-         mutate(ternsp = as.double(str_extract(ternsp, &quot;\\d*&quot;)))
-         
-  } 
-  if (&quot;razo&quot; %in% colnames(inputdataframe)) {
-    #razorbills
-        inputdataframe &lt;- inputdataframe %&gt;% 
-        mutate(razo = razo)
-  } else {
-         inputdataframe &lt;- inputdataframe %&gt;% 
-         mutate(razo = str_extract(other, &quot;\\d*razo|\\d*razor|\\d*.RAZO|\\d*.razorbills|\\d*.bills|\\d*.bill|\\d*.RAZ0|\\d*.RABI|\\d*.razo|\\d*razo&quot;)) %&gt;% 
-         mutate(razo = as.double(str_extract(razo, &quot;\\d*&quot;)))
-         
-  } 
-  if (&quot;lagu&quot; %in% colnames(inputdataframe)) {
-    #laughing gulls
-        inputdataframe &lt;- inputdataframe %&gt;% 
-        mutate(lagu = lagu)
-  } else {
-         inputdataframe &lt;- inputdataframe %&gt;% 
-         mutate(lagu = str_extract(other, &quot;\\d*lagu|\\d*.laughing|\\d*.LAGU|\\d*lagus|\\d*.laughing gull|\\d*.lagu|\\d*LAGU|\\d*.laughing gulls&quot;)) %&gt;% 
-         mutate(lagu = as.double(str_extract(lagu, &quot;\\d*&quot;)))
-         
-  } 
-  if (&quot;comu&quot; %in% colnames(inputdataframe)) {
-    #murres
-        inputdataframe &lt;- inputdataframe %&gt;% 
-        mutate(comu = comu)
-  } else {
-         inputdataframe &lt;- inputdataframe %&gt;% 
-         mutate(comu = str_extract(other, &quot;\\d*murre|\\d*.COMU|\\d*.common murre|\\d*.murre|\\d*.comu|\\d*.common murres|\\d*COMU&quot;)) %&gt;% 
-         mutate(comu = as.double(str_extract(comu, &quot;\\d*&quot;)))
-         
-  } 
-  if (&quot;baea&quot; %in% colnames(inputdataframe)) {
-    #bald eagle
-        inputdataframe &lt;- inputdataframe %&gt;% 
-        mutate(baea = baea)
-  } else {
-         inputdataframe &lt;- inputdataframe %&gt;% 
-         mutate(baea = str_extract(other, &quot;\\d*.imm|\\d*.BAEA|\\d*.eagle|\\d*.juv&quot;)) %&gt;% 
-         mutate(baea = as.double(str_extract(baea, &quot;\\d*&quot;)))
-         
-  } 
-  if (&quot;noga&quot; %in% colnames(inputdataframe)) {
-    #gannet
-        inputdataframe &lt;- inputdataframe %&gt;% 
-        mutate(noga = noga)
-  } else {
-         inputdataframe &lt;- inputdataframe %&gt;% 
-         mutate(noga = str_extract(other, &quot;\\d*.gannets|\\d*.NOGA|\\d*.gannet&quot;)) %&gt;% 
-         mutate(noga = as.double(str_extract(noga, &quot;\\d*&quot;)))
-         
-  } 
-  if (&quot;corvid&quot; %in% colnames(inputdataframe)) {
-    #corvid
-        inputdataframe &lt;- inputdataframe %&gt;% 
-        mutate(corvid = corvid)
-  } else {
-         inputdataframe &lt;- inputdataframe %&gt;% 
-         mutate(corvid = str_extract(other, &quot;\\d*.crow|\\d*.Corvid|\\d*.AMCR|\\d*.Corvids|\\d*.crows|\\d*crow|\\d*.CORA&quot;)) %&gt;% 
-         mutate(corvid = as.double(str_extract(corvid, &quot;\\d*&quot;)))
-         
-  } 
-  if (&quot;peepsp&quot; %in% colnames(inputdataframe)) {
-    #sandpipers
-        inputdataframe &lt;- inputdataframe %&gt;% 
-        mutate(peepsp = peepsp)
-  } else {
-         inputdataframe &lt;- inputdataframe %&gt;% 
-         mutate(peepsp = str_extract(other, &quot;\\d*.SPSA|\\d*.WHIM|\\d*..SPSA|\\d*.spotted sandpiper|\\d*.least sandpiper|\\d*.pipers|\\d*.common sandpipers|\\d*.piper|\\d*.red knots|\\d*.wimbrel|\\d*.spotted sandpipers|\\d*.sandpiper|\\d*.sandpipers|\\d*.RUTU|\\d*.SESA|d*.SBDO|\\d*.REPH|\\d*.LESA&quot;)) %&gt;% 
-         mutate(peepsp = as.double(str_extract(peepsp, &quot;\\d*&quot;)))
-         
-  } 
-  if (&quot;seals&quot; %in% colnames(inputdataframe)) {
-    #seals
-        inputdataframe &lt;- inputdataframe %&gt;% 
-        mutate(seals = seals)
-  } else {
-         inputdataframe &lt;- inputdataframe %&gt;% 
-         mutate(seals = str_extract(other, &quot;\\d*.Seal|\\d*.Seals|\\d*.Harbor|\\d*.Gray|\\d*.seals|\\d*.grey|\\d*.seal|\\d*.harbor|\\d*.gray|\\*.Grey|\\d*.Grey Seal|\\d*.Grey Seals|\\d*.harbor seal|\\d*.gray seal&quot;)) %&gt;% 
-         mutate(seals = as.double(str_extract(seals, &quot;\\d*&quot;)))
-         
-  } 
-  if (&quot;colo&quot; %in% colnames(inputdataframe)) {
-    #loon
-        inputdataframe &lt;- inputdataframe %&gt;% 
-        mutate(colo = colo)
-  } else {
-         inputdataframe &lt;- inputdataframe %&gt;% 
-         mutate(colo = str_extract(other, &quot;\\d*.COLO|\\d*.loon|\\d*.loons&quot;)) %&gt;% 
-         mutate(colo = as.double(str_extract(colo, &quot;\\d*&quot;)))
-         
-  } 
-  if (&quot;cago&quot; %in% colnames(inputdataframe)) {
-    #geese
-        inputdataframe &lt;- inputdataframe %&gt;% 
-        mutate(cago = cago)
-  } else {
-         inputdataframe &lt;- inputdataframe %&gt;% 
-         mutate(cago = str_extract(other, &quot;\\d*.CAGO|\\d*.goose|\\d*.canada goose|\\d*.canada geese&quot;)) %&gt;% 
-         mutate(cago = as.double(str_extract(cago, &quot;\\d*&quot;)))
-         
-  } 
-  if (&quot;porpoise&quot; %in% colnames(inputdataframe)) {
-    #porpoise
-        inputdataframe &lt;- inputdataframe %&gt;% 
-        mutate(porpoise = porpoise)
-  } else {
-         inputdataframe &lt;- inputdataframe %&gt;% 
-         mutate(porpoise = str_extract(other, &quot;\\d*.Harbor porpoise|\\d*.porpoise|\\d*.Porpoises|\\d*.porpoises&quot;)) %&gt;% 
-         mutate(porpoise = as.double(str_extract(porpoise, &quot;\\d*&quot;)))
-         
-  } 
-  if (&quot;raptor&quot; %in% colnames(inputdataframe)) {
-    #raptor
-        inputdataframe &lt;- inputdataframe %&gt;% 
-        mutate(raptor = raptor)
-  } else {
-         inputdataframe &lt;- inputdataframe %&gt;% 
-         mutate(raptor = str_extract(other, &quot;\\d*.tv|\\d*.peregrine|\\d*.PEFA|\\d*.MERL&quot;)) %&gt;% 
-         mutate(raptor = as.double(str_extract(raptor, &quot;\\d*&quot;)))
-         
-  } 
-  if (&quot;shearwater&quot; %in% colnames(inputdataframe)) {
-    #shearwater
-        inputdataframe &lt;- inputdataframe %&gt;% 
-        mutate(shearwater = shearwater)
-  } else {
-         inputdataframe &lt;- inputdataframe %&gt;% 
-         mutate(shearwater = str_extract(other, &quot;\\d*.shearwater|\\d*.GRSH|\\d*.GRSHE&quot;)) %&gt;% 
-         mutate(shearwater = as.double(str_extract(shearwater, &quot;\\d*&quot;)))
-         
-  } 
-  if (&quot;gbhe&quot; %in% colnames(inputdataframe)) {
-    #herons
-        inputdataframe &lt;- inputdataframe %&gt;% 
-        mutate(gbhe = gbhe)
-  } else {
-         inputdataframe &lt;- inputdataframe %&gt;% 
-         mutate(gbhe = str_extract(other, &quot;\\d*.heron|\\d*.GBHE|\\d*.great blue heron&quot;)) %&gt;% 
-         mutate(gbhe = as.double(str_extract(gbhe, &quot;\\d*&quot;)))
-         
-  } 
-  if (&quot;scoter&quot; %in% colnames(inputdataframe)) {
-    #scoter
-        inputdataframe &lt;- inputdataframe %&gt;% 
-        mutate(scoter = scoter)
-  } else {
-         inputdataframe &lt;- inputdataframe %&gt;% 
-         mutate(scoter = str_extract(other, &quot;\\d*.scoter|\\d*.Scoter|\\d*.BLSC|\\d*.surf scoter|\\d*.SUSC&quot;)) %&gt;% 
-         mutate(scoter = as.double(str_extract(scoter, &quot;\\d*&quot;)))
-         
-  } 
-  if (&quot;wisp&quot; %in% colnames(inputdataframe)) {
-    #Wilson&#39;s Storm-Petrel
-        inputdataframe &lt;- inputdataframe %&gt;% 
-        mutate(wisp = wisp)
-  } else {
-         inputdataframe &lt;- inputdataframe %&gt;% 
-         mutate(wisp = str_extract(other, &quot;\\d*.WISP&quot;)) %&gt;% 
-         mutate(wisp = as.double(str_extract(wisp, &quot;\\d*&quot;)))
-         
-  } 
-  if (&quot;lbbg&quot; %in% colnames(inputdataframe)) {
-    #LBBG
-        inputdataframe &lt;- inputdataframe %&gt;% 
-        mutate(lbbg = lbbg)
-  } else {
-         inputdataframe &lt;- inputdataframe %&gt;% 
-         mutate(lbbg = str_extract(other, &quot;\\d*.LBBG&quot;)) %&gt;% 
-         mutate(lbbg = as.double(str_extract(lbbg, &quot;\\d*&quot;)))
-  }
- return(inputdataframe)
-}</code></pre>
-<pre class="r"><code>#This function selects the columns organized by the functions above, then pivots them to create a long dataframe where species is a single column. If new species are added to the splitcomments function, they must also be added to the list of columns athat are selected and pivoted in order to appear in the final dataframe. 
-
-selectcolumns &lt;- function(inputdataframe) {
-  r &lt;- inputdataframe %&gt;% 
-    mutate(notes = other) %&gt;% 
-    select(&quot;date&quot;,&quot;herg&quot;,&quot;gbbg&quot;,&quot;coei_ad&quot;,&quot;coei_ju&quot;,&quot;blgu&quot;,&quot;other&quot;,&quot;puffin&quot;,&quot;dcco&quot;,&quot;ternsp&quot;,&quot;razo&quot;,&quot;lagu&quot;,&quot;comu&quot;,&quot;baea&quot;,&quot;noga&quot;,&quot;corvid&quot;,&quot;peepsp&quot;,&quot;seals&quot;,&quot;colo&quot;,&quot;cago&quot;,&quot;porpoise&quot;,&quot;raptor&quot;,&quot;gbhe&quot;,&quot;scoter&quot;,&quot;shearwater&quot;,&quot;notes&quot;,&quot;wisp&quot;,&quot;lbbg&quot;) %&gt;% 
-    mutate(herg = as.numeric(herg), gbbg = as.numeric(gbbg), coei_ad = as.double(coei_ad), coei_ju = as.double(coei_ju), blgu = as.double(blgu)) %&gt;% 
-    pivot_longer(cols = c(&quot;herg&quot;,&quot;gbbg&quot;,&quot;coei_ad&quot;,&quot;coei_ju&quot;,&quot;blgu&quot;,&quot;puffin&quot;,&quot;dcco&quot;,&quot;ternsp&quot;,&quot;razo&quot;,&quot;lagu&quot;,&quot;comu&quot;,&quot;baea&quot;,&quot;noga&quot;,&quot;corvid&quot;,&quot;peepsp&quot;,&quot;seals&quot;,&quot;colo&quot;,&quot;cago&quot;,&quot;porpoise&quot;,&quot;raptor&quot;, &quot;gbhe&quot;,&quot;scoter&quot;,&quot;shearwater&quot;,&quot;wisp&quot;,&quot;lbbg&quot;),
-                 names_to = &quot;species&quot;,
-                 values_to = &quot;count&quot;) %&gt;% 
-    select(date, species, count, notes)
-  return(r)
-}</code></pre>
-<pre class="r"><code>tower_count_2000 &lt;- read_excel(&quot;data/tower_count/tower_count_2000.XLS&quot;)
-tower_count_2000 &lt;- tower_count_2000[2:32,]
-tower_count_2000 &lt;- tower_count_2000 %&gt;%
-  mutate(coei_ju = as.double(str_extract(`# eiders`, &quot;(?&lt;=\\().*(?=\\))&quot;))) %&gt;% 
-  mutate(`# eiders` = as.double(str_extract(`# eiders`, &quot;\\d*&quot;))) %&gt;% 
-  mutate(gbbg = NA)</code></pre>
-<pre><code>## Warning in mask$eval_all_mutate(quo): NAs introduced by coercion</code></pre>
-<pre class="r"><code>tower_count_2000 &lt;- cleancolumns(tower_count_2000)</code></pre>
-<pre><code>## [1] &quot;blgus&quot;
-## [1] &quot;hergs&quot;
-## [1] &quot;coei_ads&quot;
-## [1] &quot;other&quot;</code></pre>
-<pre class="r"><code>tower_count_2000 &lt;- splitcomments(tower_count_2000)
-tower_2000_clean &lt;- selectcolumns(tower_count_2000)
-tower_2000_clean$year = 2000</code></pre>
-<pre class="r"><code>tower_count_2001 &lt;- read_excel(&quot;data/tower_count/tower_count_2001.xlsx&quot;, skip = 2)
-tower_count_2001 &lt;- tower_count_2001 %&gt;% 
-  mutate(GBBG = case_when(GBBG == &quot;-&quot; ~ &quot;NA&quot;,
-         TRUE ~ as.character(GBBG)))
-
-tower_count_2001 &lt;- cleancolumns(tower_count_2001)</code></pre>
-<pre><code>## [1] &quot;dates&quot;
-## [1] &quot;hergs&quot;
-## [1] &quot;gbbgs&quot;
-## [1] &quot;coei_ads&quot;
-## [1] &quot;coei_jus&quot;
-## [1] &quot;blgus&quot;
-## [1] &quot;other&quot;</code></pre>
-<pre class="r"><code>tower_count_2001 &lt;- splitcomments(tower_count_2001)
-tower_2001_clean &lt;- selectcolumns(tower_count_2001)</code></pre>
-<pre><code>## Warning in mask$eval_all_mutate(quo): NAs introduced by coercion</code></pre>
-<pre class="r"><code>tower_2001_clean$year = 2001</code></pre>
-<pre class="r"><code>tower_count_2002 &lt;- read_excel(&quot;data/tower_count/tower_count_2002.xlsx&quot;, skip = 2)
-
-tower_2002_clean &lt;- tower_count_2002 %&gt;% 
-  cleancolumns() %&gt;% 
-  splitcomments() %&gt;% 
-  selectcolumns()</code></pre>
-<pre><code>## [1] &quot;dates&quot;
-## [1] &quot;hergs&quot;
-## [1] &quot;gbbgs&quot;
-## [1] &quot;coei_ads&quot;
-## [1] &quot;coei_jus&quot;
-## [1] &quot;blgus&quot;
-## [1] &quot;other&quot;</code></pre>
-<pre class="r"><code>tower_2002_clean$year = 2002</code></pre>
-<pre class="r"><code>tower_count_2003 &lt;- read_excel(&quot;data/tower_count/tower_count_2003.xls&quot;)
-
-#where eider chicks and adults are recorded in the same column with dashes or parens or slashes to separate them, it is necessary to manually extract those numbers. 
-tower_count_2003 &lt;- tower_count_2003 %&gt;% 
-  mutate(coei_ad = str_extract(Eider, &quot;^(.+)/|^(.+)&quot;)) %&gt;% 
-  mutate(coei_ad = as.double(str_extract(coei_ad,&quot;\\d*&quot;))) %&gt;%
-  mutate(coei_ju = str_extract(Eider, &quot;\\/.*&quot;)) %&gt;% 
-  mutate(coei_ju = as.double(str_extract(coei_ju, &quot;\\d*$&quot;)))
-
-tower_count_2003 &lt;- cleancolumns(tower_count_2003)</code></pre>
-<pre><code>## [1] &quot;dates&quot;
-## [1] &quot;hergs&quot;
-## [1] &quot;gbbgs&quot;
-## [1] &quot;blgus&quot;
-## [1] &quot;other&quot;</code></pre>
-<pre class="r"><code>tower_count_2003 &lt;- splitcomments(tower_count_2003)
-tower_2003_clean &lt;- selectcolumns(tower_count_2003)</code></pre>
-<pre><code>## Warning in mask$eval_all_mutate(quo): NAs introduced by coercion</code></pre>
-<pre class="r"><code>tower_2003_clean$year = 2003</code></pre>
-<pre class="r"><code>tower_count_2005 &lt;- read_excel(&quot;data/tower_count/tower_count_2005.xls&quot;)
-
-tower_count_2005 &lt;- tower_count_2005 %&gt;% 
-  mutate(other = NA)
-
-tower_count_2005 &lt;- cleancolumns(tower_count_2005)</code></pre>
-<pre><code>## [1] &quot;dates&quot;
-## [1] &quot;hergs&quot;
-## [1] &quot;gbbgs&quot;
-## [1] &quot;blgus&quot;
-## [1] &quot;coei_ads&quot;
-## [1] &quot;coei_jus&quot;</code></pre>
-<pre class="r"><code>tower_count_2005 &lt;- splitcomments(tower_count_2005)
-tower_2005_clean &lt;- selectcolumns(tower_count_2005)
-tower_2005_clean$year = 2005</code></pre>
-<pre class="r"><code>tower_count_2006 &lt;- read_excel(&quot;data/tower_count/tower_count_2006.xls&quot;)
-
-tower_count_2006 &lt;- cleancolumns(tower_count_2006)</code></pre>
-<pre><code>## [1] &quot;hergs&quot;
-## [1] &quot;gbbgs&quot;
-## [1] &quot;coei_ads&quot;
-## [1] &quot;blgus&quot;</code></pre>
-<pre class="r"><code>tower_count_2006 &lt;- splitcomments(tower_count_2006)
-tower_count_2006 &lt;- tower_count_2006 %&gt;% 
-  mutate(coei_ju = as.double(str_extract(other, &quot;\\d*eiderchix&quot;)))</code></pre>
-<pre><code>## Warning in mask$eval_all_mutate(quo): NAs introduced by coercion</code></pre>
-<pre class="r"><code>tower_2006_clean &lt;- selectcolumns(tower_count_2006)
-tower_2006_clean$year = 2006</code></pre>
-<pre class="r"><code>tower_count_2007 &lt;- read_excel(&quot;data/tower_count/tower_count_2007.xls&quot;)
-
-tower_count_2007 &lt;- cleancolumns(tower_count_2007)</code></pre>
-<pre><code>## [1] &quot;gbbgs&quot;
-## [1] &quot;blgus&quot;
-## [1] &quot;coei_ads&quot;
-## [1] &quot;coei_jus&quot;
-## [1] &quot;other&quot;</code></pre>
-<pre class="r"><code>tower_count_2007 &lt;- splitcomments(tower_count_2007)
-tower_2007_clean &lt;- selectcolumns(tower_count_2007)
-tower_2007_clean$year = 2007</code></pre>
-<pre class="r"><code>tower_count_2008 &lt;- read_excel(&quot;data/tower_count/tower_count_2008.xlsx&quot;, skip = 2)
-
-tower_count_2008 &lt;- cleancolumns(tower_count_2008)</code></pre>
-<pre><code>## [1] &quot;dates&quot;
-## [1] &quot;hergs&quot;
-## [1] &quot;gbbgs&quot;
-## [1] &quot;blgus&quot;
-## [1] &quot;coei_ads&quot;
-## [1] &quot;coei_jus&quot;</code></pre>
-<pre class="r"><code>tower_count_2008 &lt;- splitcomments(tower_count_2008)
-tower_2008_clean &lt;- selectcolumns(tower_count_2008)
-tower_2008_clean$year = 2008</code></pre>
-<pre class="r"><code>tower_count_2009 &lt;- read_excel(&quot;data/tower_count/tower_count_2009.xlsx&quot;, skip = 2)
-
-tower_count_2009 &lt;- cleancolumns(tower_count_2009)</code></pre>
-<pre><code>## [1] &quot;dates&quot;
-## [1] &quot;hergs&quot;
-## [1] &quot;gbbgs&quot;
-## [1] &quot;blgus&quot;
-## [1] &quot;coei_ads&quot;
-## [1] &quot;coei_jus&quot;</code></pre>
-<pre class="r"><code>tower_count_2009 &lt;- splitcomments(tower_count_2009)
-tower_2009_clean &lt;- selectcolumns(tower_count_2009)
-tower_2009_clean$year = 2009</code></pre>
-<pre class="r"><code>tower_count_2010 &lt;- read_excel(&quot;data/tower_count/tower_count_2010.xlsx&quot;,skip = 2)
-
-tower_2010_clean &lt;- tower_count_2010 %&gt;% 
-  cleancolumns() %&gt;% 
-  splitcomments() %&gt;% 
-  selectcolumns()</code></pre>
-<pre><code>## [1] &quot;dates&quot;
-## [1] &quot;gbbgs&quot;
-## [1] &quot;hergs&quot;
-## [1] &quot;coei_ads&quot;
-## [1] &quot;coei_jus&quot;
-## [1] &quot;blgus&quot;</code></pre>
-<pre><code>## Warning in mask$eval_all_mutate(quo): NAs introduced by coercion</code></pre>
-<pre class="r"><code>tower_2010_clean$year = 2010</code></pre>
-<pre class="r"><code>tower_count_2011 &lt;- read_excel(&quot;data/tower_count/tower_count_2011.xls&quot;, skip = 2)
-tower_count_2011 &lt;- tower_count_2011[1:47,]
-tower_count_2011 &lt;- tower_count_2011 %&gt;% 
-  mutate(year = &quot;2011&quot;) %&gt;% 
-  mutate(day = str_sub(Date, start = 1, end = 2)) %&gt;% 
-  mutate(monthch = str_sub(Date, start = 3,)) %&gt;% 
-  mutate(month = case_when(monthch %in% &quot;June&quot; ~ &quot;6&quot;,
-                           monthch %in% &quot; June&quot; ~ &quot;6&quot;,
-                           monthch %in% &quot; July&quot; ~ &quot;7&quot;,
-                           monthch %in% &quot; August&quot; ~ &quot;8&quot;,
-                           monthch %in% &quot;July&quot; ~ &quot;7&quot;,
-                           monthch %in% &quot;August&quot; ~ &quot;8&quot;,
-                           TRUE ~ &quot;&quot;
-                           )) %&gt;% 
-  select(-Comments)
-
-tower_count_2011 &lt;- cleancolumns(tower_count_2011)</code></pre>
-<pre><code>## [1] &quot;dates&quot;
-## [1] &quot;hergs&quot;
-## [1] &quot;gbbgs&quot;
-## [1] &quot;blgus&quot;
-## [1] &quot;coei_ads&quot;
-## [1] &quot;puffins&quot;
-## [1] &quot;coei_jus&quot;
-## [1] &quot;other&quot;</code></pre>
-<pre class="r"><code>tower_count_2011 &lt;- splitcomments(tower_count_2011)
-tower_2011_clean &lt;- selectcolumns(tower_count_2011)
-tower_2011_clean$year = 2011</code></pre>
-<pre class="r"><code>tower_count_2012 &lt;- read_excel(&quot;data/tower_count/tower_count_2012.xls&quot;, skip = 2) 
-
-tower_count_2012 &lt;- cleancolumns(tower_count_2012)</code></pre>
-<pre><code>## [1] &quot;dates&quot;
-## [1] &quot;hergs&quot;
-## [1] &quot;gbbgs&quot;
-## [1] &quot;blgus&quot;
-## [1] &quot;coei_ads&quot;
-## [1] &quot;coei_jus&quot;
-## [1] &quot;puffins&quot;
-## [1] &quot;razos&quot;
-## [1] &quot;corms&quot;
-## [1] &quot;crows&quot;
-## [1] &quot;loon&quot;
-## [1] &quot;gannets&quot;
-## [1] &quot;eagles&quot;
-## [1] &quot;lagus&quot;
-## [1] &quot;peeps&quot;
-## [1] &quot;other&quot;</code></pre>
-<pre class="r"><code>tower_count_2012 &lt;- splitcomments(tower_count_2012)
-tower_2012_clean &lt;- selectcolumns(tower_count_2012)
-tower_2012_clean$year = 2012</code></pre>
-<pre class="r"><code> tower_count_2013 &lt;- read_excel(&quot;data/tower_count/tower_count_2013.xls&quot;) 
-
-tower_count_2013 &lt;- cleancolumns(tower_count_2013)</code></pre>
-<pre><code>## [1] &quot;dates&quot;
-## [1] &quot;hergs&quot;
-## [1] &quot;gbbgs&quot;
-## [1] &quot;blgus&quot;
-## [1] &quot;coei_ads&quot;
-## [1] &quot;coei_jus&quot;
-## [1] &quot;puffins&quot;
-## [1] &quot;corms&quot;
-## [1] &quot;loon&quot;
-## [1] &quot;terns&quot;
-## [1] &quot;gannets&quot;
-## [1] &quot;eagles&quot;
-## [1] &quot;scoter&quot;
-## [1] &quot;seals&quot;
-## [1] &quot;razos&quot;
-## [1] &quot;lagus&quot;</code></pre>
-<pre class="r"><code>tower_count_2013 &lt;- splitcomments(tower_count_2013)
-tower_2013_clean &lt;- selectcolumns(tower_count_2013)
-tower_2013_clean$year = 2013</code></pre>
-<pre class="r"><code>tower_count_2014 &lt;- read_excel(&quot;data/tower_count/tower_count_2014.xlsx&quot;)
-#thank god a normal one
-
-tower_count_2014 &lt;- cleancolumns(tower_count_2014)</code></pre>
-<pre><code>## [1] &quot;blgus&quot;
-## [1] &quot;coei_ads&quot;
-## [1] &quot;coei_jus&quot;</code></pre>
-<pre class="r"><code>tower_count_2014 &lt;- splitcomments(tower_count_2014)
-tower_2014_clean &lt;- selectcolumns(tower_count_2014)
-tower_2014_clean$year = 2014</code></pre>
-<pre class="r"><code>tower_count_2015 &lt;- read_excel(&quot;data/tower_count/tower_count_2015.xlsx&quot;)
-
-tower_count_2015 &lt;- cleancolumns(tower_count_2015)</code></pre>
-<pre><code>## [1] &quot;blgus&quot;
-## [1] &quot;coei_ads&quot;
-## [1] &quot;coei_jus&quot;</code></pre>
-<pre class="r"><code>tower_count_2015 &lt;- splitcomments(tower_count_2015)
-tower_2015_clean &lt;- selectcolumns(tower_count_2015)
-tower_2015_clean$year = 2015</code></pre>
-<pre class="r"><code>tower_count_2016 &lt;- read_excel(&quot;data/tower_count/tower_count_2016.xlsx&quot;)
-
-tower_count_2016 &lt;- cleancolumns(tower_count_2016)</code></pre>
-<pre><code>## [1] &quot;blgus&quot;
-## [1] &quot;coei_ads&quot;
-## [1] &quot;coei_jus&quot;</code></pre>
-<pre class="r"><code>tower_count_2016 &lt;- splitcomments(tower_count_2016)
-tower_2016_clean &lt;- selectcolumns(tower_count_2016)
-tower_2016_clean$year = 2016</code></pre>
-<pre class="r"><code>tower_count_2017 &lt;- read_excel(&quot;data/tower_count/tower_count_2017.xlsx&quot;) %&gt;% 
-  mutate(coei_ad = str_extract(`COEI + chix`, &quot;^(.+)[\\+]|\\d*&quot;)) %&gt;% 
-  mutate(coei_ad = as.double(str_extract(coei_ad,&quot;\\d*&quot;))) %&gt;%
-  mutate(coei_ju = str_extract(`COEI + chix`, &quot;[\\+].*&quot;)) %&gt;% 
-  mutate(coei_ju = as.double(str_extract(coei_ju, &quot;\\d*$&quot;))) %&gt;% 
-  select(-`COEI + chix`)
-
-tower_count_2017 &lt;- cleancolumns(tower_count_2017)</code></pre>
-<pre><code>## [1] &quot;dates&quot;
-## [1] &quot;hergs&quot;
-## [1] &quot;gbbgs&quot;
-## [1] &quot;blgus&quot;
-## [1] &quot;other&quot;</code></pre>
-<pre class="r"><code>tower_count_2017 &lt;- splitcomments(tower_count_2017)
-tower_2017_clean &lt;- selectcolumns(tower_count_2017)
-tower_2017_clean$year = 2017</code></pre>
-<pre class="r"><code>tower_count_2018 &lt;- read_excel(&quot;data/tower_count/tower_count_2018.xlsx&quot;)
-
-tower_count_2018 &lt;- cleancolumns(tower_count_2018)</code></pre>
-<pre><code>## [1] &quot;dates&quot;
-## [1] &quot;hergs&quot;
-## [1] &quot;gbbgs&quot;
-## [1] &quot;coei_ads&quot;
-## [1] &quot;coei_jus&quot;
-## [1] &quot;blgus&quot;
-## [1] &quot;other&quot;</code></pre>
-<pre class="r"><code>tower_count_2018 &lt;- splitcomments(tower_count_2018)
-tower_2018_clean &lt;- selectcolumns(tower_count_2018)
-tower_2018_clean$date[tower_2018_clean$date == &quot;2008-05-28&quot;] &lt;- &quot;2018-05-28&quot;
-tower_2018_clean$year = 2018</code></pre>
-<pre class="r"><code>tower_count_2019 &lt;- read_excel(&quot;data/tower_count/tower_count_2019.xlsx&quot;)
-
-tower_count_2019 &lt;- cleancolumns(tower_count_2019)</code></pre>
-<pre><code>## [1] &quot;dates&quot;
-## [1] &quot;hergs&quot;
-## [1] &quot;gbbgs&quot;
-## [1] &quot;coei_ads&quot;
-## [1] &quot;coei_jus&quot;
-## [1] &quot;blgus&quot;
-## [1] &quot;other&quot;</code></pre>
-<pre class="r"><code>tower_count_2019 &lt;- splitcomments(tower_count_2019)
-tower_2019_clean &lt;- selectcolumns(tower_count_2019)
-tower_2019_clean$year = 2019</code></pre>
-<pre class="r"><code>tower_count_2020 &lt;- read_excel(&quot;data/tower_count/tower_count_2020.xlsx&quot;)
-
-tower_count_2020 &lt;- cleancolumns(tower_count_2020)</code></pre>
-<pre><code>## [1] &quot;dates&quot;</code></pre>
-<pre class="r"><code>tower_count_2020 &lt;- splitcomments(tower_count_2020)
-tower_2020_clean &lt;- selectcolumns(tower_count_2020)
-tower_2020_clean$year = 2020</code></pre>
-<pre class="r"><code>tower_count_2021 &lt;- read_excel(&quot;data/tower_count/tower_count_2021.xlsx&quot;)
-
-tower_count_2021 &lt;- cleancolumns(tower_count_2021)</code></pre>
-<pre><code>## [1] &quot;coei_ads&quot;
-## [1] &quot;coei_jus&quot;
-## [1] &quot;blgus&quot;</code></pre>
-<pre class="r"><code>tower_count_2021 &lt;- splitcomments(tower_count_2021)
-tower_2021_clean &lt;- selectcolumns(tower_count_2021)
-tower_2021_clean$year = 2021</code></pre>
-<pre class="r"><code>tower_count_2022 &lt;- read_excel(&quot;data/tower_count/tower_count_2022.xlsx&quot;)
-
-tower_count_2022 &lt;- cleancolumns(tower_count_2022)
-tower_count_2022 &lt;- splitcomments(tower_count_2022)
-tower_2022_clean &lt;- selectcolumns(tower_count_2022)
-tower_2022_clean$year = 2022</code></pre>
-<p>#add new code chunks as necessary for future years’ data.</p>
-<pre class="r"><code>#This binds all the years together. Can be updated to add new years. 
-tower &lt;- rbind(tower_2000_clean,tower_2001_clean,tower_2002_clean,tower_2003_clean,tower_2005_clean,tower_2006_clean,tower_2007_clean,tower_2008_clean,tower_2009_clean,tower_2010_clean,tower_2011_clean,tower_2012_clean,tower_2013_clean,tower_2014_clean,tower_2015_clean, tower_2016_clean,tower_2017_clean,tower_2018_clean,tower_2019_clean, tower_2020_clean, tower_2021_clean, tower_2022_clean)
-
-towertowrite &lt;- tower %&gt;% 
-  mutate(count = ifelse(is.na(count), 0, count))
-
-#Uncomment this line and specify a filepath to write a clean csv
-#write.csv(towertowrite, &quot;data/towerclean.csv&quot;)</code></pre>
+<p>#Data Dictionary: Cleaning Nest Counts and Mapping Data</p>
+<p>#Density_habitat.csv</p>
+<p>Data on the density of nesting birds and the habitat they are found
+in for all years of data (1999 - 2022). We are using distance to nearest
+neighbors as a proxy for density. For each nest, the distance to the
+three nearest neighbors is calculated.</p>
+<p><code>point_id</code> : the id of the nest that distance is being
+measured from. The id comes from the shape files. Each nest has it’s own
+unique id. <code>near_point_id</code> : the id of the nest that the
+distance to is being measured. There are three near_point_id’s for each
+point_id. <code>distance</code> : distance from point_id to near_point
+id. <code>distance_rank</code> : three possible values: 1, 2, and 3. !
+represents the closest neighbor, 2 represents the second closest, and 3
+represents the third closest. <code>year</code> : the year in question
+<code>habitat</code> : habitat the the nest is in. 2 possible values:
+berm and vegetation</p>
+<p>#gull_density folder</p>
+<p>This folder contains the data used to make the density_habitat file
+above.</p>
+<p>#gullshapefiles</p>
+<p>Shape files of the nesting distribution of gulls from 1999 to 2022.
+This is used to create the maps showing nest locations. The code chunk
+labeled ‘read-in-shapefiles’ reads all of these in, them binds them into
+one data fram called <code>gullshapecombined</code>. In this combined
+file, there are three columns:</p>
+<p><code>year</code> : year of the nest <code>flag</code> : the unique
+flag of the nest <code>geometry</code> : the latitude and longitude of
+the nest. This is what is used to create the actual map.</p>
+<p>#nest_count_clean folder</p>
+<p>This folder contains all of the cleaned up nest counts. Each csv
+contains the following colunms:</p>
+<p><code>flag</code>: the unique flag of the nest <code>clutch</code>:
+number of eggs in the nest <code>year</code> : the year
+<code>location</code>: where the nest is. This column is not as cleaned
+up as it count be <code>species</code> : species of bird who made the
+nest</p>
+<p>#all.nest.count.csv</p>
+<p>This csv contains all of the cleaned up nest counts rbinded together.
+contains the following columns:</p>
+<p><code>flag</code>: the unique flag of the nest <code>clutch</code>:
+number of eggs in the nest <code>year</code> : the year
+<code>species</code> : species of bird who made the nest</p>
+<p>#nest_count_folder</p>
+<p>This folder contains all of the excel sheets that were used to clean
+up the nest count data.</p>
+<p>#outlinecolored</p>
+<p>Shape file containing the outline of Great Duck. Created by John
+Anderson – for more information, see the Great Duck Island group on
+COA’s ArcGIS Online Organization.</p>
 
 
 

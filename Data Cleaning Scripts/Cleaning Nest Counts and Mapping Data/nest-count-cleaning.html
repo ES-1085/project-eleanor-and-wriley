@@ -13,7 +13,7 @@
 
 <meta name="date" content="2023-03-16" />
 
-<title>tower count data cleaning</title>
+<title>Nest Count Data Cleaning</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -350,625 +350,792 @@ display: none;
 
 
 
-<h1 class="title toc-ignore">tower count data cleaning</h1>
+<h1 class="title toc-ignore">Nest Count Data Cleaning</h1>
 <h4 class="author">Eleanor and Wriley</h4>
 <h4 class="date">16 March 2023</h4>
 
 </div>
 
 
-<pre class="r"><code>#lists of possible columns names for our usual birds, add as new ones arise
-hergs &lt;- c(&quot;gulls&quot;,&quot;hegu&quot;,&quot;HERG&quot;,&quot;Gull&quot;,&quot;# gulls&quot;, &quot;HeGu&quot;,&quot;HerGull&quot;)
-gbbgs &lt;- c(&quot;bbgu&quot;,&quot;GBBG&quot;,&quot;BBGull&quot;)
-blgus &lt;- c(&quot;# squees&quot;, &quot;squees&quot;,&quot;BLGU&quot;,&quot;Guillem&quot;, &quot;BGUY&quot;, &quot;squee&quot;,&quot;SQUEE&quot;)
-coei_jus &lt;-c(&quot;chix&quot;,&quot;eider chicks&quot;, &quot;COEI ducklings&quot;, &quot;Eider Chicks&quot;,&quot;COEI chix&quot;,&quot;COEI  chix&quot;,&quot;EICHICK&quot;, &quot;coei chix&quot;)
-coei_ads &lt;- c(&quot;COEI&quot;,&quot;Eiders&quot;, &quot;# eiders&quot;, &quot;eider&quot;,&quot;eiders&quot;, &quot;coei&quot;)
-others &lt;- c(&quot;Other&quot;,&quot;notes&quot;,&quot;comments&quot;,&quot;others&quot;, &quot;Others&quot;, &quot;comment&quot;,&quot;Comments&quot;)
-dates &lt;- c(&quot;Date&quot;)
-puffins &lt;- c(&quot;ATPU&quot;,&quot;puffs&quot;,&quot;puffins&quot;,&quot;atpu&quot;)
-corms &lt;- c(&quot;DCCO&quot;,&quot;cormorants&quot;)
+<pre class="r"><code>nest_count_2022 &lt;- read_excel(&quot;data/nest_count/nest_count_2022.xlsx&quot;, na = &quot;NA&quot;)
 
+nest_count_2022 &lt;- nest_count_2022 %&gt;%
+  mutate(year = &quot;2022&quot;) %&gt;%
+  mutate(species = str_extract(comment, &quot;\\d*GBBG|\\d*COEI&quot;)) %&gt;%
+  mutate(species = str_replace(species, &quot;COEI&quot;, &quot;coei&quot;)) %&gt;%
+  mutate(species = str_replace(species, &quot;GBBG&quot;, &quot;gbbg&quot;)) %&gt;%
+  replace_na(list(species = &quot;herg&quot;)) %&gt;%
+  select(Flag, clutch, location, year, species) %&gt;%
+  rename(flag = Flag)</code></pre>
+<pre class="r"><code>nest_count_2021 &lt;- read_excel(&quot;data/nest_count/nest_count_2021.xlsx&quot;, na = &quot;NA&quot;)</code></pre>
+<pre><code>## New names:
+## • `` -&gt; `...5`
+## • `` -&gt; `...6`
+## • `` -&gt; `...7`</code></pre>
+<pre class="r"><code>nest_count_2021 &lt;- nest_count_2021 %&gt;%
+  mutate(year = &quot;2021&quot;) %&gt;%
+    mutate(detect.gbbg = str_detect(comment, &quot;GBBG&quot;)) %&gt;% 
+    mutate(detect.gbbg.2 = str_detect(`...7`, &quot;GBBG&quot;)) %&gt;%
+    mutate(detect.coei = str_detect(comment, &quot;eider&quot;)) %&gt;%
+    mutate(detect.coei.2 = str_detect(`...7`, &quot;COEI&quot;)) %&gt;%
+    mutate(species = case_when(
+      detect.gbbg == &quot;TRUE&quot; | detect.gbbg.2 == &quot;TRUE&quot; ~ &quot;gbbg&quot;,
+      detect.coei == &quot;TRUE&quot; | detect.coei.2 == &quot;TRUE&quot; ~ &quot;coei&quot;)) %&gt;%
+  replace_na(list(species = &quot;herg&quot;)) %&gt;%
+  select(flag, clutch, location, year, species)</code></pre>
+<pre class="r"><code>nest_count_2020 &lt;- read_excel(&quot;data/nest_count/nest_count_2020.xlsx&quot;, na = &quot;NA&quot;)</code></pre>
+<pre><code>## Warning: Expecting logical in E1116 / R1116C5: got &#39;corrected total&#39;</code></pre>
+<pre><code>## New names:
+## • `` -&gt; `...5`</code></pre>
+<pre class="r"><code>unique(nest_count_2020$comment)</code></pre>
+<pre><code>##  [1] NA                                     
+##  [2] &quot;Black-back gull nest?&quot;                
+##  [3] &quot;1 pip.Confirmed Black-back gull nest.&quot;
+##  [4] &quot;1 chick&quot;                              
+##  [5] &quot;1 pip&quot;                                
+##  [6] &quot;black-back?&quot;                          
+##  [7] &quot;Possibly N3A&quot;                         
+##  [8] &quot;Eider&quot;                                
+##  [9] &quot;Black-back?&quot;                          
+## [10] &quot;handwriting&quot;                          
+## [11] &quot;Eider, Rosebushes&quot;                    
+## [12] &quot;Eider, Rocks&quot;                         
+## [13] &quot;Under helipad&quot;                        
+## [14] &quot;Eider on Nest&quot;                        
+## [15] &quot;Black back&quot;                           
+## [16] &quot;2 pip&quot;                                
+## [17] &quot;Mother eider, 3 eggs depredated&quot;      
+## [18] &quot;Note: A6K&quot;                            
+## [19] &quot;Eider nest, 2 eggs, depredated&quot;       
+## [20] &quot;Depredated eider, 2 eggs depredated&quot;  
+## [21] &quot;Eider nest, 3 eggs, depredated&quot;       
+## [22] &quot;Black-Back&quot;                           
+## [23] &quot;3 chicks&quot;                             
+## [24] &quot;2 Chicks, 1 pip&quot;                      
+## [25] &quot;2 chicks&quot;                             
+## [26] &quot;1 pip, 1 chick&quot;                       
+## [27] &quot;1 chick, 1 pip&quot;                       
+## [28] &quot;1225.5555555555554&quot;</code></pre>
+<pre class="r"><code>head(nest_count_2020)</code></pre>
+<pre><code>## # A tibble: 6 × 5
+##    flag clutch location                       comment ...5 
+##   &lt;dbl&gt;  &lt;dbl&gt; &lt;chr&gt;                          &lt;chr&gt;   &lt;lgl&gt;
+## 1    18      2 Generator Shed to Puffin Point &lt;NA&gt;    NA   
+## 2    24      1 Generator Shed to Puffin Point &lt;NA&gt;    NA   
+## 3   286      2 Generator Shed to Puffin Point &lt;NA&gt;    NA   
+## 4   423      1 Generator Shed to Puffin Point &lt;NA&gt;    NA   
+## 5   302      3 Generator Shed to Puffin Point &lt;NA&gt;    NA   
+## 6   261      2 Generator Shed to Puffin Point &lt;NA&gt;    NA</code></pre>
+<pre class="r"><code>nest_count_2020 &lt;- nest_count_2020 %&gt;%
+  mutate(year = &quot;2020&quot;) %&gt;%
+  mutate(species = ifelse(grepl(&quot;Black-back&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;Black back&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;black-back&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;Black-Back&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;GBBG&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;gbbg&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;Eider&quot;, comment), &quot;coei&quot;,
+                          ifelse(grepl(&quot;eider&quot;, comment), &quot;coei&quot;, 
+                          ifelse(grepl(&quot;COEI&quot;, comment), &quot;coei&quot;,
+                          ifelse(grepl(&quot;coei&quot;, comment), &quot;coei&quot;,
+                          &quot;herg&quot;))))))))))) %&gt;%
+  select(flag, clutch, location, year, species)</code></pre>
+<pre class="r"><code>nest_count_2019 &lt;- read_excel(&quot;data/nest_count/nest_count_2019.xlsx&quot;, na = &quot;NA&quot;)</code></pre>
+<pre><code>## Warning: Expecting numeric in B1036 / R1036C2: got &#39;N/A&#39;</code></pre>
+<pre><code>## New names:
+## • `` -&gt; `...6`
+## • `` -&gt; `...8`</code></pre>
+<pre class="r"><code>unique(nest_count_2019$comment)</code></pre>
+<pre><code>##  [1] NA                                  &quot;1 pip, 1 chick&quot;                   
+##  [3] &quot;1 small egg (3-4cm)&quot;               &quot;1chick, 1pip&quot;                     
+##  [5] &quot;1chick, 2pip&quot;                      &quot;1pip&quot;                             
+##  [7] &quot;GBBG&quot;                              &quot;2chick, 1pip&quot;                     
+##  [9] &quot;2pip&quot;                              &quot;Eider&quot;                            
+## [11] &quot;2chick&quot;                            &quot;(I)&quot;                              
+## [13] &quot;(H)&quot;                               &quot;trapped nest&quot;                     
+## [15] &quot;(G)&quot;                               &quot;1chick&quot;                           
+## [17] &quot;1 pip&quot;                             &quot;2 chick&quot;                          
+## [19] &quot;2 chicks&quot;                          &quot;(F)&quot;                              
+## [21] &quot;recorded later as 3&quot;               &quot;(J)&quot;                              
+## [23] &quot;1 chick, 2 pip&quot;                    &quot;1 small&quot;                          
+## [25] &quot;(D) red&quot;                           &quot;(E)&quot;                              
+## [27] &quot;trapped nest, original flag \&quot;3\&quot;&quot; &quot;(B)&quot;                              
+## [29] &quot;(A)&quot;                               &quot;blue flags&quot;                       
+## [31] &quot;2 pip&quot;                             &quot;1 chick&quot;                          
+## [33] &quot;3 pip&quot;                             &quot;Edier&quot;                            
+## [35] &quot;1 chick, 1 pip&quot;                    &quot;2 chick, 1 pip&quot;                   
+## [37] &quot;Eider mom on nest&quot;</code></pre>
+<pre class="r"><code>nest_count_2019 &lt;- nest_count_2019 %&gt;%
+  mutate(year = &quot;2019&quot;) %&gt;%
+  mutate(species = ifelse(grepl(&quot;Black-back&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;Black back&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;black-back&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;Black-Back&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;GBBG&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;gbbg&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;Eider&quot;, comment), &quot;coei&quot;,
+                          ifelse(grepl(&quot;eider&quot;, comment), &quot;coei&quot;, 
+                          ifelse(grepl(&quot;Edier&quot;, comment), &quot;coei&quot;,
+                          ifelse(grepl(&quot;COEI&quot;, comment), &quot;coei&quot;,
+                          ifelse(grepl(&quot;coei&quot;, comment), &quot;coei&quot;,
+                          &quot;herg&quot;)))))))))))) %&gt;%
+  select(nest, clutch, location, year, species) %&gt;%
+  rename(flag = nest)</code></pre>
+<pre class="r"><code>nest_count_2018 &lt;- read_excel(&quot;data/nest_count/nest_count_2018.xlsx&quot;, na = &quot;NA&quot;)</code></pre>
+<pre><code>## New names:
+## • `` -&gt; `...5`</code></pre>
+<pre class="r"><code>unique(nest_count_2018$comment)</code></pre>
+<pre><code>## Warning: Unknown or uninitialised column: `comment`.</code></pre>
+<pre><code>## NULL</code></pre>
+<pre class="r"><code>nest_count_2018 &lt;- nest_count_2018 %&gt;%
+  mutate(year = &quot;2018&quot;) %&gt;%
+  mutate(species = ifelse(grepl(&quot;Black-back&quot;, comments), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;Black back&quot;, comments), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;black-back&quot;, comments), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;Black-Back&quot;, comments), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;GBBG&quot;, comments), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;gbbg&quot;, comments), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;Eider&quot;, comments), &quot;coei&quot;,
+                          ifelse(grepl(&quot;eider&quot;, comments), &quot;coei&quot;, 
+                          ifelse(grepl(&quot;Edier&quot;, comments), &quot;coei&quot;,
+                          ifelse(grepl(&quot;COEI&quot;, comments), &quot;coei&quot;,
+                          ifelse(grepl(&quot;coei&quot;, comments), &quot;coei&quot;,
+                          &quot;herg&quot;)))))))))))) %&gt;%
+  select(nest, clutch, location, year, species) %&gt;%
+  rename(flag = nest)</code></pre>
+<pre class="r"><code>nest_count_2017 &lt;- read_excel(&quot;data/nest_count/nest_count_2017.xlsx&quot;, na = &quot;NA&quot;)
 
-#This function overwrites a variety of potential column names and replaces them with a standard name. It is not order dependent and can be used on dataframes with any number of columns and any variety of column names. It will leave columns that are not specified untouched. It can be appended as needed. 
+unique(nest_count_2017$comment)</code></pre>
+<pre><code>## Warning: Unknown or uninitialised column: `comment`.</code></pre>
+<pre><code>## NULL</code></pre>
+<pre class="r"><code>nest_count_2017 &lt;- nest_count_2017 %&gt;%
+  mutate(year = &quot;2017&quot;) %&gt;%
+  rename(comment = &quot;Desc.&quot;,
+         location = &quot;loc.&quot;,
+         clutch = Clutch,
+         flag = Nest) %&gt;%
+  mutate(species = ifelse(grepl(&quot;Black-back&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;Black back&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;black-back&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;Black-Back&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;GBBG&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;gbbg&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;Eider&quot;, comment), &quot;coei&quot;,
+                          ifelse(grepl(&quot;eider&quot;, comment), &quot;coei&quot;, 
+                          ifelse(grepl(&quot;Edier&quot;, comment), &quot;coei&quot;,
+                          ifelse(grepl(&quot;COEI&quot;, comment), &quot;coei&quot;,
+                          ifelse(grepl(&quot;coei&quot;, comment), &quot;coei&quot;,
+                          &quot;herg&quot;)))))))))))) %&gt;%
+  select(flag, clutch, location, year, species)</code></pre>
+<pre class="r"><code>nest_count_2016 &lt;- read_excel(&quot;data/nest_count/nest_count_2016.xlsx&quot;, na = &quot;NA&quot;)
 
-#One possible issue may arise if a dataframe has two columns that need to be combined into one. For example, a dataframe that has both a AMCR and a CORA column cannot be processed by this function--one column will be overwritten. If that is the case, I recommend adding those columns together before doing anything to process that dataframe.  
-cleancolumns &lt;- function(inputdataframe) {
-  for (i in 1:length(colnames(inputdataframe))){
-      if (colnames(inputdataframe)[i] %in% hergs) {
-        colnames(inputdataframe)[i] &lt;- &quot;herg&quot;
-        print(&quot;hergs&quot;)
-    } else if(colnames(inputdataframe)[i] %in% gbbgs) {
-        colnames(inputdataframe)[i] &lt;- &quot;gbbg&quot;
-        print(&quot;gbbgs&quot;)
-    } else if (colnames(inputdataframe)[i] %in% blgus) {
-      colnames(inputdataframe)[i] &lt;- &quot;blgu&quot;
-      print(&quot;blgus&quot;)
-    } else if (colnames(inputdataframe)[i] %in% coei_jus) {
-      colnames(inputdataframe)[i] &lt;- &quot;coei_ju&quot;
-      print(&quot;coei_jus&quot;)
-    } else if (colnames(inputdataframe)[i] %in% coei_ads) {
-      colnames(inputdataframe)[i] &lt;- &quot;coei_ad&quot;
-      print(&quot;coei_ads&quot;)
-    } else if (colnames(inputdataframe)[i] %in% others) {
-      colnames(inputdataframe)[i] &lt;- &quot;other&quot;
-      print(&quot;other&quot;)
-    } else if (colnames(inputdataframe)[i] %in% dates) {
-      colnames(inputdataframe)[i] &lt;- &quot;date&quot;
-      print(&quot;dates&quot;)
-    } else if (colnames(inputdataframe)[i] %in% puffins) {
-      colnames(inputdataframe)[i] &lt;- &quot;puffin&quot;
-      print(&quot;puffins&quot;)
-    } else if (colnames(inputdataframe)[i] %in% corms) {
-      colnames(inputdataframe)[i] &lt;- &quot;dcco&quot;
-      print(&quot;corms&quot;)
-    } else if (colnames(inputdataframe)[i] %in% &quot;COLO&quot;) {
-      colnames(inputdataframe)[i] &lt;- &quot;colo&quot;
-      print(&quot;loon&quot;)
-    } else if (colnames(inputdataframe)[i] %in% &quot;tern&quot;) {
-      colnames(inputdataframe)[i] &lt;- &quot;ternsp&quot;
-      print(&quot;terns&quot;)
-    } else if (colnames(inputdataframe)[i] %in% &quot;NOGA&quot;) {
-      colnames(inputdataframe)[i] &lt;- &quot;noga&quot;
-      print(&quot;gannets&quot;)
-    } else if (colnames(inputdataframe)[i] %in% &quot;BAEA&quot;) {
-      colnames(inputdataframe)[i] &lt;- &quot;baea&quot;
-      print(&quot;eagles&quot;)
-    } else if (colnames(inputdataframe)[i] %in% &quot;scoter&quot;) {
-      colnames(inputdataframe)[i] &lt;- &quot;scoter&quot;
-      print(&quot;scoter&quot;)
-    } else if (colnames(inputdataframe)[i] %in% &quot;seal&quot;) {
-      colnames(inputdataframe)[i] &lt;- &quot;seals&quot;
-      print(&quot;seals&quot;)
-    } else if (colnames(inputdataframe)[i] %in% &quot;RAZO&quot;) {
-      colnames(inputdataframe)[i] &lt;- &quot;razo&quot;
-      print(&quot;razos&quot;)
-    } else if (colnames(inputdataframe)[i] %in% &quot;LAGU&quot;) {
-      colnames(inputdataframe)[i] &lt;- &quot;lagu&quot;
-      print(&quot;lagus&quot;)
-    } else if (colnames(inputdataframe)[i] %in% c(&quot;AMCR&quot;, &quot;CORA&quot;,&quot;crow&quot;,&quot;corvid&quot;)) {
-      colnames(inputdataframe)[i] &lt;- &quot;corvid&quot;
-      print(&quot;crows&quot;)
-    } else if (colnames(inputdataframe)[i] %in% &quot;SPSA&quot;) {
-      colnames(inputdataframe)[i] &lt;- &quot;peepsp&quot;
-      print(&quot;peeps&quot;)
-    }
-      
-  }
-  return(inputdataframe)
-}</code></pre>
-<pre class="r"><code>##This function uses regex to extract numbers of birds from the &quot;comment&quot; column. There is one if/else pair for every species that should be extracted, and each species has a string of possible expressions used to refer to it. Those strings can be extended to account for new species nicknames, and additional if/else phrases can be added to add new species into the eventual clean datafile. 
+nest_count_2016 &lt;- nest_count_2016 %&gt;%
+  mutate(year = &quot;2016&quot;) %&gt;%
+   rename(comment = &quot;Info&quot;,
+         clutch = Clutch,
+         flag = Flag) %&gt;%
+ mutate(species = ifelse(grepl(&quot;Black-back&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;Black back&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;black-back&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;Black-Back&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;GBBG&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;gbbg&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;Eider&quot;, comment), &quot;coei&quot;,
+                          ifelse(grepl(&quot;eider&quot;, comment), &quot;coei&quot;, 
+                          ifelse(grepl(&quot;Edier&quot;, comment), &quot;coei&quot;,
+                          ifelse(grepl(&quot;COEI&quot;, comment), &quot;coei&quot;,
+                          ifelse(grepl(&quot;coei&quot;, comment), &quot;coei&quot;,
+                          &quot;herg&quot;)))))))))))) %&gt;%
+  select(flag, clutch, year, species) </code></pre>
+<pre class="r"><code>nest_count_2015 &lt;- read_excel(&quot;data/nest_count/nest_count_2015.xlsx&quot;, na = &quot;NA&quot;)</code></pre>
+<pre><code>## New names:
+## • `` -&gt; `...5`</code></pre>
+<pre class="r"><code>nest_count_2015 &lt;- nest_count_2015 %&gt;%
+  mutate(year = &quot;2015&quot;) %&gt;%
+   rename(comment = &quot;Info&quot;,
+         clutch = Clutch,
+         flag = Flag) %&gt;%
+ mutate(species = ifelse(grepl(&quot;Black-back&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;Black back&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;black-back&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;Black-Back&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;GBBG&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;gbbg&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;Eider&quot;, comment), &quot;coei&quot;,
+                          ifelse(grepl(&quot;eider&quot;, comment), &quot;coei&quot;, 
+                          ifelse(grepl(&quot;Edier&quot;, comment), &quot;coei&quot;,
+                          ifelse(grepl(&quot;COEI&quot;, comment), &quot;coei&quot;,
+                          ifelse(grepl(&quot;coei&quot;, comment), &quot;coei&quot;,
+                          &quot;herg&quot;)))))))))))) %&gt;%
+  select(flag, clutch, year, species) </code></pre>
+<pre class="r"><code>nest_count_2014 &lt;- read_excel(&quot;data/nest_count/nest_count_2014.xlsx&quot;, na = &quot;NA&quot;)</code></pre>
+<pre><code>## New names:
+## • `` -&gt; `...6`
+## • `` -&gt; `...7`
+## • `` -&gt; `...8`
+## • `` -&gt; `...9`
+## • `` -&gt; `...10`
+## • `` -&gt; `...11`
+## • `` -&gt; `...12`
+## • `` -&gt; `...13`
+## • `` -&gt; `...14`
+## • `` -&gt; `...15`</code></pre>
+<pre class="r"><code>nest_count_2014 &lt;- nest_count_2014 %&gt;%
+  mutate(year = &quot;2014&quot;) %&gt;%
+   rename(comment = &quot;Species&quot;,
+         clutch = &quot;Clutch size&quot;,
+         flag = &quot;Flag #&quot;,
+         location = Location) %&gt;%
+ mutate(species = ifelse(grepl(&quot;Black-back&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;Black back&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;black-back&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;Black-Back&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;b&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;GBBG&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;gbbg&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;Eider&quot;, comment), &quot;coei&quot;,
+                          ifelse(grepl(&quot;eider&quot;, comment), &quot;coei&quot;, 
+                          ifelse(grepl(&quot;Edier&quot;, comment), &quot;coei&quot;,
+                          ifelse(grepl(&quot;COEI&quot;, comment), &quot;coei&quot;,
+                          ifelse(grepl(&quot;coei&quot;, comment), &quot;coei&quot;,
+                          &quot;herg&quot;))))))))))))) %&gt;%
+  select(flag, clutch, year, species) </code></pre>
+<pre class="r"><code>nest_count_2013 &lt;- read_excel(&quot;data/nest_count/nest_count_2013.xlsx&quot;, na = &quot;NA&quot;)</code></pre>
+<pre><code>## New names:
+## • `` -&gt; `...5`
+## • `` -&gt; `...6`
+## • `` -&gt; `...7`</code></pre>
+<pre class="r"><code>nest_count_2013 &lt;- nest_count_2013 %&gt;%
+  mutate(year = &quot;2013&quot;) %&gt;%
+   # rename(comment = &quot;Species&quot;,
+   #       clutch = &quot;Clutch size&quot;,
+   #       flag = &quot;Flag #&quot;,
+   #       location = Location) %&gt;%
+ mutate(species = ifelse(grepl(&quot;Black-back&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;Black back&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;black-back&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;Black-Back&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;b&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;GBBG&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;gbbg&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;Eider&quot;, comment), &quot;coei&quot;,
+                          ifelse(grepl(&quot;eider&quot;, comment), &quot;coei&quot;, 
+                          ifelse(grepl(&quot;Edier&quot;, comment), &quot;coei&quot;,
+                          ifelse(grepl(&quot;COEI&quot;, comment), &quot;coei&quot;,
+                          ifelse(grepl(&quot;coei&quot;, comment), &quot;coei&quot;,
+                          &quot;herg&quot;))))))))))))) %&gt;%
+  select(flag, clutch, year, species)</code></pre>
+<pre class="r"><code>nest_count_2012 &lt;- read_excel(&quot;data/nest_count/nest_count_2012.xlsx&quot;, na = &quot;NA&quot;)</code></pre>
+<pre><code>## New names:
+## • `` -&gt; `...5`
+## • `` -&gt; `...6`
+## • `` -&gt; `...7`
+## • `` -&gt; `...8`
+## • `` -&gt; `...9`</code></pre>
+<pre class="r"><code>nest_count_2012 &lt;- nest_count_2012 %&gt;%
+  mutate(year = &quot;2012&quot;) %&gt;%
+   # rename(comment = &quot;Species&quot;,
+   #       clutch = &quot;Clutch size&quot;,
+   #       flag = &quot;Flag #&quot;,
+   #       location = Location) %&gt;%
+ mutate(species = ifelse(grepl(&quot;Black-back&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;Black back&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;black-back&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;Black-Back&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;b&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;GBBG&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;BBG&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;gbbg&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;Eider&quot;, comment), &quot;coei&quot;,
+                          ifelse(grepl(&quot;eider&quot;, comment), &quot;coei&quot;, 
+                          ifelse(grepl(&quot;Edier&quot;, comment), &quot;coei&quot;,
+                          ifelse(grepl(&quot;COEI&quot;, comment), &quot;coei&quot;,
+                          ifelse(grepl(&quot;coei&quot;, comment), &quot;coei&quot;,
+                          &quot;herg&quot;)))))))))))))) %&gt;%
+  select(flag, clutch, year, location, species)</code></pre>
+<pre class="r"><code>nest_count_2011 &lt;- read_excel(&quot;data/nest_count/nest_count_2011.xls&quot;, na = &quot;NA&quot;)
 
-splitcomments &lt;- function(inputdataframe) {
-  #puffins
-    if (&quot;puffin&quot; %in% colnames(inputdataframe)) {
-        inputdataframe &lt;- inputdataframe %&gt;% 
-        mutate(puffin = puffin)
-  } else {
-        inputdataframe &lt;- inputdataframe %&gt;% 
-        mutate(puffin = str_extract(other, &quot;\\d*puff|\\d*.puff|\\d*atpu|\\d*.atpu|\\d*puffis|\\d*puffins|\\d*.puffins|\\d*.ATPU|\\d*.ALPU|\\d*.puffin|\\d*..ATPU&quot;)) %&gt;% 
-        mutate(puffin = as.double(str_extract(puffin, &quot;\\d*&quot;)))
-        
-  } 
-  if (&quot;dcco&quot; %in% colnames(inputdataframe)) {
-    #cormorants
-        inputdataframe &lt;- inputdataframe %&gt;% 
-        mutate(dcco = dcco)
-  } else {
-         inputdataframe &lt;- inputdataframe %&gt;% 
-         mutate(dcco = str_extract(other, &quot;\\d*corm|\\d*dcc|\\d*dcco|\\d*ddco|\\d*.DCCO|\\d*.DCC0|\\d*.commorants|\\d*.corm|\\d*.cormorants|d*..corm|\\d*.dcco&quot;)) %&gt;% 
-         mutate(dcco = as.double(str_extract(dcco, &quot;\\d*&quot;)))
-         
-  } 
-  if (&quot;ternsp&quot; %in% colnames(inputdataframe)) {
-    #terns
-        inputdataframe &lt;- inputdataframe %&gt;% 
-        mutate(ternsp = ternsp)
-  } else {
-         inputdataframe &lt;- inputdataframe %&gt;% 
-         mutate(ternsp = str_extract(other, &quot;\\d*cote|\\d*.terns|\\d*.COTE|\\d*.ARTE|\\d*.Terns|\\d*.Tern|\\d*.arte|\\d*.common tern|\\d*.common term&quot;)) %&gt;% 
-         mutate(ternsp = as.double(str_extract(ternsp, &quot;\\d*&quot;)))
-         
-  } 
-  if (&quot;razo&quot; %in% colnames(inputdataframe)) {
-    #razorbills
-        inputdataframe &lt;- inputdataframe %&gt;% 
-        mutate(razo = razo)
-  } else {
-         inputdataframe &lt;- inputdataframe %&gt;% 
-         mutate(razo = str_extract(other, &quot;\\d*razo|\\d*razor|\\d*.RAZO|\\d*.razorbills|\\d*.bills|\\d*.bill|\\d*.RAZ0|\\d*.RABI|\\d*.razo|\\d*razo&quot;)) %&gt;% 
-         mutate(razo = as.double(str_extract(razo, &quot;\\d*&quot;)))
-         
-  } 
-  if (&quot;lagu&quot; %in% colnames(inputdataframe)) {
-    #laughing gulls
-        inputdataframe &lt;- inputdataframe %&gt;% 
-        mutate(lagu = lagu)
-  } else {
-         inputdataframe &lt;- inputdataframe %&gt;% 
-         mutate(lagu = str_extract(other, &quot;\\d*lagu|\\d*.laughing|\\d*.LAGU|\\d*lagus|\\d*.laughing gull|\\d*.lagu|\\d*LAGU|\\d*.laughing gulls&quot;)) %&gt;% 
-         mutate(lagu = as.double(str_extract(lagu, &quot;\\d*&quot;)))
-         
-  } 
-  if (&quot;comu&quot; %in% colnames(inputdataframe)) {
-    #murres
-        inputdataframe &lt;- inputdataframe %&gt;% 
-        mutate(comu = comu)
-  } else {
-         inputdataframe &lt;- inputdataframe %&gt;% 
-         mutate(comu = str_extract(other, &quot;\\d*murre|\\d*.COMU|\\d*.common murre|\\d*.murre|\\d*.comu|\\d*.common murres|\\d*COMU&quot;)) %&gt;% 
-         mutate(comu = as.double(str_extract(comu, &quot;\\d*&quot;)))
-         
-  } 
-  if (&quot;baea&quot; %in% colnames(inputdataframe)) {
-    #bald eagle
-        inputdataframe &lt;- inputdataframe %&gt;% 
-        mutate(baea = baea)
-  } else {
-         inputdataframe &lt;- inputdataframe %&gt;% 
-         mutate(baea = str_extract(other, &quot;\\d*.imm|\\d*.BAEA|\\d*.eagle|\\d*.juv&quot;)) %&gt;% 
-         mutate(baea = as.double(str_extract(baea, &quot;\\d*&quot;)))
-         
-  } 
-  if (&quot;noga&quot; %in% colnames(inputdataframe)) {
-    #gannet
-        inputdataframe &lt;- inputdataframe %&gt;% 
-        mutate(noga = noga)
-  } else {
-         inputdataframe &lt;- inputdataframe %&gt;% 
-         mutate(noga = str_extract(other, &quot;\\d*.gannets|\\d*.NOGA|\\d*.gannet&quot;)) %&gt;% 
-         mutate(noga = as.double(str_extract(noga, &quot;\\d*&quot;)))
-         
-  } 
-  if (&quot;corvid&quot; %in% colnames(inputdataframe)) {
-    #corvid
-        inputdataframe &lt;- inputdataframe %&gt;% 
-        mutate(corvid = corvid)
-  } else {
-         inputdataframe &lt;- inputdataframe %&gt;% 
-         mutate(corvid = str_extract(other, &quot;\\d*.crow|\\d*.Corvid|\\d*.AMCR|\\d*.Corvids|\\d*.crows|\\d*crow|\\d*.CORA&quot;)) %&gt;% 
-         mutate(corvid = as.double(str_extract(corvid, &quot;\\d*&quot;)))
-         
-  } 
-  if (&quot;peepsp&quot; %in% colnames(inputdataframe)) {
-    #sandpipers
-        inputdataframe &lt;- inputdataframe %&gt;% 
-        mutate(peepsp = peepsp)
-  } else {
-         inputdataframe &lt;- inputdataframe %&gt;% 
-         mutate(peepsp = str_extract(other, &quot;\\d*.SPSA|\\d*.WHIM|\\d*..SPSA|\\d*.spotted sandpiper|\\d*.least sandpiper|\\d*.pipers|\\d*.common sandpipers|\\d*.piper|\\d*.red knots|\\d*.wimbrel|\\d*.spotted sandpipers|\\d*.sandpiper|\\d*.sandpipers|\\d*.RUTU|\\d*.SESA|d*.SBDO|\\d*.REPH|\\d*.LESA&quot;)) %&gt;% 
-         mutate(peepsp = as.double(str_extract(peepsp, &quot;\\d*&quot;)))
-         
-  } 
-  if (&quot;seals&quot; %in% colnames(inputdataframe)) {
-    #seals
-        inputdataframe &lt;- inputdataframe %&gt;% 
-        mutate(seals = seals)
-  } else {
-         inputdataframe &lt;- inputdataframe %&gt;% 
-         mutate(seals = str_extract(other, &quot;\\d*.Seal|\\d*.Seals|\\d*.Harbor|\\d*.Gray|\\d*.seals|\\d*.grey|\\d*.seal|\\d*.harbor|\\d*.gray|\\*.Grey|\\d*.Grey Seal|\\d*.Grey Seals|\\d*.harbor seal|\\d*.gray seal&quot;)) %&gt;% 
-         mutate(seals = as.double(str_extract(seals, &quot;\\d*&quot;)))
-         
-  } 
-  if (&quot;colo&quot; %in% colnames(inputdataframe)) {
-    #loon
-        inputdataframe &lt;- inputdataframe %&gt;% 
-        mutate(colo = colo)
-  } else {
-         inputdataframe &lt;- inputdataframe %&gt;% 
-         mutate(colo = str_extract(other, &quot;\\d*.COLO|\\d*.loon|\\d*.loons&quot;)) %&gt;% 
-         mutate(colo = as.double(str_extract(colo, &quot;\\d*&quot;)))
-         
-  } 
-  if (&quot;cago&quot; %in% colnames(inputdataframe)) {
-    #geese
-        inputdataframe &lt;- inputdataframe %&gt;% 
-        mutate(cago = cago)
-  } else {
-         inputdataframe &lt;- inputdataframe %&gt;% 
-         mutate(cago = str_extract(other, &quot;\\d*.CAGO|\\d*.goose|\\d*.canada goose|\\d*.canada geese&quot;)) %&gt;% 
-         mutate(cago = as.double(str_extract(cago, &quot;\\d*&quot;)))
-         
-  } 
-  if (&quot;porpoise&quot; %in% colnames(inputdataframe)) {
-    #porpoise
-        inputdataframe &lt;- inputdataframe %&gt;% 
-        mutate(porpoise = porpoise)
-  } else {
-         inputdataframe &lt;- inputdataframe %&gt;% 
-         mutate(porpoise = str_extract(other, &quot;\\d*.Harbor porpoise|\\d*.porpoise|\\d*.Porpoises|\\d*.porpoises&quot;)) %&gt;% 
-         mutate(porpoise = as.double(str_extract(porpoise, &quot;\\d*&quot;)))
-         
-  } 
-  if (&quot;raptor&quot; %in% colnames(inputdataframe)) {
-    #raptor
-        inputdataframe &lt;- inputdataframe %&gt;% 
-        mutate(raptor = raptor)
-  } else {
-         inputdataframe &lt;- inputdataframe %&gt;% 
-         mutate(raptor = str_extract(other, &quot;\\d*.tv|\\d*.peregrine|\\d*.PEFA|\\d*.MERL&quot;)) %&gt;% 
-         mutate(raptor = as.double(str_extract(raptor, &quot;\\d*&quot;)))
-         
-  } 
-  if (&quot;shearwater&quot; %in% colnames(inputdataframe)) {
-    #shearwater
-        inputdataframe &lt;- inputdataframe %&gt;% 
-        mutate(shearwater = shearwater)
-  } else {
-         inputdataframe &lt;- inputdataframe %&gt;% 
-         mutate(shearwater = str_extract(other, &quot;\\d*.shearwater|\\d*.GRSH|\\d*.GRSHE&quot;)) %&gt;% 
-         mutate(shearwater = as.double(str_extract(shearwater, &quot;\\d*&quot;)))
-         
-  } 
-  if (&quot;gbhe&quot; %in% colnames(inputdataframe)) {
-    #herons
-        inputdataframe &lt;- inputdataframe %&gt;% 
-        mutate(gbhe = gbhe)
-  } else {
-         inputdataframe &lt;- inputdataframe %&gt;% 
-         mutate(gbhe = str_extract(other, &quot;\\d*.heron|\\d*.GBHE|\\d*.great blue heron&quot;)) %&gt;% 
-         mutate(gbhe = as.double(str_extract(gbhe, &quot;\\d*&quot;)))
-         
-  } 
-  if (&quot;scoter&quot; %in% colnames(inputdataframe)) {
-    #scoter
-        inputdataframe &lt;- inputdataframe %&gt;% 
-        mutate(scoter = scoter)
-  } else {
-         inputdataframe &lt;- inputdataframe %&gt;% 
-         mutate(scoter = str_extract(other, &quot;\\d*.scoter|\\d*.Scoter|\\d*.BLSC|\\d*.surf scoter|\\d*.SUSC&quot;)) %&gt;% 
-         mutate(scoter = as.double(str_extract(scoter, &quot;\\d*&quot;)))
-         
-  } 
-  if (&quot;wisp&quot; %in% colnames(inputdataframe)) {
-    #Wilson&#39;s Storm-Petrel
-        inputdataframe &lt;- inputdataframe %&gt;% 
-        mutate(wisp = wisp)
-  } else {
-         inputdataframe &lt;- inputdataframe %&gt;% 
-         mutate(wisp = str_extract(other, &quot;\\d*.WISP&quot;)) %&gt;% 
-         mutate(wisp = as.double(str_extract(wisp, &quot;\\d*&quot;)))
-         
-  } 
-  if (&quot;lbbg&quot; %in% colnames(inputdataframe)) {
-    #LBBG
-        inputdataframe &lt;- inputdataframe %&gt;% 
-        mutate(lbbg = lbbg)
-  } else {
-         inputdataframe &lt;- inputdataframe %&gt;% 
-         mutate(lbbg = str_extract(other, &quot;\\d*.LBBG&quot;)) %&gt;% 
-         mutate(lbbg = as.double(str_extract(lbbg, &quot;\\d*&quot;)))
-  }
- return(inputdataframe)
-}</code></pre>
-<pre class="r"><code>#This function selects the columns organized by the functions above, then pivots them to create a long dataframe where species is a single column. If new species are added to the splitcomments function, they must also be added to the list of columns athat are selected and pivoted in order to appear in the final dataframe. 
+nest_count_2011 &lt;- nest_count_2011 %&gt;%
+  mutate(year = &quot;2011&quot;) %&gt;%
+   # rename(comment = &quot;Species&quot;,
+   #       clutch = &quot;Clutch size&quot;,
+   #       flag = &quot;Flag #&quot;,
+   #       location = Location) %&gt;%
+ mutate(species = ifelse(grepl(&quot;Black-back&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;Black back&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;black-back&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;Black-Back&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;Blackback&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;blackback&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;b&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;GBBG&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;BBG&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;gbbg&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;Eider&quot;, comment), &quot;coei&quot;,
+                          ifelse(grepl(&quot;eider&quot;, comment), &quot;coei&quot;, 
+                          ifelse(grepl(&quot;Edier&quot;, comment), &quot;coei&quot;,
+                          ifelse(grepl(&quot;COEI&quot;, comment), &quot;coei&quot;,
+                          ifelse(grepl(&quot;coei&quot;, comment), &quot;coei&quot;,
+                          &quot;herg&quot;)))))))))))))))) %&gt;%
+  select(flag, clutch, year, location, species)</code></pre>
+<pre class="r"><code>##NEED TO DEAL WITH LATER SUPER UNTIDY
+nest_count_2010.a &lt;- read_excel(&quot;data/nest_count/nest_count_2010.xls&quot;, na = &quot;NA&quot;, range = (&quot;A2:C106&quot;))</code></pre>
+<pre><code>## New names:
+## • `` -&gt; `...1`</code></pre>
+<pre class="r"><code>nest_count_2010.a &lt;- nest_count_2010.a %&gt;%
+  mutate(location = &quot;west_side&quot;) %&gt;%
+  rename(flag = Flag,
+         clutch = Clutch) %&gt;%
+  select(flag, clutch, location)
 
-selectcolumns &lt;- function(inputdataframe) {
-  r &lt;- inputdataframe %&gt;% 
-    mutate(notes = other) %&gt;% 
-    select(&quot;date&quot;,&quot;herg&quot;,&quot;gbbg&quot;,&quot;coei_ad&quot;,&quot;coei_ju&quot;,&quot;blgu&quot;,&quot;other&quot;,&quot;puffin&quot;,&quot;dcco&quot;,&quot;ternsp&quot;,&quot;razo&quot;,&quot;lagu&quot;,&quot;comu&quot;,&quot;baea&quot;,&quot;noga&quot;,&quot;corvid&quot;,&quot;peepsp&quot;,&quot;seals&quot;,&quot;colo&quot;,&quot;cago&quot;,&quot;porpoise&quot;,&quot;raptor&quot;,&quot;gbhe&quot;,&quot;scoter&quot;,&quot;shearwater&quot;,&quot;notes&quot;,&quot;wisp&quot;,&quot;lbbg&quot;) %&gt;% 
-    mutate(herg = as.numeric(herg), gbbg = as.numeric(gbbg), coei_ad = as.double(coei_ad), coei_ju = as.double(coei_ju), blgu = as.double(blgu)) %&gt;% 
-    pivot_longer(cols = c(&quot;herg&quot;,&quot;gbbg&quot;,&quot;coei_ad&quot;,&quot;coei_ju&quot;,&quot;blgu&quot;,&quot;puffin&quot;,&quot;dcco&quot;,&quot;ternsp&quot;,&quot;razo&quot;,&quot;lagu&quot;,&quot;comu&quot;,&quot;baea&quot;,&quot;noga&quot;,&quot;corvid&quot;,&quot;peepsp&quot;,&quot;seals&quot;,&quot;colo&quot;,&quot;cago&quot;,&quot;porpoise&quot;,&quot;raptor&quot;, &quot;gbhe&quot;,&quot;scoter&quot;,&quot;shearwater&quot;,&quot;wisp&quot;,&quot;lbbg&quot;),
-                 names_to = &quot;species&quot;,
-                 values_to = &quot;count&quot;) %&gt;% 
-    select(date, species, count, notes)
-  return(r)
-}</code></pre>
-<pre class="r"><code>tower_count_2000 &lt;- read_excel(&quot;data/tower_count/tower_count_2000.XLS&quot;)
-tower_count_2000 &lt;- tower_count_2000[2:32,]
-tower_count_2000 &lt;- tower_count_2000 %&gt;%
-  mutate(coei_ju = as.double(str_extract(`# eiders`, &quot;(?&lt;=\\().*(?=\\))&quot;))) %&gt;% 
-  mutate(`# eiders` = as.double(str_extract(`# eiders`, &quot;\\d*&quot;))) %&gt;% 
-  mutate(gbbg = NA)</code></pre>
-<pre><code>## Warning in mask$eval_all_mutate(quo): NAs introduced by coercion</code></pre>
-<pre class="r"><code>tower_count_2000 &lt;- cleancolumns(tower_count_2000)</code></pre>
-<pre><code>## [1] &quot;blgus&quot;
-## [1] &quot;hergs&quot;
-## [1] &quot;coei_ads&quot;
-## [1] &quot;other&quot;</code></pre>
-<pre class="r"><code>tower_count_2000 &lt;- splitcomments(tower_count_2000)
-tower_2000_clean &lt;- selectcolumns(tower_count_2000)
-tower_2000_clean$year = 2000</code></pre>
-<pre class="r"><code>tower_count_2001 &lt;- read_excel(&quot;data/tower_count/tower_count_2001.xlsx&quot;, skip = 2)
-tower_count_2001 &lt;- tower_count_2001 %&gt;% 
-  mutate(GBBG = case_when(GBBG == &quot;-&quot; ~ &quot;NA&quot;,
-         TRUE ~ as.character(GBBG)))
+nest_count_2010.b &lt;- read_excel(&quot;data/nest_count/nest_count_2010.xls&quot;, na = &quot;NA&quot;, range = (&quot;D2:E63&quot;))</code></pre>
+<pre><code>## New names:
+## • `` -&gt; `...1`</code></pre>
+<pre class="r"><code>nest_count_2010.b &lt;- nest_count_2010.b %&gt;%
+  mutate(location = &quot;borofsky_extension&quot;) %&gt;%
+  rename(clutch = Clutch) %&gt;%
+  mutate(flag = &quot;&quot;) %&gt;%
+  select(flag, clutch, location)
 
-tower_count_2001 &lt;- cleancolumns(tower_count_2001)</code></pre>
-<pre><code>## [1] &quot;dates&quot;
-## [1] &quot;hergs&quot;
-## [1] &quot;gbbgs&quot;
-## [1] &quot;coei_ads&quot;
-## [1] &quot;coei_jus&quot;
-## [1] &quot;blgus&quot;
-## [1] &quot;other&quot;</code></pre>
-<pre class="r"><code>tower_count_2001 &lt;- splitcomments(tower_count_2001)
-tower_2001_clean &lt;- selectcolumns(tower_count_2001)</code></pre>
-<pre><code>## Warning in mask$eval_all_mutate(quo): NAs introduced by coercion</code></pre>
-<pre class="r"><code>tower_2001_clean$year = 2001</code></pre>
-<pre class="r"><code>tower_count_2002 &lt;- read_excel(&quot;data/tower_count/tower_count_2002.xlsx&quot;, skip = 2)
+nest_count_2010.c &lt;- read_excel(&quot;data/nest_count/nest_count_2010.xls&quot;, na = &quot;NA&quot;, range = (&quot;G1:H113&quot;))
+nest_count_2010.c &lt;- nest_count_2010.c %&gt;%
+  mutate(location = &quot;borofsky&quot;,
+         flag = &quot;&quot;) %&gt;%
+  rename(clutch = &quot;Borofsky&#39;s&quot;) %&gt;%
+  select(flag, clutch, location)
 
-tower_2002_clean &lt;- tower_count_2002 %&gt;% 
-  cleancolumns() %&gt;% 
-  splitcomments() %&gt;% 
-  selectcolumns()</code></pre>
-<pre><code>## [1] &quot;dates&quot;
-## [1] &quot;hergs&quot;
-## [1] &quot;gbbgs&quot;
-## [1] &quot;coei_ads&quot;
-## [1] &quot;coei_jus&quot;
-## [1] &quot;blgus&quot;
-## [1] &quot;other&quot;</code></pre>
-<pre class="r"><code>tower_2002_clean$year = 2002</code></pre>
-<pre class="r"><code>tower_count_2003 &lt;- read_excel(&quot;data/tower_count/tower_count_2003.xls&quot;)
+nest_count_2010.d &lt;- read_excel(&quot;data/nest_count/nest_count_2010.xls&quot;, na = &quot;NA&quot;, range = (&quot;J2:K40&quot;))
+nest_count_2010.d &lt;- nest_count_2010.d %&gt;%
+  rename(flag = Flag,
+         clutch = Clutch) %&gt;%
+  mutate(location = &quot;east_side&quot;) %&gt;%
+  select(flag, clutch, location)
 
-#where eider chicks and adults are recorded in the same column with dashes or parens or slashes to separate them, it is necessary to manually extract those numbers. 
-tower_count_2003 &lt;- tower_count_2003 %&gt;% 
-  mutate(coei_ad = str_extract(Eider, &quot;^(.+)/|^(.+)&quot;)) %&gt;% 
-  mutate(coei_ad = as.double(str_extract(coei_ad,&quot;\\d*&quot;))) %&gt;%
-  mutate(coei_ju = str_extract(Eider, &quot;\\/.*&quot;)) %&gt;% 
-  mutate(coei_ju = as.double(str_extract(coei_ju, &quot;\\d*$&quot;)))
+nest_count_2010 &lt;- rbind(nest_count_2010.a, nest_count_2010.b, nest_count_2010.c, nest_count_2010.d) %&gt;%
+  mutate(flag.test = str_extract(flag, &quot;\\d*&quot;)) %&gt;%
+  mutate(clutch.test = str_extract(clutch, &quot;\\d*&quot;)) %&gt;%
+  mutate(comment = paste(flag, clutch)) %&gt;%
+  mutate(year = &quot;2010&quot;) %&gt;%
+  rename(flag.pre = flag,
+         clutch.pre = clutch,
+         flag = flag.test,
+         clutch = clutch.test) %&gt;%
+ mutate(species = ifelse(grepl(&quot;Black-back&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;Black back&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;black-back&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;Black-Back&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;Blackback&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;blackback&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;(bb)&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;GBBG&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;BBG&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;gbbg&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;Eider&quot;, comment), &quot;coei&quot;,
+                          ifelse(grepl(&quot;eider&quot;, comment), &quot;coei&quot;, 
+                          ifelse(grepl(&quot;Edier&quot;, comment), &quot;coei&quot;,
+                          ifelse(grepl(&quot;COEI&quot;, comment), &quot;coei&quot;,
+                          ifelse(grepl(&quot;coei&quot;, comment), &quot;coei&quot;,
+                          &quot;herg&quot;)))))))))))))))) %&gt;%
+  select(flag, clutch, year, location, species)</code></pre>
+<pre class="r"><code>nest_count_2009 &lt;- read_excel(&quot;data/nest_count/nest_count_2009.xls&quot;, na = &quot;NA&quot;)</code></pre>
+<pre><code>## New names:
+## • `` -&gt; `...5`
+## • `` -&gt; `...6`
+## • `` -&gt; `...7`
+## • `` -&gt; `...8`</code></pre>
+<pre class="r"><code>nest_count_2009 &lt;- nest_count_2009 %&gt;%
+  mutate(year = &quot;2009&quot;) %&gt;%
+   rename(clutch = &quot;CLUTCH&quot;,
+         flag = &quot;FLAG&quot;,
+         location = &quot;LOCATION&quot;) %&gt;%
+  mutate(comment = paste(COMMENT, location, seperate = &quot;/&quot;)) %&gt;%
+ mutate(species = ifelse(grepl(&quot;Black-back&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;Black back&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;black-back&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;Black-Back&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;Blackback&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;blackback&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;Black&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;black&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;b&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;GBBG&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;BBG&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;gbbg&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;Eider&quot;, comment), &quot;coei&quot;,
+                          ifelse(grepl(&quot;eider&quot;, comment), &quot;coei&quot;, 
+                          ifelse(grepl(&quot;Edier&quot;, comment), &quot;coei&quot;,
+                          ifelse(grepl(&quot;COEI&quot;, comment), &quot;coei&quot;,
+                          ifelse(grepl(&quot;coei&quot;, comment), &quot;coei&quot;,
+                          &quot;herg&quot;)))))))))))))))))) %&gt;%
+  select(flag, clutch, year, location, species)</code></pre>
+<pre class="r"><code>nest_count_2008 &lt;- read_excel(&quot;data/nest_count/nest_count_2008.xls&quot;, na = &quot;NA&quot;)
 
-tower_count_2003 &lt;- cleancolumns(tower_count_2003)</code></pre>
-<pre><code>## [1] &quot;dates&quot;
-## [1] &quot;hergs&quot;
-## [1] &quot;gbbgs&quot;
-## [1] &quot;blgus&quot;
-## [1] &quot;other&quot;</code></pre>
-<pre class="r"><code>tower_count_2003 &lt;- splitcomments(tower_count_2003)
-tower_2003_clean &lt;- selectcolumns(tower_count_2003)</code></pre>
-<pre><code>## Warning in mask$eval_all_mutate(quo): NAs introduced by coercion</code></pre>
-<pre class="r"><code>tower_2003_clean$year = 2003</code></pre>
-<pre class="r"><code>tower_count_2005 &lt;- read_excel(&quot;data/tower_count/tower_count_2005.xls&quot;)
+nest_count_2008 &lt;- nest_count_2008 %&gt;%
+  mutate(year = &quot;2008&quot;) %&gt;%
+   rename(note = comment,
+          desc = species) %&gt;%
+  mutate(comment = paste(note, desc)) %&gt;%
+ mutate(species = ifelse(grepl(&quot;Black-back&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;Black back&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;black-back&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;Black-Back&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;Blackback&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;blackback&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;Black&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;black&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;GBBG&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;BBG&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;gbbg&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;Eider&quot;, comment), &quot;coei&quot;,
+                          ifelse(grepl(&quot;eider&quot;, comment), &quot;coei&quot;, 
+                          ifelse(grepl(&quot;Edier&quot;, comment), &quot;coei&quot;,
+                          ifelse(grepl(&quot;COEI&quot;, comment), &quot;coei&quot;,
+                          ifelse(grepl(&quot;coei&quot;, comment), &quot;coei&quot;,
+                          &quot;herg&quot;))))))))))))))))) %&gt;%
+  select(flag, clutch, year, location, species)</code></pre>
+<pre class="r"><code>nest_count_2007 &lt;- read_excel(&quot;data/nest_count/nest_count_2007.xls&quot;, sheet = &quot;Sheet1&quot;, na = &quot;NA&quot;)</code></pre>
+<pre><code>## New names:
+## • `` -&gt; `...5`
+## • `` -&gt; `...6`
+## • `` -&gt; `...7`</code></pre>
+<pre class="r"><code>nest_count_2007.eider &lt;- read_excel(&quot;data/nest_count/nest_count_2007.xls&quot;, 
+    sheet = &quot;Sheet2&quot;)
 
-tower_count_2005 &lt;- tower_count_2005 %&gt;% 
-  mutate(other = NA)
+nest_count_2007 &lt;- nest_count_2007 %&gt;%
+  select(flag, clutch, comment, location) %&gt;%
+  rbind(nest_count_2007.eider)
+  
+  
+nest_count_2007 &lt;- nest_count_2007 %&gt;%
+  mutate(year = &quot;2007&quot;) %&gt;%
+ mutate(species = ifelse(grepl(&quot;Black-back&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;Black back&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;black-back&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;Black-Back&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;Blackback&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;blackback&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;Black&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;black&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;GBBG&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;BBG&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;gbbg&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;Eider&quot;, comment), &quot;coei&quot;,
+                          ifelse(grepl(&quot;eider&quot;, comment), &quot;coei&quot;, 
+                          ifelse(grepl(&quot;Edier&quot;, comment), &quot;coei&quot;,
+                          ifelse(grepl(&quot;COEI&quot;, comment), &quot;coei&quot;,
+                          ifelse(grepl(&quot;coei&quot;, comment), &quot;coei&quot;,
+                          &quot;herg&quot;))))))))))))))))) %&gt;%
+  select(flag, clutch, year, location, species)</code></pre>
+<pre class="r"><code>nest_count_2006 &lt;- read_excel(&quot;data/nest_count/nest_count_2006.xls&quot;, na = &quot;NA&quot;)
 
-tower_count_2005 &lt;- cleancolumns(tower_count_2005)</code></pre>
-<pre><code>## [1] &quot;dates&quot;
-## [1] &quot;hergs&quot;
-## [1] &quot;gbbgs&quot;
-## [1] &quot;blgus&quot;
-## [1] &quot;coei_ads&quot;
-## [1] &quot;coei_jus&quot;</code></pre>
-<pre class="r"><code>tower_count_2005 &lt;- splitcomments(tower_count_2005)
-tower_2005_clean &lt;- selectcolumns(tower_count_2005)
-tower_2005_clean$year = 2005</code></pre>
-<pre class="r"><code>tower_count_2006 &lt;- read_excel(&quot;data/tower_count/tower_count_2006.xls&quot;)
+nest_count_2006 &lt;- nest_count_2006 %&gt;%
+  mutate(year = &quot;2006&quot;) %&gt;%
+   rename(note = comment,
+         gull.sp = species,
+         flag = &quot;number&quot;,
+         location = &quot;colony&quot;) %&gt;%
+  mutate(comment = paste(note, gull.sp, seperate = &quot;/&quot;)) %&gt;%
+ mutate(species = ifelse(grepl(&quot;Black-back&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;Black back&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;black-back&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;Black-Back&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;Blackback&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;blackback&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;Black&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;black&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;b&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;GBBG&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;BBG&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;gbbg&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;Eider&quot;, comment), &quot;coei&quot;,
+                          ifelse(grepl(&quot;eider&quot;, comment), &quot;coei&quot;, 
+                          ifelse(grepl(&quot;Edier&quot;, comment), &quot;coei&quot;,
+                          ifelse(grepl(&quot;COEI&quot;, comment), &quot;coei&quot;,
+                          ifelse(grepl(&quot;coei&quot;, comment), &quot;coei&quot;,
+                          &quot;herg&quot;)))))))))))))))))) %&gt;%
+  select(flag, clutch, year, location, species)</code></pre>
+<pre class="r"><code>nest_count_2005 &lt;- read_excel(&quot;data/nest_count/nest_count_2005.xls&quot;, na = &quot;NA&quot;)
 
-tower_count_2006 &lt;- cleancolumns(tower_count_2006)</code></pre>
-<pre><code>## [1] &quot;hergs&quot;
-## [1] &quot;gbbgs&quot;
-## [1] &quot;coei_ads&quot;
-## [1] &quot;blgus&quot;</code></pre>
-<pre class="r"><code>tower_count_2006 &lt;- splitcomments(tower_count_2006)
-tower_count_2006 &lt;- tower_count_2006 %&gt;% 
-  mutate(coei_ju = as.double(str_extract(other, &quot;\\d*eiderchix&quot;)))</code></pre>
-<pre><code>## Warning in mask$eval_all_mutate(quo): NAs introduced by coercion</code></pre>
-<pre class="r"><code>tower_2006_clean &lt;- selectcolumns(tower_count_2006)
-tower_2006_clean$year = 2006</code></pre>
-<pre class="r"><code>tower_count_2007 &lt;- read_excel(&quot;data/tower_count/tower_count_2007.xls&quot;)
+nest_count_2005 &lt;- nest_count_2005 %&gt;%
+  mutate(year = &quot;2005&quot;) %&gt;%
+  rename(location = colony,
+         flag = number) %&gt;%
+ mutate(species = ifelse(grepl(&quot;Black-back&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;Black back&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;black-back&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;Black-Back&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;Blackback&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;blackback&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;Black&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;black&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;GBBG&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;BBG&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;gbbg&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;Eider&quot;, comment), &quot;coei&quot;,
+                          ifelse(grepl(&quot;eider&quot;, comment), &quot;coei&quot;, 
+                          ifelse(grepl(&quot;Edier&quot;, comment), &quot;coei&quot;,
+                          ifelse(grepl(&quot;COEI&quot;, comment), &quot;coei&quot;,
+                          ifelse(grepl(&quot;coei&quot;, comment), &quot;coei&quot;,
+                          &quot;herg&quot;))))))))))))))))) %&gt;%
+  select(flag, clutch, year, location, species)</code></pre>
+<pre class="r"><code>nest_count_2004 &lt;- read_excel(&quot;data/nest_count/nest_count_2004.xls&quot;, na = &quot;NA&quot;)
 
-tower_count_2007 &lt;- cleancolumns(tower_count_2007)</code></pre>
-<pre><code>## [1] &quot;gbbgs&quot;
-## [1] &quot;blgus&quot;
-## [1] &quot;coei_ads&quot;
-## [1] &quot;coei_jus&quot;
-## [1] &quot;other&quot;</code></pre>
-<pre class="r"><code>tower_count_2007 &lt;- splitcomments(tower_count_2007)
-tower_2007_clean &lt;- selectcolumns(tower_count_2007)
-tower_2007_clean$year = 2007</code></pre>
-<pre class="r"><code>tower_count_2008 &lt;- read_excel(&quot;data/tower_count/tower_count_2008.xlsx&quot;, skip = 2)
+nest_count_2004 &lt;- nest_count_2004 %&gt;%
+  mutate(year = &quot;2004&quot;) %&gt;%
+  rename(flag = nest,
+         comment = comments) %&gt;%
+ mutate(species = ifelse(grepl(&quot;Black-back&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;Black back&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;black-back&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;Black-Back&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;Blackback&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;blackback&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;Black&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;black&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;GBBG&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;BBG&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;gbbg&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;Eider&quot;, comment), &quot;coei&quot;,
+                          ifelse(grepl(&quot;eider&quot;, comment), &quot;coei&quot;, 
+                          ifelse(grepl(&quot;Edier&quot;, comment), &quot;coei&quot;,
+                          ifelse(grepl(&quot;COEI&quot;, comment), &quot;coei&quot;,
+                          ifelse(grepl(&quot;coei&quot;, comment), &quot;coei&quot;,
+                          &quot;herg&quot;))))))))))))))))) %&gt;%
+  select(flag, clutch, year, location, species)</code></pre>
+<pre class="r"><code>nest_count_2003 &lt;- read_excel(&quot;data/nest_count/nest_count_2003.xls&quot;, na = &quot;NA&quot;)
 
-tower_count_2008 &lt;- cleancolumns(tower_count_2008)</code></pre>
-<pre><code>## [1] &quot;dates&quot;
-## [1] &quot;hergs&quot;
-## [1] &quot;gbbgs&quot;
-## [1] &quot;blgus&quot;
-## [1] &quot;coei_ads&quot;
-## [1] &quot;coei_jus&quot;</code></pre>
-<pre class="r"><code>tower_count_2008 &lt;- splitcomments(tower_count_2008)
-tower_2008_clean &lt;- selectcolumns(tower_count_2008)
-tower_2008_clean$year = 2008</code></pre>
-<pre class="r"><code>tower_count_2009 &lt;- read_excel(&quot;data/tower_count/tower_count_2009.xlsx&quot;, skip = 2)
+nest_count_2003 &lt;- nest_count_2003 %&gt;%
+  mutate(year = &quot;2003&quot;) %&gt;%
+  rename(flag = nest,
+         species.a = species,
+         location = colony) %&gt;%
+  mutate(comment = paste(species.a, comments)) %&gt;%
+ mutate(species = ifelse(grepl(&quot;Black-back&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;Black back&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;black-back&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;Black-Back&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;Blackback&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;blackback&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;Black&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;black&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;GBBG&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;BBG&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;gbbg&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;Eider&quot;, comment), &quot;coei&quot;,
+                          ifelse(grepl(&quot;eider&quot;, comment), &quot;coei&quot;, 
+                          ifelse(grepl(&quot;Edier&quot;, comment), &quot;coei&quot;,
+                          ifelse(grepl(&quot;COEI&quot;, comment), &quot;coei&quot;,
+                          ifelse(grepl(&quot;coei&quot;, comment), &quot;coei&quot;,
+                          &quot;herg&quot;))))))))))))))))) %&gt;%
+  select(flag, clutch, year, location, species)</code></pre>
+<pre class="r"><code>nest_count_2002 &lt;- read_excel(&quot;data/nest_count/nest_count_2002.xls&quot;, na = &quot;NA&quot;)
 
-tower_count_2009 &lt;- cleancolumns(tower_count_2009)</code></pre>
-<pre><code>## [1] &quot;dates&quot;
-## [1] &quot;hergs&quot;
-## [1] &quot;gbbgs&quot;
-## [1] &quot;blgus&quot;
-## [1] &quot;coei_ads&quot;
-## [1] &quot;coei_jus&quot;</code></pre>
-<pre class="r"><code>tower_count_2009 &lt;- splitcomments(tower_count_2009)
-tower_2009_clean &lt;- selectcolumns(tower_count_2009)
-tower_2009_clean$year = 2009</code></pre>
-<pre class="r"><code>tower_count_2010 &lt;- read_excel(&quot;data/tower_count/tower_count_2010.xlsx&quot;,skip = 2)
+nest_count_2002 &lt;- nest_count_2002 %&gt;%
+  mutate(year = &quot;2002&quot;) %&gt;%
+  rename(flag = nest,
+         species.a = species,
+         location = colony) %&gt;%
+  mutate(comment = paste(species.a, comments)) %&gt;%
+ mutate(species = ifelse(grepl(&quot;Black-back&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;Black back&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;black-back&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;Black-Back&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;Blackback&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;blackback&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;Black&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;black&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;GBBG&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;BBG&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;gbbg&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;Eider&quot;, comment), &quot;coei&quot;,
+                          ifelse(grepl(&quot;eider&quot;, comment), &quot;coei&quot;, 
+                          ifelse(grepl(&quot;Edier&quot;, comment), &quot;coei&quot;,
+                          ifelse(grepl(&quot;COEI&quot;, comment), &quot;coei&quot;,
+                          ifelse(grepl(&quot;coei&quot;, comment), &quot;coei&quot;,
+                          &quot;herg&quot;))))))))))))))))) %&gt;%
+  select(flag, clutch, year, location, species)</code></pre>
+<pre class="r"><code>nest_count_2001 &lt;- read_excel(&quot;data/nest_count/nest_count_2001.xls&quot;, na = &quot;NA&quot;, range = (&quot;A1:D793&quot;))
 
-tower_2010_clean &lt;- tower_count_2010 %&gt;% 
-  cleancolumns() %&gt;% 
-  splitcomments() %&gt;% 
-  selectcolumns()</code></pre>
-<pre><code>## [1] &quot;dates&quot;
-## [1] &quot;gbbgs&quot;
-## [1] &quot;hergs&quot;
-## [1] &quot;coei_ads&quot;
-## [1] &quot;coei_jus&quot;
-## [1] &quot;blgus&quot;</code></pre>
-<pre><code>## Warning in mask$eval_all_mutate(quo): NAs introduced by coercion</code></pre>
-<pre class="r"><code>tower_2010_clean$year = 2010</code></pre>
-<pre class="r"><code>tower_count_2011 &lt;- read_excel(&quot;data/tower_count/tower_count_2011.xls&quot;, skip = 2)
-tower_count_2011 &lt;- tower_count_2011[1:47,]
-tower_count_2011 &lt;- tower_count_2011 %&gt;% 
-  mutate(year = &quot;2011&quot;) %&gt;% 
-  mutate(day = str_sub(Date, start = 1, end = 2)) %&gt;% 
-  mutate(monthch = str_sub(Date, start = 3,)) %&gt;% 
-  mutate(month = case_when(monthch %in% &quot;June&quot; ~ &quot;6&quot;,
-                           monthch %in% &quot; June&quot; ~ &quot;6&quot;,
-                           monthch %in% &quot; July&quot; ~ &quot;7&quot;,
-                           monthch %in% &quot; August&quot; ~ &quot;8&quot;,
-                           monthch %in% &quot;July&quot; ~ &quot;7&quot;,
-                           monthch %in% &quot;August&quot; ~ &quot;8&quot;,
-                           TRUE ~ &quot;&quot;
-                           )) %&gt;% 
-  select(-Comments)
+nest_count_2001 &lt;- nest_count_2001 %&gt;%
+  mutate(year = &quot;2001&quot;) %&gt;%
+  rename(flag = &quot;NEST$&quot;,
+         clutch = &quot;CLUTCH&quot;,
+         chick = &quot;CHICK$&quot;,
+         location = &quot;COMMENTS$&quot;) %&gt;%
+  mutate(comment = paste(location, chick)) %&gt;%
+ mutate(species = ifelse(grepl(&quot;Black-back&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;Black back&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;black-back&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;Black-Back&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;Blackback&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;blackback&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;Black&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;black&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;GBBG&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;BBG&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;gbbg&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;Eider&quot;, comment), &quot;coei&quot;,
+                          ifelse(grepl(&quot;eider&quot;, comment), &quot;coei&quot;, 
+                          ifelse(grepl(&quot;Edier&quot;, comment), &quot;coei&quot;,
+                          ifelse(grepl(&quot;COEI&quot;, comment), &quot;coei&quot;,
+                          ifelse(grepl(&quot;coei&quot;, comment), &quot;coei&quot;,
+                          &quot;herg&quot;))))))))))))))))) %&gt;%
+  select(flag, clutch, year, location, species)
 
-tower_count_2011 &lt;- cleancolumns(tower_count_2011)</code></pre>
-<pre><code>## [1] &quot;dates&quot;
-## [1] &quot;hergs&quot;
-## [1] &quot;gbbgs&quot;
-## [1] &quot;blgus&quot;
-## [1] &quot;coei_ads&quot;
-## [1] &quot;puffins&quot;
-## [1] &quot;coei_jus&quot;
-## [1] &quot;other&quot;</code></pre>
-<pre class="r"><code>tower_count_2011 &lt;- splitcomments(tower_count_2011)
-tower_2011_clean &lt;- selectcolumns(tower_count_2011)
-tower_2011_clean$year = 2011</code></pre>
-<pre class="r"><code>tower_count_2012 &lt;- read_excel(&quot;data/tower_count/tower_count_2012.xls&quot;, skip = 2) 
+nest_count_2001$flag &lt;- as.double(nest_count_2001$flag)</code></pre>
+<pre class="r"><code>nest_count_2000 &lt;- read_excel(&quot;data/nest_count/nest_count_2000.xls&quot;, na = &quot;NA&quot;)
 
-tower_count_2012 &lt;- cleancolumns(tower_count_2012)</code></pre>
-<pre><code>## [1] &quot;dates&quot;
-## [1] &quot;hergs&quot;
-## [1] &quot;gbbgs&quot;
-## [1] &quot;blgus&quot;
-## [1] &quot;coei_ads&quot;
-## [1] &quot;coei_jus&quot;
-## [1] &quot;puffins&quot;
-## [1] &quot;razos&quot;
-## [1] &quot;corms&quot;
-## [1] &quot;crows&quot;
-## [1] &quot;loon&quot;
-## [1] &quot;gannets&quot;
-## [1] &quot;eagles&quot;
-## [1] &quot;lagus&quot;
-## [1] &quot;peeps&quot;
-## [1] &quot;other&quot;</code></pre>
-<pre class="r"><code>tower_count_2012 &lt;- splitcomments(tower_count_2012)
-tower_2012_clean &lt;- selectcolumns(tower_count_2012)
-tower_2012_clean$year = 2012</code></pre>
-<pre class="r"><code> tower_count_2013 &lt;- read_excel(&quot;data/tower_count/tower_count_2013.xls&quot;) 
+nest_count_2000 &lt;- nest_count_2000 %&gt;%
+  mutate(year = &quot;2000&quot;) %&gt;%
+  rename(flag = nest,
+         comment = note) %&gt;%
+ mutate(species = ifelse(grepl(&quot;Black-back&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;Black back&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;black-back&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;Black-Back&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;Blackback&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;blackback&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;Black&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;black&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;GBBG&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;BBG&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;bb&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;gbbg&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;Eider&quot;, comment), &quot;coei&quot;,
+                          ifelse(grepl(&quot;eider&quot;, comment), &quot;coei&quot;, 
+                          ifelse(grepl(&quot;Edier&quot;, comment), &quot;coei&quot;,
+                          ifelse(grepl(&quot;COEI&quot;, comment), &quot;coei&quot;,
+                          ifelse(grepl(&quot;coei&quot;, comment), &quot;coei&quot;,
+                          &quot;herg&quot;)))))))))))))))))) %&gt;%
+  rename(location = comment) %&gt;%
+  select(flag, clutch, year, location, species)</code></pre>
+<pre class="r"><code>nest_count_1999 &lt;- read_excel(&quot;data/nest_count/nest_count_1999.xls&quot;, na = &quot;NA&quot;)
 
-tower_count_2013 &lt;- cleancolumns(tower_count_2013)</code></pre>
-<pre><code>## [1] &quot;dates&quot;
-## [1] &quot;hergs&quot;
-## [1] &quot;gbbgs&quot;
-## [1] &quot;blgus&quot;
-## [1] &quot;coei_ads&quot;
-## [1] &quot;coei_jus&quot;
-## [1] &quot;puffins&quot;
-## [1] &quot;corms&quot;
-## [1] &quot;loon&quot;
-## [1] &quot;terns&quot;
-## [1] &quot;gannets&quot;
-## [1] &quot;eagles&quot;
-## [1] &quot;scoter&quot;
-## [1] &quot;seals&quot;
-## [1] &quot;razos&quot;
-## [1] &quot;lagus&quot;</code></pre>
-<pre class="r"><code>tower_count_2013 &lt;- splitcomments(tower_count_2013)
-tower_2013_clean &lt;- selectcolumns(tower_count_2013)
-tower_2013_clean$year = 2013</code></pre>
-<pre class="r"><code>tower_count_2014 &lt;- read_excel(&quot;data/tower_count/tower_count_2014.xlsx&quot;)
-#thank god a normal one
+nest_count_1999 &lt;- nest_count_1999 %&gt;%
+  mutate(year = &quot;1999&quot;) %&gt;%
+  rename(flag = nest,
+         location = area) %&gt;%
+ mutate(species = ifelse(grepl(&quot;Black-back&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;Black back&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;black-back&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;Black-Back&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;Blackback&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;blackback&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;Black&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;black&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;GBBG&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;BBG&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;bb&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;gbbg&quot;, comment), &quot;gbbg&quot;,
+                          ifelse(grepl(&quot;Eider&quot;, comment), &quot;coei&quot;,
+                          ifelse(grepl(&quot;EIDER&quot;, comment), &quot;coei&quot;,
+                          ifelse(grepl(&quot;eider&quot;, comment), &quot;coei&quot;, 
+                          ifelse(grepl(&quot;Edier&quot;, comment), &quot;coei&quot;,
+                          ifelse(grepl(&quot;COEI&quot;, comment), &quot;coei&quot;,
+                          ifelse(grepl(&quot;coei&quot;, comment), &quot;coei&quot;,
+                          &quot;herg&quot;))))))))))))))))))) %&gt;%
+  select(flag, clutch, year, location, species)</code></pre>
+<pre class="r"><code>#Uncomment to write fresh csv files
+# write.csv(nest_count_2022, &quot;data/nest_count_clean_2022.csv&quot;)
+# write.csv(nest_count_2021, &quot;data/nest_count_clean_2021.csv&quot;)
+# write.csv(nest_count_2020, &quot;data/nest_count_clean_2020.csv&quot;)
+# write.csv(nest_count_2019, &quot;data/nest_count_clean_2019.csv&quot;)
+# write.csv(nest_count_2018, &quot;data/nest_count_clean_2018.csv&quot;)
+# write.csv(nest_count_2017, &quot;data/nest_count_clean_2017.csv&quot;)
+# write.csv(nest_count_2016, &quot;data/nest_count_clean_2016.csv&quot;)
+# write.csv(nest_count_2015, &quot;data/nest_count_clean_2015.csv&quot;)
+# write.csv(nest_count_2014, &quot;data/nest_count_clean_2014.csv&quot;)
+# write.csv(nest_count_2013, &quot;data/nest_count_clean_2013.csv&quot;)
+# write.csv(nest_count_2012, &quot;data/nest_count_clean_2012.csv&quot;)
+# write.csv(nest_count_2011, &quot;data/nest_count_clean_2011.csv&quot;)
+# write.csv(nest_count_2010, &quot;data/nest_count_clean_2010.csv&quot;)
+# write.csv(nest_count_2009, &quot;data/nest_count_clean_2009.csv&quot;)
+# write.csv(nest_count_2008, &quot;data/nest_count_clean_2008.csv&quot;)
+# write.csv(nest_count_2007, &quot;data/nest_count_clean_2007.csv&quot;)
+# write.csv(nest_count_2006, &quot;data/nest_count_clean_2006.csv&quot;)
+# write.csv(nest_count_2005, &quot;data/nest_count_clean_2005.csv&quot;)
+# write.csv(nest_count_2004, &quot;data/nest_count_clean_2004.csv&quot;)
+# write.csv(nest_count_2003, &quot;data/nest_count_clean_2003.csv&quot;)
+# write.csv(nest_count_2002, &quot;data/nest_count_clean_2002.csv&quot;)
+# write.csv(nest_count_2001, &quot;data/nest_count_clean_2001.csv&quot;)
+# write.csv(nest_count_2000, &quot;data/nest_count_clean_2000.csv&quot;)
+# write.csv(nest_count_1999, &quot;data/nest_count_clean_1999.csv&quot;)</code></pre>
+<pre class="r"><code>nest_count_clean_2022 &lt;- read.csv(&quot;data/nest_count_clean/nest_count_clean_2022.csv&quot;) %&gt;%
+  select(flag, year, species, clutch)
+nest_count_clean_2021 &lt;- read.csv(&quot;data/nest_count_clean/nest_count_clean_2021.csv&quot;) %&gt;%
+  select(flag, year, species, clutch)
+nest_count_clean_2020 &lt;- read.csv(&quot;data/nest_count_clean/nest_count_clean_2020.csv&quot;) %&gt;%
+  select(flag, year, species, clutch)
+nest_count_clean_2019 &lt;- read.csv(&quot;data/nest_count_clean/nest_count_clean_2019.csv&quot;) %&gt;%
+  select(flag, year, species, clutch)
+nest_count_clean_2018 &lt;- read.csv(&quot;data/nest_count_clean/nest_count_clean_2018.csv&quot;) %&gt;%
+  select(flag, year, species, clutch)
+nest_count_clean_2017 &lt;- read.csv(&quot;data/nest_count_clean/nest_count_clean_2017.csv&quot;) %&gt;%
+  select(flag, year, species, clutch)
+nest_count_clean_2016 &lt;- read.csv(&quot;data/nest_count_clean/nest_count_clean_2016.csv&quot;) %&gt;%
+  select(flag, year, species, clutch)
+nest_count_clean_2015 &lt;- read.csv(&quot;data/nest_count_clean/nest_count_clean_2015.csv&quot;) %&gt;%
+  select(flag, year, species, clutch)
+nest_count_clean_2014 &lt;- read.csv(&quot;data/nest_count_clean/nest_count_clean_2014.csv&quot;) %&gt;%
+  select(flag, year, species, clutch)
+nest_count_clean_2013 &lt;- read.csv(&quot;data/nest_count_clean/nest_count_clean_2013.csv&quot;) %&gt;%
+  select(flag, year, species, clutch)
+nest_count_clean_2012 &lt;- read.csv(&quot;data/nest_count_clean/nest_count_clean_2012.csv&quot;) %&gt;%
+  select(flag, year, species, clutch)
+nest_count_clean_2011 &lt;- read.csv(&quot;data/nest_count_clean/nest_count_clean_2011.csv&quot;) %&gt;%
+  select(flag, year, species, clutch)
+nest_count_clean_2010 &lt;- read.csv(&quot;data/nest_count_clean/nest_count_clean_2010.csv&quot;) %&gt;%
+  select(flag, year, species, clutch)
+nest_count_clean_2009 &lt;- read.csv(&quot;data/nest_count_clean/nest_count_clean_2009.csv&quot;) %&gt;%
+  select(flag, year, species, clutch)
+nest_count_clean_2008 &lt;- read.csv(&quot;data/nest_count_clean/nest_count_clean_2008.csv&quot;) %&gt;%
+  select(flag, year, species, clutch)
+nest_count_clean_2007 &lt;- read.csv(&quot;data/nest_count_clean/nest_count_clean_2007.csv&quot;) %&gt;%
+  select(flag, year, species, clutch)
+nest_count_clean_2006 &lt;- read.csv(&quot;data/nest_count_clean/nest_count_clean_2006.csv&quot;) %&gt;%
+  select(flag, year, species, clutch)
+nest_count_clean_2005 &lt;- read.csv(&quot;data/nest_count_clean/nest_count_clean_2005.csv&quot;) %&gt;%
+  select(flag, year, species, clutch)
+nest_count_clean_2004 &lt;- read.csv(&quot;data/nest_count_clean/nest_count_clean_2004.csv&quot;) %&gt;%
+  select(flag, year, species, clutch)
+nest_count_clean_2003 &lt;- read.csv(&quot;data/nest_count_clean/nest_count_clean_2003.csv&quot;) %&gt;%
+  select(flag, year, species, clutch)
+nest_count_clean_2002 &lt;- read.csv(&quot;data/nest_count_clean/nest_count_clean_2002.csv&quot;) %&gt;%
+  select(flag, year, species, clutch)
+nest_count_clean_2001 &lt;- read.csv(&quot;data/nest_count_clean/nest_count_clean_2001.csv&quot;) %&gt;%
+  select(flag, year, species, clutch)
+nest_count_clean_2000 &lt;- read.csv(&quot;data/nest_count_clean/nest_count_clean_2000.csv&quot;) %&gt;%
+  select(flag, year, species, clutch)
+nest_count_clean_1999 &lt;- read.csv(&quot;data/nest_count_clean/nest_count_clean_1999.csv&quot;) %&gt;%
+  select(flag, year, species, clutch)
 
-tower_count_2014 &lt;- cleancolumns(tower_count_2014)</code></pre>
-<pre><code>## [1] &quot;blgus&quot;
-## [1] &quot;coei_ads&quot;
-## [1] &quot;coei_jus&quot;</code></pre>
-<pre class="r"><code>tower_count_2014 &lt;- splitcomments(tower_count_2014)
-tower_2014_clean &lt;- selectcolumns(tower_count_2014)
-tower_2014_clean$year = 2014</code></pre>
-<pre class="r"><code>tower_count_2015 &lt;- read_excel(&quot;data/tower_count/tower_count_2015.xlsx&quot;)
+all.nest.count &lt;- rbind(nest_count_clean_2022, 
+                        nest_count_clean_2021,
+                        nest_count_clean_2020,
+                        nest_count_clean_2019,
+                        nest_count_clean_2018,
+                        nest_count_clean_2017,
+                        nest_count_clean_2016,
+                        nest_count_clean_2015,
+                        nest_count_clean_2014,
+                        nest_count_clean_2013,
+                        nest_count_clean_2012,
+                        nest_count_clean_2011,
+                        nest_count_clean_2010,
+                        nest_count_clean_2009,
+                        nest_count_clean_2008,
+                        nest_count_clean_2007,
+                        nest_count_clean_2006,
+                        nest_count_clean_2005,
+                        nest_count_clean_2004,
+                        nest_count_clean_2003,
+                        nest_count_clean_2002,
+                        nest_count_clean_2001,
+                        nest_count_clean_2000,
+                        nest_count_clean_1999)
 
-tower_count_2015 &lt;- cleancolumns(tower_count_2015)</code></pre>
-<pre><code>## [1] &quot;blgus&quot;
-## [1] &quot;coei_ads&quot;
-## [1] &quot;coei_jus&quot;</code></pre>
-<pre class="r"><code>tower_count_2015 &lt;- splitcomments(tower_count_2015)
-tower_2015_clean &lt;- selectcolumns(tower_count_2015)
-tower_2015_clean$year = 2015</code></pre>
-<pre class="r"><code>tower_count_2016 &lt;- read_excel(&quot;data/tower_count/tower_count_2016.xlsx&quot;)
-
-tower_count_2016 &lt;- cleancolumns(tower_count_2016)</code></pre>
-<pre><code>## [1] &quot;blgus&quot;
-## [1] &quot;coei_ads&quot;
-## [1] &quot;coei_jus&quot;</code></pre>
-<pre class="r"><code>tower_count_2016 &lt;- splitcomments(tower_count_2016)
-tower_2016_clean &lt;- selectcolumns(tower_count_2016)
-tower_2016_clean$year = 2016</code></pre>
-<pre class="r"><code>tower_count_2017 &lt;- read_excel(&quot;data/tower_count/tower_count_2017.xlsx&quot;) %&gt;% 
-  mutate(coei_ad = str_extract(`COEI + chix`, &quot;^(.+)[\\+]|\\d*&quot;)) %&gt;% 
-  mutate(coei_ad = as.double(str_extract(coei_ad,&quot;\\d*&quot;))) %&gt;%
-  mutate(coei_ju = str_extract(`COEI + chix`, &quot;[\\+].*&quot;)) %&gt;% 
-  mutate(coei_ju = as.double(str_extract(coei_ju, &quot;\\d*$&quot;))) %&gt;% 
-  select(-`COEI + chix`)
-
-tower_count_2017 &lt;- cleancolumns(tower_count_2017)</code></pre>
-<pre><code>## [1] &quot;dates&quot;
-## [1] &quot;hergs&quot;
-## [1] &quot;gbbgs&quot;
-## [1] &quot;blgus&quot;
-## [1] &quot;other&quot;</code></pre>
-<pre class="r"><code>tower_count_2017 &lt;- splitcomments(tower_count_2017)
-tower_2017_clean &lt;- selectcolumns(tower_count_2017)
-tower_2017_clean$year = 2017</code></pre>
-<pre class="r"><code>tower_count_2018 &lt;- read_excel(&quot;data/tower_count/tower_count_2018.xlsx&quot;)
-
-tower_count_2018 &lt;- cleancolumns(tower_count_2018)</code></pre>
-<pre><code>## [1] &quot;dates&quot;
-## [1] &quot;hergs&quot;
-## [1] &quot;gbbgs&quot;
-## [1] &quot;coei_ads&quot;
-## [1] &quot;coei_jus&quot;
-## [1] &quot;blgus&quot;
-## [1] &quot;other&quot;</code></pre>
-<pre class="r"><code>tower_count_2018 &lt;- splitcomments(tower_count_2018)
-tower_2018_clean &lt;- selectcolumns(tower_count_2018)
-tower_2018_clean$date[tower_2018_clean$date == &quot;2008-05-28&quot;] &lt;- &quot;2018-05-28&quot;
-tower_2018_clean$year = 2018</code></pre>
-<pre class="r"><code>tower_count_2019 &lt;- read_excel(&quot;data/tower_count/tower_count_2019.xlsx&quot;)
-
-tower_count_2019 &lt;- cleancolumns(tower_count_2019)</code></pre>
-<pre><code>## [1] &quot;dates&quot;
-## [1] &quot;hergs&quot;
-## [1] &quot;gbbgs&quot;
-## [1] &quot;coei_ads&quot;
-## [1] &quot;coei_jus&quot;
-## [1] &quot;blgus&quot;
-## [1] &quot;other&quot;</code></pre>
-<pre class="r"><code>tower_count_2019 &lt;- splitcomments(tower_count_2019)
-tower_2019_clean &lt;- selectcolumns(tower_count_2019)
-tower_2019_clean$year = 2019</code></pre>
-<pre class="r"><code>tower_count_2020 &lt;- read_excel(&quot;data/tower_count/tower_count_2020.xlsx&quot;)
-
-tower_count_2020 &lt;- cleancolumns(tower_count_2020)</code></pre>
-<pre><code>## [1] &quot;dates&quot;</code></pre>
-<pre class="r"><code>tower_count_2020 &lt;- splitcomments(tower_count_2020)
-tower_2020_clean &lt;- selectcolumns(tower_count_2020)
-tower_2020_clean$year = 2020</code></pre>
-<pre class="r"><code>tower_count_2021 &lt;- read_excel(&quot;data/tower_count/tower_count_2021.xlsx&quot;)
-
-tower_count_2021 &lt;- cleancolumns(tower_count_2021)</code></pre>
-<pre><code>## [1] &quot;coei_ads&quot;
-## [1] &quot;coei_jus&quot;
-## [1] &quot;blgus&quot;</code></pre>
-<pre class="r"><code>tower_count_2021 &lt;- splitcomments(tower_count_2021)
-tower_2021_clean &lt;- selectcolumns(tower_count_2021)
-tower_2021_clean$year = 2021</code></pre>
-<pre class="r"><code>tower_count_2022 &lt;- read_excel(&quot;data/tower_count/tower_count_2022.xlsx&quot;)
-
-tower_count_2022 &lt;- cleancolumns(tower_count_2022)
-tower_count_2022 &lt;- splitcomments(tower_count_2022)
-tower_2022_clean &lt;- selectcolumns(tower_count_2022)
-tower_2022_clean$year = 2022</code></pre>
-<p>#add new code chunks as necessary for future years’ data.</p>
-<pre class="r"><code>#This binds all the years together. Can be updated to add new years. 
-tower &lt;- rbind(tower_2000_clean,tower_2001_clean,tower_2002_clean,tower_2003_clean,tower_2005_clean,tower_2006_clean,tower_2007_clean,tower_2008_clean,tower_2009_clean,tower_2010_clean,tower_2011_clean,tower_2012_clean,tower_2013_clean,tower_2014_clean,tower_2015_clean, tower_2016_clean,tower_2017_clean,tower_2018_clean,tower_2019_clean, tower_2020_clean, tower_2021_clean, tower_2022_clean)
-
-towertowrite &lt;- tower %&gt;% 
-  mutate(count = ifelse(is.na(count), 0, count))
-
-#Uncomment this line and specify a filepath to write a clean csv
-#write.csv(towertowrite, &quot;data/towerclean.csv&quot;)</code></pre>
+#Uncomment to write a fresh file
+#write.csv(all.nest.count, &quot;data/all.nest.count.csv&quot;)</code></pre>
 
 
 

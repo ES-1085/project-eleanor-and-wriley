@@ -1,18 +1,20 @@
 Exploring Long-Term Datasets from Great Duck Island
 ================
-by Eleanor and Wriley
+by Eleanor Gnam and Wriley Hodge
+16 March 2023
+Prepared for Data Science 1: Visualization at College of the Atlantic
 
 ## Summary
 
-Students have been collecting data on Great Duck Island (GDI) since 2000. GDI is home to a series of nesting seabirds (in ordewr of rough abundances): Leach's Storm Petrels (Hydrobates leucorhous), Herring Gulls (Larus argentatus), Black Guillemots (Cepphus grylle), Great Black-Backed Gulls (Larus marinus), Common Eiders (Somateria mollissima), and Atlantic Puffins (Fratercula arctica). Much of the data  on Great Duck is focused on these seabirds.  We chose to look at two big sets of data within the long term monitoring on Great Duck: (1) tower count, and (2) nest counts / nest mapping. Every season (which runs from approximately June 4th to July 25th each year, though some start earlier and others end later), researchers begin the day by counting every bird in sight from the tower located on the south end of Great Duck. Island wide counts of breeding gulls are also conducted at the beginning of June each year, and the sub colony on the south end of the island is also mapped into a GIS each year.
+Students have been collecting data on Great Duck Island (GDI) since 2000. GDI is home to a series of nesting seabirds (in order of rough abundances): Leach's Storm Petrels (Hydrobates leucorhous), Herring Gulls (Larus argentatus), Black Guillemots (Cepphus grylle), Great Black-Backed Gulls (Larus marinus), Common Eiders (Somateria mollissima), and Atlantic Puffins (Fratercula arctica). Much of the data on Great Duck is focused on these seabirds.  We chose to look at two big sets of data within the long term monitoring on Great Duck: (1) tower count, and (2) nest counts / nest mapping. Every season (which runs from approximately June 4th to July 25th each year, though some start earlier and others end later), researchers begin the day by counting every bird in sight from the tower located on the south end of Great Duck. Island wide counts of breeding gulls are also conducted at the beginning of June each year, and the sub colony on the south end of the island is also mapped into a GIS each year.
 
 ## Methods/Data Collection
 
 Tower count:
 
-Each morning at 0700, all researchers count every bird in sight from the tower on the north end (ELEANOR FILL THIS OUT?)
+Each morning at 0700, all researchers count every bird in sight from the tower on the south end of the island. The focus of tower count is on the four breeding species seen from the tower (both gull species, black guillemots, and common eiders) but other species are also recorded. Each species present is recorded, as is the number of individuals of each species present. The tower offers a 360-degree view of the south end of the island, including a view of many miles of ocean south of the island. Each member of the crew counts every bird, and the final number is a rough mean of the observers' counts. Observers vary in birding skill, introducing some inevitable uncertainty into that dataset. 
 
-Nest counts and mapping: At the beginning of June, researchers count the number of nests in the gull colonies across the island. This is done by lining up at arms length from eachother, and sweeping across the each colony until all nests have been flagged with a unique number and counted. The species and clutch (amount of eggs in each nest) are recorded for each nest. Over the next few days, researchers use a Trimble GPS to record the nest location of each flagged nest on the south end.
+Nest counts and mapping: At the beginning of June, researchers count the number of nests in the gull colonies across the island. This is done by lining up at arms length from each other, and sweeping across the each colony until all nests have been flagged with a unique number and counted. The species and clutch (amount of eggs in each nest) are recorded for each nest. Over the next few days, researchers use a Trimble GPS to record the nest location of each flagged nest on the south end.
 
 
 ## Navigating the Project Folder
@@ -51,13 +53,13 @@ The `presentation` folder contains code and files used to build our presentation
 
 -------------------------------------------------------------------------------------------------------
 
-The `towercount_shinyapp` folder contains necessary files for the Tower Count shiny app, which can be found here: https://udppk1-eleanor-gnam.shinyapps.io/towerDRAFT/. It contains a data folder for the data file that the app draws upon, a dictionary for that datafolder, and a README with instructions on how to use and update the app. 
+The `towercount_shinyapp` folder contains necessary files for the Tower Count shiny app, which can be found here: https://udppk1-eleanor-gnam.shinyapps.io/towerDRAFT/. It contains a data folder for the data file that the app draws upon, a data dictionary for that data.
 
 
 
 ## Summary of Findings
 
-Tower Count:
+Tower Count: Generally, visualizations of tower count data confirmed our initial feelings about species trends: we've seen increasingly more gulls since the early 2000s, though Herring Gulls have recently begun to crest over and decline again. Meanwhile, our eiders and guillemots have declined. We were surprised to see how dramatic the decline in guillemots has been, and the 2023 crew plans to focus some extra attention on that species. We were surprised to notice that the diversity of species seen from the tower seems to have increased over the last 20 years. What we don't know is if this represents an actual change in the Gulf of Maine's or changing habits in data collection. 
 
 Colony Dynamics: Our graphs show that while overall, the total number of gulls nesting on Great Duck has slightly increased, the distribution between different subcolonies has shifted considerably, with the Borofksy colony on the north end disappearing and the south end colony becoming the largest. We can also see that the distribution of nests in the south end colony has remained relatively evenly split between nesting on the rocky shoreline and the interior vegetation. The mean distance to nearest neighbor has decreased over the last 20 years, as has the overall variance in distance to nearest neighbor. We can also see that gulls consitently nest in a higher density on the berm. This raises a series of questions about how and why gulls are choosing to nest where they nest, and what it is about different habitats that facilitates different densities.
 
@@ -75,14 +77,19 @@ Our presentation can be found [here] (https://docs.google.com/presentation/d/1xe
 
 ## Data
 
-Our data came from the generations of students who conducted research at the Alice Eno Research Station on Great Duck Island, under the supervision of Professor John Anderson at College of the Atlantic. None of this data is currently published, and was all accessed from the data archive on the Island Computer (the central storage location of all things GDI related)
+Our data came from the generations of students who conducted research at the Alice Eno Research Station on Great Duck Island, under the supervision of Professor John Anderson at College of the Atlantic. None of this data is currently published, and was all accessed from the data archive on the Island Computer (the central storage location of all things GDI related). This data archive was assembled in large part by Addison Gruber. Finally, much of the initial data entry/digitization for tower count was done by Kate Shlepr and Anne Hurley in 2013. For questions about the data used in this project, contact the authors or John Anderson. 
 
-Include a citation for your data here. See
-<http://libraryguides.vu.edu.au/c.php?g=386501&p=4347840> for guidance
-on proper citation for datasets. If you got your data off the web, make
-sure to note the retrieval date.
 
-## References
+## Acknowledgements
 
-List any references here. You should, at a minimum, list your data
-source.
+We are indebted to the generations of students on GDI who put in the time and hard work to collect this data. We wish that we could name all of them. We are especially grateful to Addison Gruber, Kate Shlepr, and Anne Hurley for the earlier work they did digitizing and managing the GDI data archive. 
+
+College of the Atlantic is one of four primary landowners on Great Duck Island. Most of the Island is owned in joint trust between the State of Maine and the Nature Conservancy. A small inholding on the North End is owned by Andra and Rich Borofsky, and the Great Duck Light itself is owned by the United States Coast Guard. We are grateful to all of these folks for their continued support and cooperation in allowing us to conduct research on their property. 
+
+Research on GDI would not be possible without the support of Toby Stephenson and the various crew-members of the RV Osprey who provide us with logistical support and transport. 
+
+This project benefited greatly from generous feedback and advice given by Gordon Longsworth, Hallie Arno, John Anderson, and Addison Gruber. It was prepared under the instruction and supervision of Dr. Laurie Baker. 
+
+Finally, we wish to express our gratitude to the late Alice Eno, without whom there would be no Alice Eno Field Station. 
+
+

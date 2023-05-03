@@ -19,6 +19,7 @@ tower <- read_csv("Data/towerclean.csv",
 #Format year column
 tower$year <- year(as.Date(as.character(tower$year), format = "%Y"))
 
+#Add common name labels
 tower <- tower %>%
   mutate(label = case_when(species == "herg" ~ "Herring Gulls",
                          species == "gbbg" ~ "Great Black-backed Gull",
@@ -44,6 +45,7 @@ tower <- tower %>%
                          species == "scoter" ~ "Scoter sp.",
                          TRUE ~ as.character(species)))
 
+#add species-fixed colors. Haven't done anything with this yet. 
 tower <- tower %>%
   mutate(col = case_when(species == "herg" ~ "#440154",
                            species == "gbbg" ~ "#414487",
@@ -74,7 +76,7 @@ yearlist <- as.list(unique(tower$year))
 specieslist <- as.list(unique(tower$species))
 labellist <- as.list(unique(tower$label))
 
-
+#fix one bafflingly incorrect date. 
 tower$date[tower$date == "2008-05-28"] <- "2018-05-28"
 
 #define standard error function
@@ -91,14 +93,15 @@ ui <- fluidPage(theme = shinytheme("flatly"),
   sidebarLayout(
     sidebarPanel(
         pickerInput("yearIn", "Year:", choices = yearlist, options = list(`actions-box` = TRUE),multiple = TRUE, selected = c(2000:2022)),
-        selectInput("plottype","Plot Type", choices = c("barplot","boxplot","multi-year barplot","lines", "multi-year boxplots","counts within season", "lines faceted by species", "boxplots faceted by species", "counts by day of year"), selected = "lines faceted by species"),
+        selectInput("plottype","Plot Type", choices = c("barplot","boxplot","multi-year barplot","lines", "multi-year boxplots","counts within season", "lines faceted by species", "boxplots faceted by species", "counts by day of year", "scatterplot of counts"), selected = "lines faceted by species"),
         selectInput("barstat","Statistic to Use (won't affect boxplots)", choices = c("Median", "Mean", "High Count", "Season Total"), selected = "Median"),
         fluidRow(prettyCheckboxGroup("speciesIn", "Species", shape = "curve", animation = "jelly", choiceValues = specieslist, selected  = c("herg","gbbg","coei_ad","blgu"), choiceNames = labellist)
     )),
     mainPanel(
       plotOutput("plot"),
       textOutput("text"),
-      DTOutput("summary")
+      DTOutput("summary"),
+      textOutput("contact")
     )
    )
   ),
@@ -124,6 +127,7 @@ ui <- fluidPage(theme = shinytheme("flatly"),
 
 server <- function(input, output) {
 
+  #table for data download
   output$full <- renderDT({
     tower %>% 
       filter(species %in% input$speciesIn2) %>% 
@@ -135,7 +139,7 @@ server <- function(input, output) {
             }) %>% 
       select(date, year, species, count, notes)
       })
-  
+#download button--I want to figure out how to password protect this
   output$downloaddata <- downloadHandler(
     filename = function() {
       "shinyappdownload.csv"
@@ -153,9 +157,9 @@ server <- function(input, output) {
                    ), file, row.names = FALSE)
     })
   
-  
+  #data table
   output$summary <- renderDT({
-    if (input$plottype == "counts within season"){
+    if (input$plottype %in% c("counts within season", "scatterplot of counts")){
       tower %>%
         filter(species %in% input$speciesIn, year %in% input$yearIn) %>% 
         select(date, year, species, count, notes)
@@ -197,6 +201,7 @@ server <- function(input, output) {
     }
   })
   
+  #warning texts
   output$text <- renderText({
     if (input$plottype %in% c("counts within season","lines faceted by species", "boxplots faceted by species")){
       print("NOTE: When this warning is shown, X and Y axes are not consistent between plots.")
@@ -211,6 +216,7 @@ server <- function(input, output) {
 
     }
   })
+  #main panel plot
   output$plot <- renderPlot({
      if (input$plottype == "barplot") {
         tower %>% 
@@ -419,9 +425,28 @@ server <- function(input, output) {
             theme(strip.background = element_rect(fill = "#9CCAA8"), 
                   strip.text = element_text(size = 15), 
                   title = element_text(size = 15))
-        }
+        } 
+    } else if (input$plottype == "scatterplot of counts") {
+      tower %>% 
+        filter(year %in% input$yearIn) %>% 
+        filter(species %in% input$speciesIn) %>% 
+        mutate(year = as.factor(year)) %>% 
+        ggplot(aes(x = date, y = count, color = species))+
+        geom_jitter()+
+        geom_smooth()+
+        labs(title= "Counts throughout season", subtitle = "Great Duck Tower Data")+
+        scale_color_viridis_d() +
+        facet_wrap(~species, scales = "free")+
+        theme_bw()+
+        theme(strip.background = element_rect(fill = "#9CCAA8"), 
+              strip.text = element_text(size = 15), 
+              title = element_text(size = 15))
     }
 }) #this one closes the renderPlot input
+  
+  output$contact <- renderText({
+    print("For more information about this app or the data it contains, contact Eleanor Gnam (egnam23@coa.edu) or Wriley Hodge (whodge24@coa.edu)")
+  })
 
 } #this one closes the server
 

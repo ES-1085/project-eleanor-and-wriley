@@ -5,7 +5,7 @@
 Data on the density of nesting birds and the habitat they are found in for all years of data (1999 - 2022). We are using distance to nearest neighbors as a proxy for density. For each nest, the distance to the three nearest neighbors is calculated.
 
 `point_id` : the id of the nest that distance is being measured from. The id comes from the shape files. Each nest has it's own unique id.
-`near_point_id` : the id of the nest that the distance to is being measured. There are three              near_point_id's for each point_id.
+`near_point_id` : the id of the nest that the distance to is being measured. There are three near_point_id's for each point_id.
 `distance` : distance from point_id to near_point id.
 `distance_rank` : three possible values: 1, 2, and 3. ! represents the closest neighbor, 2 represents the second closest, and 3 represents the third closest.
 `year` : the year in question
@@ -48,7 +48,7 @@ This folder contains all of the excel sheets that were used to clean up the nest
 
 #outlinecolored
 
-Shape file containing the outline of Great Duck.
+Shape file containing the outline of Great Duck. Created by John Anderson -- for more information, see the Great Duck Island group on COA's ArcGIS Online Organization. 
 
 
 
