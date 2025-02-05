@@ -594,21 +594,24 @@ tower_2022_clean <- selectcolumns(tower_count_2022)
 tower_2022_clean$year = 2022
 ```
 
-#add new code chunks as necessary for future years' data. 
 
-```{r}
-#This binds all the years together. Can be updated to add new years. 
-tower <- rbind(tower_2000_clean,tower_2001_clean,tower_2002_clean,tower_2003_clean,tower_2005_clean,tower_2006_clean,tower_2007_clean,tower_2008_clean,tower_2009_clean,tower_2010_clean,tower_2011_clean,tower_2012_clean,tower_2013_clean,tower_2014_clean,tower_2015_clean, tower_2016_clean,tower_2017_clean,tower_2018_clean,tower_2019_clean, tower_2020_clean, tower_2021_clean, tower_2022_clean)
+```{r 2023}
+tower_2023 <- read_csv("~/r_umbrella/R Projects/project-eleanor-and-wriley/Data Cleaning Scripts/Tower Count Data/data/tower_count/tower_2023.csv", 
+    col_types = cols(date = col_date(format = "%m/%d/%Y"), 
+        atpu = col_double()))
 
-towertowrite <- tower %>% 
-  mutate(count = ifelse(is.na(count), 0, count))
+tower_count_2023 <- tower_count_2023 %>% 
+  filter(date > "2023-06-01") %>% 
+  mutate(puffin = as.double(puffin))
 
-#Uncomment this line and specify a filepath to write a clean csv
-#write.csv(towertowrite, "data/towerclean.csv")
+
+tower_count_2023 <- cleancolumns(tower_count_2023)
+tower_count_2023 <- splitcomments(tower_count_2023)
+tower_2023_clean <- selectcolumns(tower_count_2023)
+tower_2023_clean$year = 2023
 ```
 
-
-```{r}
+```{r 2024}
 tower_count_2024 <- read_excel("~/r_umbrella/R Projects/project-eleanor-and-wriley/Data Cleaning Scripts/Tower Count Data/data/tower_count/tower_count_2024.xlsx", 
     na = "na")
 
@@ -624,13 +627,28 @@ tower_2024_clean <- selectcolumns(tower_count_2024)
 tower_2024_clean$year = 2024
 ```
 
+#add new code chunks as necessary for future years' data. 
+
+```{r}
+#This binds all the years together. Can be updated to add new years. 
+tower <- rbind(tower_2000_clean,tower_2001_clean,tower_2002_clean,tower_2003_clean,tower_2005_clean,tower_2006_clean,tower_2007_clean,tower_2008_clean,tower_2009_clean,tower_2010_clean,tower_2011_clean,tower_2012_clean,tower_2013_clean,tower_2014_clean,tower_2015_clean, tower_2016_clean,tower_2017_clean,tower_2018_clean,tower_2019_clean, tower_2020_clean, tower_2021_clean, tower_2022_clean)
+
+towertowrite <- tower %>% 
+  mutate(count = ifelse(is.na(count), 0, count))
+
+#Uncomment this line and specify a filepath to write a clean csv
+#write.csv(towertowrite, "data/towerclean.csv")
+```
+
+
+
 
 ```{r}
 towerclean <- read_csv("~/r_umbrella/R Projects/project-eleanor-and-wriley/Data Cleaning Scripts/Tower Count Data/data/tower_count/towerclean.csv", 
     col_types = cols(...1 = col_skip()))
 
 
-towerclean <- rbind(towerclean, tower_2024_clean)
+towerclean <- rbind(towerclean, tower_2023_clean)
 
 #write.csv(towerclean, "data/tower_count/towerclean.csv")
 ```
